@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#6B3F1D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cavalier">
+<meta name="description" content="Programme d'entraînement au sol pour cavalier — 4 semaines">
+<title>Cavalier — Programme du cavalier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --paper: #F2E8D5;
+  --paper-deep: #E8DCC4;
+  --ink: #1B1410;
+  --ink-soft: #5A4A3A;
+  --ink-mute: #8A7A6A;
+  --saddle: #6B3F1D;
+  --saddle-dark: #4A2A0F;
+  --brass: #B89456;
+  --brass-light: #D4B57A;
+  --sage: #5C7B4A;
+  --surface: #FBF6E9;
+  --surface-elev: #FFFFFF;
+  --border: rgba(27, 20, 16, 0.1);
+  --border-strong: rgba(27, 20, 16, 0.18);
+  --shadow-sm: 0 1px 2px rgba(74, 42, 15, 0.06);
+  --shadow-md: 0 2px 6px rgba(74, 42, 15, 0.08), 0 12px 32px rgba(74, 42, 15, 0.06);
+  --shadow-lg: 0 8px 32px rgba(74, 42, 15, 0.18);
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
+}
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+body {
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(184, 148, 86, 0.08), transparent 45%),
+    radial-gradient(circle at 80% 90%, rgba(107, 63, 29, 0.06), transparent 45%);
+  background-attachment: fixed;
+}
+
+#app { max-width: 720px; margin: 0 auto; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+
+.app-header { padding: 36px 24px 16px; }
+.brand { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.brand-mark { width: 32px; height: 32px; color: var(--saddle); flex-shrink: 0; }
+.brand h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-style: italic;
+  font-size: 30px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variation-settings: "opsz" 144;
+}
+.tagline {
+  font-size: 11px;
+  color: var(--ink-mute);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+  font-weight: 500;
+}
+.overall-progress { display: flex; align-items: center; gap: 12px; }
+.progress-bar { flex: 1; height: 5px; background: var(--paper-deep); border-radius: 100px; overflow: hidden; }
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--saddle), var(--brass));
+  border-radius: 100px;
+  width: 0%;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.progress-text { font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; font-weight: 600; letter-spacing: 0.02em; }
+
+.week-nav { display: flex; gap: 8px; padding: 20px 24px 18px; overflow-x: auto; scrollbar-width: none; }
+.week-nav::-webkit-scrollbar { display: none; }
+.week-pill {
+  flex-shrink: 0;
+  padding: 9px 14px;
+  border-radius: 100px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.week-pill:active { transform: scale(0.96); }
+.week-pill.active { background: var(--saddle); border-color: var(--saddle); color: var(--paper); }
+.week-pill .num { font-family: var(--font-display); font-weight: 600; font-style: italic; margin-right: 2px; }
+
+main { padding: 0 24px 24px; }
+.week-head { margin-bottom: 20px; padding: 0 4px; }
+.week-eyebrow { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--brass); font-weight: 700; margin-bottom: 6px; }
+.week-head h2 {
+  font-family: var(--font-display);
+  font-size: 34px;
+  line-height: 1.05;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin-bottom: 10px;
+  font-variation-settings: "opsz" 144;
+}
+.week-head h2 em { font-style: italic; color: var(--saddle); font-weight: 400; }
+.week-head p { font-size: 14px; color: var(--ink-soft); line-height: 1.55; }
+
+.routine-banner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--brass);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+.routine-banner strong { color: var(--ink); font-weight: 600; }
+
+.session {
+  background: var(--surface-elev);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease;
+}
+.session.expanded { box-shadow: var(--shadow-md); }
+.session-head { display: flex; align-items: center; gap: 14px; padding: 14px 16px; cursor: pointer; user-select: none; }
+.session-letter {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--paper);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 600; font-style: italic;
+  font-size: 19px;
+  color: var(--saddle);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+.session.complete .session-letter { background: var(--sage); color: white; }
+.session-info { flex: 1; min-width: 0; }
+.session-day { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); font-weight: 700; margin-bottom: 3px; }
+.session-title { font-family: var(--font-display); font-size: 17px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+.session-meta {
+  display: flex; align-items: center;
+  font-size: 12px;
+  color: var(--ink-mute);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  padding: 4px 8px;
+  background: var(--paper);
+  border-radius: 100px;
+  margin-right: 4px;
+}
+.session.complete .session-meta { background: var(--sage); color: white; }
+.session-chevron { color: var(--ink-mute); transition: transform 0.3s ease; display: flex; }
+.session.expanded .session-chevron { transform: rotate(180deg); }
+.session-body { display: none; border-top: 1px solid var(--border); padding: 6px 16px 12px; }
+.session.expanded .session-body { display: block; }
+
+.exercise {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.exercise:last-child { border-bottom: none; }
+.checkbox {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-strong);
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+.checkbox:active { transform: scale(0.92); }
+.checkbox.checked { background: var(--saddle); border-color: var(--saddle); }
+.checkbox svg {
+  width: 14px; height: 14px;
+  color: var(--paper);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s ease;
+}
+.checkbox.checked svg { opacity: 1; transform: scale(1); }
+.exercise-info {
+  flex: 1; min-width: 0;
+  cursor: pointer;
+  padding: 2px 0;
+  user-select: none;
+}
+.exercise-info:active .exercise-name { color: var(--saddle); }
+.exercise.done .exercise-name {
+  text-decoration: line-through;
+  text-decoration-color: var(--ink-mute);
+  color: var(--ink-mute);
+}
+.exercise-name {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: 2px;
+  transition: all 0.2s ease;
+}
+.demo-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--saddle);
+  margin-left: 4px;
+  vertical-align: -3px;
+  flex-shrink: 0;
+}
+.demo-hint svg { width: 9px; height: 9px; }
+.exercise-spec {
+  font-size: 12px;
+  color: var(--ink-mute);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.timer-btn {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  color: var(--saddle);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.timer-btn:active { transform: scale(0.94); background: var(--paper-deep); }
+.timer-btn svg { width: 17px; height: 17px; }
+
+.tips {
+  margin: 24px 24px 20px;
+  padding: 24px 22px;
+  background: linear-gradient(135deg, var(--saddle-dark), var(--saddle));
+  color: var(--paper);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.tips::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(184, 148, 86, 0.25), transparent 70%);
+  pointer-events: none;
+}
+.tips-eyebrow { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--brass-light); font-weight: 700; margin-bottom: 8px; position: relative; }
+.tips h2 {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 26px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  letter-spacing: -0.015em;
+  position: relative;
+  font-variation-settings: "opsz" 144;
+}
+.tips ul { list-style: none; position: relative; }
+.tips li {
+  font-size: 13.5px;
+  line-height: 1.55;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(245, 237, 220, 0.14);
+  display: flex;
+  gap: 10px;
+}
+.tips li:last-child { border-bottom: none; }
+.tips li::before { content: '—'; color: var(--brass-light); flex-shrink: 0; }
+.tips li strong { color: var(--brass-light); font-weight: 600; }
+
+.reset-btn {
+  margin: 0 24px 24px;
+  padding: 11px;
+  width: calc(100% - 48px);
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--ink-mute);
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.15s ease;
+}
+.reset-btn:active { background: var(--paper-deep); }
+
+footer {
+  padding: 0 24px 80px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-mute);
+  font-family: var(--font-display);
+  font-style: italic;
+}
+footer .ornament { display: block; margin: 0 auto 8px; color: var(--brass); opacity: 0.7; }
+
+/* Modals (timer + demo) */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 20, 16, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.modal.active { opacity: 1; pointer-events: auto; }
+.modal-card {
+  background: var(--paper);
+  border-radius: 24px;
+  padding: 28px 24px 22px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  transform: scale(0.92);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-height: 92vh;
+  overflow-y: auto;
+}
+.modal.active .modal-card { transform: scale(1); }
+.modal-eyebrow { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--brass); font-weight: 700; margin-bottom: 6px; }
+.modal-card h3 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 22px;
+  color: var(--ink);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+/* Timer */
+.timer-ring { width: 220px; height: 220px; margin: 0 auto 22px; position: relative; }
+.timer-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.timer-ring circle { fill: none; stroke-width: 5; stroke-linecap: round; }
+.timer-ring .bg { stroke: var(--paper-deep); }
+.timer-ring .fg { stroke: var(--saddle); transition: stroke-dashoffset 1s linear; }
+.timer-display { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.timer-time {
+  font-family: var(--font-display);
+  font-size: 58px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  letter-spacing: -0.05em;
+  line-height: 1;
+  font-variation-settings: "opsz" 144;
+}
+.timer-label { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute); margin-top: 8px; font-weight: 700; }
+.timer-actions { display: flex; gap: 10px; }
+.btn { flex: 1; padding: 14px 18px; border-radius: 12px; font-family: var(--font-body); font-weight: 600; font-size: 14px; letter-spacing: 0.02em; cursor: pointer; border: none; transition: all 0.15s ease; }
+.btn-primary { background: var(--saddle); color: var(--paper); }
+.btn-primary:active { background: var(--saddle-dark); transform: scale(0.98); }
+.btn-secondary { background: transparent; color: var(--ink); border: 1px solid var(--border-strong); }
+.btn-secondary:active { background: var(--paper-deep); }
+
+/* Demo animation */
+.anim-container {
+  width: 220px; height: 220px;
+  margin: 0 auto 20px;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  position: relative;
+  box-shadow: inset 0 1px 2px rgba(74, 42, 15, 0.05);
+  overflow: hidden;
+}
+.anim-svg { width: 100%; height: 100%; display: block; }
+.pose { transform-origin: center; }
+.pose-1 { animation: pose-cycle 2.4s ease-in-out infinite; }
+.pose-2 { animation: pose-cycle 2.4s ease-in-out -1.2s infinite; }
+@keyframes pose-cycle {
+  0%, 35% { opacity: 1; }
+  50%, 85% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.ground { stroke: #8A7A6A; stroke-width: 1; opacity: 0.4; }
+.wall { stroke: #8A7A6A; stroke-width: 1.5; opacity: 0.5; }
+.bench { fill: #B89456; opacity: 0.6; }
+.ball { fill: #B89456; opacity: 0.7; stroke: #8B6E3B; stroke-width: 1; }
+.engage { stroke: #B89456; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 2 3; opacity: 0.85; }
+.arrow { stroke: #B89456; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0.85; }
+
+.cues {
+  list-style: none;
+  text-align: left;
+  margin: 0 auto 18px;
+  max-width: 300px;
+}
+.cues li {
+  font-size: 13.5px;
+  line-height: 1.5;
+  padding: 7px 0 7px 16px;
+  position: relative;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--border);
+}
+.cues li:last-child { border-bottom: none; }
+.cues li::before {
+  content: '';
+  position: absolute;
+  left: 2px; top: 15px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--brass);
+}
+.cues li strong { color: var(--ink); font-weight: 600; }
+
+.install-banner {
+  position: fixed;
+  bottom: 16px; left: 16px; right: 16px;
+  max-width: 380px;
+  margin: 0 auto;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 12.5px;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: var(--shadow-lg);
+  z-index: 90;
+  transform: translateY(150%);
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.install-banner.show { transform: translateY(0); }
+.install-banner-text { flex: 1; line-height: 1.4; }
+.install-banner strong { color: var(--brass-light); font-weight: 600; display: block; margin-bottom: 1px; font-size: 13px; }
+.install-banner-text span { opacity: 0.85; }
+.install-close { background: transparent; border: none; color: var(--ink-mute); font-size: 22px; padding: 4px 8px; line-height: 1; cursor: pointer; font-family: var(--font-body); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.session { animation: fadeUp 0.4s ease backwards; }
+.session:nth-child(2) { animation-delay: 0.04s; }
+.session:nth-child(3) { animation-delay: 0.08s; }
+.session:nth-child(4) { animation-delay: 0.12s; }
+
+@media (max-width: 380px) {
+  .brand h1 { font-size: 26px; }
+  .week-head h2 { font-size: 28px; }
+  .timer-time { font-size: 50px; }
+  .timer-ring, .anim-container { width: 200px; height: 200px; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="app-header">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M16 5 C9.5 5 4.5 10 4.5 17.5 C4.5 22 6.3 25.5 9 27.5 L11 25.3 C9.2 24 7.7 21.3 7.7 17.5 C7.7 12 11.4 8.2 16 8.2 C20.6 8.2 24.3 12 24.3 17.5 C24.3 21.3 22.8 24 21 25.3 L23 27.5 C25.7 25.5 27.5 22 27.5 17.5 C27.5 10 22.5 5 16 5 Z" fill="currentColor"/>
+        <circle cx="9.5" cy="28" r="1.3" fill="#B89456"/>
+        <circle cx="22.5" cy="28" r="1.3" fill="#B89456"/>
+      </svg>
+      <h1>Cavalier</h1>
+    </div>
+    <div class="tagline">Programme · assiette &amp; liant</div>
+    <div class="overall-progress">
+      <div class="progress-bar"><div class="progress-fill" id="overall-fill"></div></div>
+      <span class="progress-text" id="overall-text">0 / 0</span>
+    </div>
+  </header>
+
+  <nav class="week-nav" id="week-nav"></nav>
+  <main id="content"></main>
+
+  <section class="tips">
+    <div class="tips-eyebrow">Le secret</div>
+    <h2>Tenir, ce n'est pas serrer</h2>
+    <ul>
+      <li><span>Le liant vient du <strong>relâchement des hanches</strong>, pas de la force.</span></li>
+      <li><span>Laisse le poids <strong>descendre dans les talons</strong>, jamais dans les genoux.</span></li>
+      <li><span>Plus tu serres les cuisses, <strong>moins tu tiens</strong>.</span></li>
+      <li><span><strong>Adducteurs &amp; gainage</strong> : la priorité absolue du cavalier.</span></li>
+    </ul>
+  </section>
+
+  <button class="reset-btn" id="reset-btn">Réinitialiser la semaine</button>
+
+  <footer>
+    <svg class="ornament" width="44" height="12" viewBox="0 0 44 12" fill="none" aria-hidden="true">
+      <line x1="0" y1="6" x2="17" y2="6" stroke="currentColor" stroke-width="1"/>
+      <line x1="27" y1="6" x2="44" y2="6" stroke="currentColor" stroke-width="1"/>
+      <circle cx="22" cy="6" r="2.2" fill="currentColor"/>
+    </svg>
+    Bon entraînement.
+  </footer>
+</div>
+
+<!-- Timer modal -->
+<div class="modal" id="timer-modal" role="dialog" aria-hidden="true">
+  <div class="modal-card">
+    <div class="modal-eyebrow">Minuteur</div>
+    <h3 id="timer-exercise-name">Gainage</h3>
+    <div class="timer-ring">
+      <svg viewBox="0 0 100 100">
+        <circle class="bg" cx="50" cy="50" r="45"/>
+        <circle class="fg" id="timer-ring-fg" cx="50" cy="50" r="45" stroke-dasharray="282.74" stroke-dashoffset="0"/>
+      </svg>
+      <div class="timer-display">
+        <div class="timer-time" id="timer-time">00:30</div>
+        <div class="timer-label" id="timer-label">Prêt</div>
+      </div>
+    </div>
+    <div class="timer-actions">
+      <button class="btn btn-secondary" id="timer-close">Fermer</button>
+      <button class="btn btn-primary" id="timer-toggle">Démarrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Demo modal -->
+<div class="modal" id="demo-modal" role="dialog" aria-hidden="true">
+  <div class="modal-card">
+    <div class="modal-eyebrow">Démonstration</div>
+    <h3 id="demo-exercise-name">Exercice</h3>
+    <div class="anim-container">
+      <svg class="anim-svg" viewBox="0 0 200 220">
+        <line class="ground" x1="20" y1="200" x2="180" y2="200"/>
+        <g class="pose pose-1" id="demo-pose-1"></g>
+        <g class="pose pose-2" id="demo-pose-2"></g>
+      </svg>
+    </div>
+    <ul class="cues" id="demo-cues"></ul>
+    <button class="btn btn-secondary" id="demo-close" style="width:100%">Fermer</button>
+  </div>
+</div>
+
+<div class="install-banner" id="install-banner">
+  <div class="install-banner-text">
+    <strong>Installer l'app</strong>
+    <span>Menu Chrome/Opera → « Installer l'application »</span>
+  </div>
+  <button class="install-close" id="install-close" aria-label="Fermer">×</button>
+</div>
+
+<script>
+// ============ ANIMATIONS ============
+// Style helpers: ink=#1B1410, saddle=#6B3F1D, brass=#B89456
+const S_INK = 'stroke="#1B1410" stroke-width="2.5" stroke-linecap="round" fill="none"';
+const S_LEG = 'stroke="#6B3F1D" stroke-width="2.5" stroke-linecap="round" fill="none"';
+
+const ANIMATIONS = {
+  // 1. SQUAT — front view, standing → squatted
+  squat: {
+    p1: `<circle cx="100" cy="42" r="11" ${S_INK}/>
+         <line x1="100" y1="53" x2="100" y2="108" ${S_INK}/>
+         <line x1="100" y1="68" x2="78" y2="108" ${S_INK}/>
+         <line x1="100" y1="68" x2="122" y2="108" ${S_INK}/>
+         <line x1="100" y1="108" x2="92" y2="200" ${S_LEG}/>
+         <line x1="100" y1="108" x2="108" y2="200" ${S_LEG}/>`,
+    p2: `<circle cx="100" cy="64" r="11" ${S_INK}/>
+         <line x1="100" y1="75" x2="100" y2="125" ${S_INK}/>
+         <line x1="100" y1="86" x2="138" y2="106" ${S_INK}/>
+         <line x1="100" y1="86" x2="62" y2="106" ${S_INK}/>
+         <line x1="100" y1="125" x2="76" y2="160" ${S_LEG}/>
+         <line x1="76" y1="160" x2="80" y2="200" ${S_LEG}/>
+         <line x1="100" y1="125" x2="124" y2="160" ${S_LEG}/>
+         <line x1="124" y1="160" x2="120" y2="200" ${S_LEG}/>
+         <path d="M 100 100 q -8 8 -8 18" class="arrow" marker-end=""/>`
+  },
+
+  // 2. BULGARIAN split squat — side view, back foot on bench
+  bulgarian: {
+    p1: `<rect class="bench" x="148" y="158" width="40" height="6" rx="2"/>
+         <circle cx="80" cy="48" r="11" ${S_INK}/>
+         <line x1="80" y1="59" x2="80" y2="110" ${S_INK}/>
+         <line x1="80" y1="74" x2="100" y2="100" ${S_INK}/>
+         <line x1="80" y1="110" x2="78" y2="200" ${S_LEG}/>
+         <line x1="80" y1="110" x2="125" y2="135" ${S_LEG}/>
+         <line x1="125" y1="135" x2="160" y2="158" ${S_LEG}/>`,
+    p2: `<rect class="bench" x="148" y="158" width="40" height="6" rx="2"/>
+         <circle cx="80" cy="70" r="11" ${S_INK}/>
+         <line x1="80" y1="81" x2="80" y2="130" ${S_INK}/>
+         <line x1="80" y1="95" x2="105" y2="115" ${S_INK}/>
+         <line x1="80" y1="130" x2="62" y2="170" ${S_LEG}/>
+         <line x1="62" y1="170" x2="78" y2="200" ${S_LEG}/>
+         <line x1="80" y1="130" x2="125" y2="148" ${S_LEG}/>
+         <line x1="125" y1="148" x2="160" y2="158" ${S_LEG}/>`
+  },
+
+  // 3. PISTOL — one leg extended forward
+  pistol: {
+    p1: `<circle cx="90" cy="42" r="11" ${S_INK}/>
+         <line x1="90" y1="53" x2="90" y2="108" ${S_INK}/>
+         <line x1="90" y1="68" x2="130" y2="78" ${S_INK}/>
+         <line x1="90" y1="68" x2="55" y2="78" ${S_INK}/>
+         <line x1="90" y1="108" x2="92" y2="200" ${S_LEG}/>
+         <line x1="90" y1="108" x2="130" y2="118" ${S_LEG}/>
+         <line x1="130" y1="118" x2="170" y2="125" ${S_LEG}/>`,
+    p2: `<circle cx="80" cy="92" r="11" ${S_INK}/>
+         <line x1="80" y1="103" x2="85" y2="148" ${S_INK}/>
+         <line x1="80" y1="110" x2="125" y2="110" ${S_INK}/>
+         <line x1="80" y1="110" x2="40" y2="110" ${S_INK}/>
+         <line x1="85" y1="148" x2="65" y2="172" ${S_LEG}/>
+         <line x1="65" y1="172" x2="85" y2="200" ${S_LEG}/>
+         <line x1="85" y1="148" x2="130" y2="142" ${S_LEG}/>
+         <line x1="130" y1="142" x2="175" y2="138" ${S_LEG}/>`
+  },
+
+  // 4. PLANK — side view, forearm down
+  plank: {
+    p1: `<circle cx="40" cy="132" r="10" ${S_INK}/>
+         <line x1="50" y1="137" x2="58" y2="155" ${S_INK}/>
+         <line x1="58" y1="155" x2="108" y2="155" ${S_INK}/>
+         <line x1="108" y1="155" x2="170" y2="172" ${S_LEG}/>
+         <line x1="170" y1="172" x2="180" y2="195" ${S_LEG}/>
+         <line x1="58" y1="155" x2="58" y2="188" ${S_INK}/>
+         <line x1="38" y1="188" x2="78" y2="188" ${S_INK}/>
+         <line x1="78" y1="152" x2="100" y2="148" class="engage"/>`,
+    p2: `<circle cx="40" cy="130" r="10" ${S_INK}/>
+         <line x1="50" y1="135" x2="58" y2="155" ${S_INK}/>
+         <line x1="58" y1="155" x2="108" y2="152" ${S_INK}/>
+         <line x1="108" y1="152" x2="170" y2="170" ${S_LEG}/>
+         <line x1="170" y1="170" x2="180" y2="195" ${S_LEG}/>
+         <line x1="58" y1="155" x2="58" y2="188" ${S_INK}/>
+         <line x1="38" y1="188" x2="78" y2="188" ${S_INK}/>
+         <line x1="78" y1="148" x2="100" y2="145" class="engage"/>`
+  },
+
+  // 5. PLANK + LEG LIFT — alternating leg up
+  plank_leg: {
+    p1: `<circle cx="40" cy="132" r="10" ${S_INK}/>
+         <line x1="50" y1="137" x2="58" y2="155" ${S_INK}/>
+         <line x1="58" y1="155" x2="108" y2="155" ${S_INK}/>
+         <line x1="108" y1="155" x2="170" y2="172" ${S_LEG}/>
+         <line x1="170" y1="172" x2="180" y2="195" ${S_LEG}/>
+         <line x1="58" y1="155" x2="58" y2="188" ${S_INK}/>
+         <line x1="38" y1="188" x2="78" y2="188" ${S_INK}/>`,
+    p2: `<circle cx="40" cy="132" r="10" ${S_INK}/>
+         <line x1="50" y1="137" x2="58" y2="155" ${S_INK}/>
+         <line x1="58" y1="155" x2="108" y2="155" ${S_INK}/>
+         <line x1="108" y1="155" x2="170" y2="150" ${S_LEG}/>
+         <line x1="170" y1="150" x2="195" y2="130" ${S_LEG}/>
+         <line x1="58" y1="155" x2="58" y2="188" ${S_INK}/>
+         <line x1="38" y1="188" x2="78" y2="188" ${S_INK}/>
+         <path d="M 175 135 l 0 -12 m -4 4 l 4 -8 4 8" class="arrow"/>`
+  },
+
+  // 6. SIDE PLANK
+  side_plank: {
+    p1: `<circle cx="36" cy="100" r="10" ${S_INK}/>
+         <line x1="40" y1="108" x2="50" y2="125" ${S_INK}/>
+         <line x1="50" y1="125" x2="50" y2="190" ${S_INK}/>
+         <line x1="32" y1="190" x2="68" y2="190" ${S_INK}/>
+         <line x1="50" y1="125" x2="160" y2="165" ${S_LEG}/>
+         <line x1="160" y1="165" x2="180" y2="195" ${S_LEG}/>
+         <line x1="50" y1="110" x2="50" y2="80" ${S_INK}/>
+         <line x1="80" y1="135" x2="120" y2="148" class="engage"/>`,
+    p2: `<circle cx="36" cy="98" r="10" ${S_INK}/>
+         <line x1="40" y1="106" x2="50" y2="123" ${S_INK}/>
+         <line x1="50" y1="123" x2="50" y2="190" ${S_INK}/>
+         <line x1="32" y1="190" x2="68" y2="190" ${S_INK}/>
+         <line x1="50" y1="123" x2="160" y2="160" ${S_LEG}/>
+         <line x1="160" y1="160" x2="180" y2="195" ${S_LEG}/>
+         <line x1="50" y1="108" x2="50" y2="78" ${S_INK}/>
+         <line x1="80" y1="132" x2="120" y2="144" class="engage"/>`
+  },
+
+  // 7. DYNAMIC PLANK — alternates plank and side-plank
+  dynamic_plank: {
+    p1: `<circle cx="40" cy="132" r="10" ${S_INK}/>
+         <line x1="50" y1="137" x2="58" y2="155" ${S_INK}/>
+         <line x1="58" y1="155" x2="108" y2="155" ${S_INK}/>
+         <line x1="108" y1="155" x2="170" y2="172" ${S_LEG}/>
+         <line x1="170" y1="172" x2="180" y2="195" ${S_LEG}/>
+         <line x1="58" y1="155" x2="58" y2="188" ${S_INK}/>
+         <line x1="38" y1="188" x2="78" y2="188" ${S_INK}/>
+         <path d="M 110 120 q 15 -8 30 0" class="arrow"/>`,
+    p2: `<circle cx="36" cy="110" r="10" ${S_INK}/>
+         <line x1="40" y1="118" x2="50" y2="135" ${S_INK}/>
+         <line x1="50" y1="135" x2="50" y2="190" ${S_INK}/>
+         <line x1="32" y1="190" x2="68" y2="190" ${S_INK}/>
+         <line x1="50" y1="135" x2="160" y2="170" ${S_LEG}/>
+         <line x1="160" y1="170" x2="180" y2="195" ${S_LEG}/>
+         <line x1="50" y1="120" x2="50" y2="92" ${S_INK}/>`
+  },
+
+  // 8. BRIDGE (pont fessier)
+  bridge: {
+    p1: `<circle cx="38" cy="172" r="10" ${S_INK}/>
+         <line x1="46" y1="176" x2="120" y2="185" ${S_INK}/>
+         <line x1="46" y1="178" x2="30" y2="170" ${S_INK}/>
+         <line x1="60" y1="180" x2="60" y2="200" ${S_INK}/>
+         <line x1="120" y1="185" x2="155" y2="190" ${S_LEG}/>
+         <line x1="155" y1="190" x2="155" y2="200" ${S_LEG}/>`,
+    p2: `<circle cx="38" cy="172" r="10" ${S_INK}/>
+         <line x1="46" y1="176" x2="120" y2="148" ${S_INK}/>
+         <line x1="46" y1="178" x2="30" y2="172" ${S_INK}/>
+         <line x1="60" y1="180" x2="60" y2="200" ${S_INK}/>
+         <line x1="120" y1="148" x2="155" y2="172" ${S_LEG}/>
+         <line x1="155" y1="172" x2="155" y2="200" ${S_LEG}/>
+         <path d="M 105 145 l 0 -18 m -4 6 l 4 -10 4 10" class="arrow"/>
+         <line x1="80" y1="152" x2="115" y2="148" class="engage"/>`
+  },
+
+  // 9. BRIDGE SINGLE LEG
+  bridge_single: {
+    p1: `<circle cx="38" cy="172" r="10" ${S_INK}/>
+         <line x1="46" y1="176" x2="120" y2="185" ${S_INK}/>
+         <line x1="46" y1="178" x2="30" y2="170" ${S_INK}/>
+         <line x1="60" y1="180" x2="60" y2="200" ${S_INK}/>
+         <line x1="120" y1="185" x2="155" y2="180" ${S_LEG}/>
+         <line x1="155" y1="180" x2="190" y2="175" ${S_LEG}/>`,
+    p2: `<circle cx="38" cy="172" r="10" ${S_INK}/>
+         <line x1="46" y1="176" x2="120" y2="148" ${S_INK}/>
+         <line x1="46" y1="178" x2="30" y2="172" ${S_INK}/>
+         <line x1="60" y1="180" x2="60" y2="200" ${S_INK}/>
+         <line x1="120" y1="148" x2="155" y2="135" ${S_LEG}/>
+         <line x1="155" y1="135" x2="190" y2="118" ${S_LEG}/>
+         <line x1="80" y1="152" x2="115" y2="148" class="engage"/>`
+  },
+
+  // 10. BRIDGE WITH BALL
+  bridge_ball: {
+    p1: `<circle class="ball" cx="160" cy="185" r="16"/>
+         <circle cx="38" cy="172" r="10" ${S_INK}/>
+         <line x1="46" y1="176" x2="120" y2="180" ${S_INK}/>
+         <line x1="46" y1="178" x2="30" y2="170" ${S_INK}/>
+         <line x1="60" y1="180" x2="60" y2="200" ${S_INK}/>
+         <line x1="120" y1="180" x2="148" y2="178" ${S_LEG}/>`,
+    p2: `<circle class="ball" cx="160" cy="185" r="16"/>
+         <circle cx="38" cy="172" r="10" ${S_INK}/>
+         <line x1="46" y1="176" x2="120" y2="145" ${S_INK}/>
+         <line x1="46" y1="178" x2="30" y2="172" ${S_INK}/>
+         <line x1="60" y1="180" x2="60" y2="200" ${S_INK}/>
+         <line x1="120" y1="145" x2="148" y2="172" ${S_LEG}/>
+         <line x1="80" y1="150" x2="115" y2="145" class="engage"/>`
+  },
+
+  // 11. LUNGE (fente)
+  lunge: {
+    p1: `<circle cx="100" cy="42" r="11" ${S_INK}/>
+         <line x1="100" y1="53" x2="100" y2="108" ${S_INK}/>
+         <line x1="100" y1="68" x2="80" y2="108" ${S_INK}/>
+         <line x1="100" y1="68" x2="120" y2="108" ${S_INK}/>
+         <line x1="100" y1="108" x2="95" y2="200" ${S_LEG}/>
+         <line x1="100" y1="108" x2="105" y2="200" ${S_LEG}/>`,
+    p2: `<circle cx="100" cy="58" r="11" ${S_INK}/>
+         <line x1="100" y1="69" x2="100" y2="120" ${S_INK}/>
+         <line x1="100" y1="82" x2="78" y2="118" ${S_INK}/>
+         <line x1="100" y1="82" x2="122" y2="118" ${S_INK}/>
+         <line x1="100" y1="120" x2="150" y2="158" ${S_LEG}/>
+         <line x1="150" y1="158" x2="150" y2="200" ${S_LEG}/>
+         <line x1="100" y1="120" x2="60" y2="170" ${S_LEG}/>
+         <line x1="60" y1="170" x2="50" y2="200" ${S_LEG}/>`
+  },
+
+  // 12. LUNGE WITH ROTATION
+  lunge_rot: {
+    p1: `<circle cx="100" cy="58" r="11" ${S_INK}/>
+         <line x1="100" y1="69" x2="100" y2="120" ${S_INK}/>
+         <line x1="100" y1="80" x2="155" y2="80" ${S_INK}/>
+         <line x1="100" y1="80" x2="45" y2="80" ${S_INK}/>
+         <line x1="100" y1="120" x2="150" y2="158" ${S_LEG}/>
+         <line x1="150" y1="158" x2="150" y2="200" ${S_LEG}/>
+         <line x1="100" y1="120" x2="60" y2="170" ${S_LEG}/>
+         <line x1="60" y1="170" x2="50" y2="200" ${S_LEG}/>`,
+    p2: `<circle cx="100" cy="58" r="11" ${S_INK}/>
+         <line x1="100" y1="69" x2="100" y2="120" ${S_INK}/>
+         <line x1="100" y1="80" x2="160" y2="115" ${S_INK}/>
+         <line x1="100" y1="80" x2="50" y2="55" ${S_INK}/>
+         <line x1="100" y1="120" x2="150" y2="158" ${S_LEG}/>
+         <line x1="150" y1="158" x2="150" y2="200" ${S_LEG}/>
+         <line x1="100" y1="120" x2="60" y2="170" ${S_LEG}/>
+         <line x1="60" y1="170" x2="50" y2="200" ${S_LEG}/>
+         <path d="M 80 95 q 18 -10 38 -3" class="arrow"/>`
+  },
+
+  // 13. WALL SIT / Position cavalier
+  wall_sit: {
+    p1: `<line class="wall" x1="40" y1="20" x2="40" y2="200"/>
+         <circle cx="56" cy="38" r="11" ${S_INK}/>
+         <line x1="50" y1="49" x2="50" y2="105" ${S_INK}/>
+         <line x1="50" y1="64" x2="80" y2="80" ${S_INK}/>
+         <line x1="50" y1="64" x2="80" y2="50" ${S_INK}/>
+         <line x1="50" y1="105" x2="60" y2="200" ${S_LEG}/>
+         <line x1="50" y1="105" x2="55" y2="200" ${S_LEG}/>`,
+    p2: `<line class="wall" x1="40" y1="20" x2="40" y2="200"/>
+         <circle cx="56" cy="68" r="11" ${S_INK}/>
+         <line x1="50" y1="79" x2="50" y2="138" ${S_INK}/>
+         <line x1="50" y1="92" x2="95" y2="115" ${S_INK}/>
+         <line x1="50" y1="92" x2="95" y2="80" ${S_INK}/>
+         <line x1="50" y1="138" x2="120" y2="138" ${S_LEG}/>
+         <line x1="120" y1="138" x2="120" y2="200" ${S_LEG}/>
+         <line x1="118" y1="200" x2="135" y2="200" ${S_LEG}/>`
+  },
+
+  // 14. SUPERMAN (extension dorsale)
+  superman: {
+    p1: `<circle cx="40" cy="170" r="10" ${S_INK}/>
+         <line x1="50" y1="170" x2="160" y2="180" ${S_INK}/>
+         <line x1="50" y1="170" x2="25" y2="155" ${S_INK}/>
+         <line x1="55" y1="175" x2="30" y2="185" ${S_INK}/>
+         <line x1="160" y1="180" x2="185" y2="190" ${S_LEG}/>
+         <line x1="160" y1="180" x2="185" y2="170" ${S_LEG}/>`,
+    p2: `<circle cx="40" cy="150" r="10" ${S_INK}/>
+         <line x1="50" y1="155" x2="160" y2="158" ${S_INK}/>
+         <line x1="50" y1="155" x2="20" y2="125" ${S_INK}/>
+         <line x1="55" y1="160" x2="22" y2="135" ${S_INK}/>
+         <line x1="160" y1="158" x2="190" y2="135" ${S_LEG}/>
+         <line x1="160" y1="158" x2="190" y2="145" ${S_LEG}/>
+         <line x1="60" y1="160" x2="140" y2="160" class="engage"/>`
+  },
+
+  // 15. RUSSIAN TWIST
+  twist: {
+    p1: `<circle cx="100" cy="80" r="11" ${S_INK}/>
+         <line x1="100" y1="91" x2="100" y2="155" ${S_INK}/>
+         <line x1="100" y1="105" x2="65" y2="118" ${S_INK}/>
+         <line x1="100" y1="105" x2="55" y2="105" ${S_INK}/>
+         <line x1="100" y1="155" x2="150" y2="135" ${S_LEG}/>
+         <line x1="150" y1="135" x2="170" y2="170" ${S_LEG}/>
+         <line x1="160" y1="170" x2="180" y2="170" ${S_INK}/>`,
+    p2: `<circle cx="100" cy="80" r="11" ${S_INK}/>
+         <line x1="100" y1="91" x2="100" y2="155" ${S_INK}/>
+         <line x1="100" y1="105" x2="135" y2="118" ${S_INK}/>
+         <line x1="100" y1="105" x2="145" y2="105" ${S_INK}/>
+         <line x1="100" y1="155" x2="150" y2="135" ${S_LEG}/>
+         <line x1="150" y1="135" x2="170" y2="170" ${S_LEG}/>
+         <line x1="160" y1="170" x2="180" y2="170" ${S_INK}/>`
+  },
+
+  // 16. BALANCE (équilibre unipodal)
+  balance: {
+    p1: `<circle cx="100" cy="42" r="11" ${S_INK}/>
+         <line x1="100" y1="53" x2="100" y2="108" ${S_INK}/>
+         <line x1="100" y1="68" x2="135" y2="75" ${S_INK}/>
+         <line x1="100" y1="68" x2="65" y2="75" ${S_INK}/>
+         <line x1="100" y1="108" x2="100" y2="200" ${S_LEG}/>
+         <line x1="100" y1="108" x2="135" y2="135" ${S_LEG}/>
+         <line x1="135" y1="135" x2="135" y2="170" ${S_LEG}/>`,
+    p2: `<circle cx="103" cy="42" r="11" ${S_INK}/>
+         <line x1="103" y1="53" x2="100" y2="108" ${S_INK}/>
+         <line x1="103" y1="68" x2="138" y2="72" ${S_INK}/>
+         <line x1="103" y1="68" x2="68" y2="78" ${S_INK}/>
+         <line x1="100" y1="108" x2="98" y2="200" ${S_LEG}/>
+         <line x1="100" y1="108" x2="138" y2="138" ${S_LEG}/>
+         <line x1="138" y1="138" x2="140" y2="172" ${S_LEG}/>`
+  },
+
+  // 17. ADDUCTORS (ball squeeze, supine)
+  adductors: {
+    p1: `<circle cx="38" cy="160" r="10" ${S_INK}/>
+         <line x1="46" y1="164" x2="130" y2="178" ${S_INK}/>
+         <line x1="46" y1="166" x2="30" y2="158" ${S_INK}/>
+         <line x1="60" y1="170" x2="60" y2="198" ${S_INK}/>
+         <line x1="130" y1="178" x2="148" y2="158" ${S_LEG}/>
+         <line x1="148" y1="158" x2="135" y2="195" ${S_LEG}/>
+         <line x1="130" y1="178" x2="170" y2="160" ${S_LEG}/>
+         <line x1="170" y1="160" x2="180" y2="195" ${S_LEG}/>
+         <circle class="ball" cx="158" cy="173" r="9"/>`,
+    p2: `<circle cx="38" cy="160" r="10" ${S_INK}/>
+         <line x1="46" y1="164" x2="130" y2="178" ${S_INK}/>
+         <line x1="46" y1="166" x2="30" y2="158" ${S_INK}/>
+         <line x1="60" y1="170" x2="60" y2="198" ${S_INK}/>
+         <line x1="130" y1="178" x2="152" y2="162" ${S_LEG}/>
+         <line x1="152" y1="162" x2="145" y2="195" ${S_LEG}/>
+         <line x1="130" y1="178" x2="165" y2="164" ${S_LEG}/>
+         <line x1="165" y1="164" x2="172" y2="195" ${S_LEG}/>
+         <circle class="ball" cx="158" cy="172" r="7"/>
+         <path d="M 152 158 l -4 -6 m 12 6 l 4 -6" class="arrow"/>`
+  },
+
+  // 18. HIP MOBILITY (cercles bassin)
+  hip_mobility: {
+    p1: `<circle cx="100" cy="42" r="11" ${S_INK}/>
+         <line x1="100" y1="53" x2="92" y2="108" ${S_INK}/>
+         <line x1="100" y1="68" x2="75" y2="98" ${S_INK}/>
+         <line x1="100" y1="68" x2="125" y2="98" ${S_INK}/>
+         <line x1="92" y1="108" x2="88" y2="200" ${S_LEG}/>
+         <line x1="92" y1="108" x2="112" y2="200" ${S_LEG}/>
+         <ellipse cx="100" cy="110" rx="20" ry="6" fill="none" stroke="#B89456" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.7"/>`,
+    p2: `<circle cx="100" cy="42" r="11" ${S_INK}/>
+         <line x1="100" y1="53" x2="108" y2="108" ${S_INK}/>
+         <line x1="100" y1="68" x2="75" y2="98" ${S_INK}/>
+         <line x1="100" y1="68" x2="125" y2="98" ${S_INK}/>
+         <line x1="108" y1="108" x2="112" y2="200" ${S_LEG}/>
+         <line x1="108" y1="108" x2="92" y2="200" ${S_LEG}/>
+         <ellipse cx="100" cy="110" rx="20" ry="6" fill="none" stroke="#B89456" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.7"/>`
+  },
+
+  // 19. HEEL DROP on step
+  heel_drop: {
+    p1: `<rect x="80" y="170" width="120" height="30" class="bench"/>
+         <circle cx="100" cy="42" r="11" ${S_INK}/>
+         <line x1="100" y1="53" x2="100" y2="108" ${S_INK}/>
+         <line x1="100" y1="68" x2="80" y2="108" ${S_INK}/>
+         <line x1="100" y1="68" x2="120" y2="108" ${S_INK}/>
+         <line x1="100" y1="108" x2="98" y2="170" ${S_LEG}/>
+         <line x1="100" y1="108" x2="102" y2="170" ${S_LEG}/>
+         <line x1="92" y1="170" x2="115" y2="170" ${S_INK}/>`,
+    p2: `<rect x="80" y="170" width="120" height="30" class="bench"/>
+         <circle cx="100" cy="48" r="11" ${S_INK}/>
+         <line x1="100" y1="59" x2="100" y2="114" ${S_INK}/>
+         <line x1="100" y1="74" x2="80" y2="114" ${S_INK}/>
+         <line x1="100" y1="74" x2="120" y2="114" ${S_INK}/>
+         <line x1="100" y1="114" x2="98" y2="178" ${S_LEG}/>
+         <line x1="100" y1="114" x2="102" y2="178" ${S_LEG}/>
+         <line x1="92" y1="184" x2="115" y2="170" ${S_INK}/>
+         <path d="M 70 178 l 0 12 m -4 -4 l 4 8 4 -8" class="arrow"/>`
+  },
+
+  // 20. PSOAS stretch — low lunge
+  psoas: {
+    p1: `<circle cx="100" cy="58" r="11" ${S_INK}/>
+         <line x1="100" y1="69" x2="100" y2="125" ${S_INK}/>
+         <line x1="100" y1="82" x2="120" y2="55" ${S_INK}/>
+         <line x1="100" y1="82" x2="80" y2="55" ${S_INK}/>
+         <line x1="100" y1="125" x2="55" y2="160" ${S_LEG}/>
+         <line x1="55" y1="160" x2="45" y2="200" ${S_LEG}/>
+         <line x1="100" y1="125" x2="160" y2="155" ${S_LEG}/>
+         <line x1="160" y1="155" x2="175" y2="195" ${S_LEG}/>`,
+    p2: `<circle cx="100" cy="48" r="11" ${S_INK}/>
+         <line x1="100" y1="59" x2="105" y2="130" ${S_INK}/>
+         <line x1="100" y1="72" x2="125" y2="40" ${S_INK}/>
+         <line x1="100" y1="72" x2="78" y2="42" ${S_INK}/>
+         <line x1="105" y1="130" x2="55" y2="158" ${S_LEG}/>
+         <line x1="55" y1="158" x2="40" y2="198" ${S_LEG}/>
+         <line x1="105" y1="130" x2="170" y2="158" ${S_LEG}/>
+         <line x1="170" y1="158" x2="185" y2="198" ${S_LEG}/>
+         <path d="M 110 145 q 8 -4 16 0" class="arrow"/>`
+  },
+
+  // 21. STRETCHES (generic — seated forward fold)
+  stretches: {
+    p1: `<circle cx="50" cy="80" r="11" ${S_INK}/>
+         <line x1="50" y1="91" x2="55" y2="148" ${S_INK}/>
+         <line x1="50" y1="105" x2="100" y2="140" ${S_INK}/>
+         <line x1="50" y1="105" x2="100" y2="155" ${S_INK}/>
+         <line x1="55" y1="148" x2="170" y2="148" ${S_LEG}/>
+         <line x1="170" y1="148" x2="180" y2="155" ${S_LEG}/>`,
+    p2: `<circle cx="70" cy="115" r="11" ${S_INK}/>
+         <line x1="78" y1="120" x2="100" y2="148" ${S_INK}/>
+         <line x1="78" y1="125" x2="130" y2="145" ${S_INK}/>
+         <line x1="78" y1="125" x2="135" y2="155" ${S_INK}/>
+         <line x1="100" y1="148" x2="170" y2="148" ${S_LEG}/>
+         <line x1="170" y1="148" x2="180" y2="155" ${S_LEG}/>
+         <path d="M 65 95 q 8 -4 16 4" class="arrow"/>`
+  }
+};
+
+// ============ PROGRAM ============
+const PROGRAM = [
+  {
+    week: 1, eyebrow: "Semaine 1", title: "Fondations", emTitle: "Fondations",
+    subtitle: "Poser les bases. Volume modéré, qualité d'exécution avant tout.",
+    sessions: [
+      { id: "S1A", letter: "A", day: "Lundi", title: "Force générale",
+        exercises: [
+          { id: "s1a1", name: "Squats", spec: "3 × 12", anim: "squat",
+            cues: ["Pieds largeur des hanches, pointes légèrement ouvertes",
+                   "Descends comme pour t'asseoir, fessiers en arrière",
+                   "<strong>Poids dans les talons</strong>, genoux alignés avec les pointes",
+                   "Buste droit, regard à l'horizon"] },
+          { id: "s1a2", name: "Gainage ventral", spec: "3 × 30s", time: 30, anim: "plank",
+            cues: ["Coudes sous les épaules, avant-bras parallèles",
+                   "Corps en <strong>ligne droite</strong> talons → tête",
+                   "Bassin en rétroversion (pas creusé, pas en l'air)",
+                   "Respire calmement, gainage continu"] },
+          { id: "s1a3", name: "Pont fessier", spec: "3 × 15", anim: "bridge",
+            cues: ["Allongé sur le dos, pieds proches des fessiers",
+                   "<strong>Pousse dans les talons</strong>, pas les pointes",
+                   "Monte jusqu'à ligne épaules-genoux, fessiers serrés",
+                   "Bassin en rétroversion en haut"] },
+          { id: "s1a4", name: "Adducteurs (ballon entre genoux)", spec: "3 × 20s", time: 20, anim: "adductors",
+            cues: ["Allongé sur le dos, genoux pliés",
+                   "Ballon ou coussin <strong>entre les genoux</strong>",
+                   "Serre fort sans bouger les jambes",
+                   "Respire en continuant à serrer"] },
+          { id: "s1a5", name: "Équilibre unipodal, yeux ouverts", spec: "3 × 30s / jambe", time: 30, anim: "balance",
+            cues: ["Pied bien planté, <strong>orteils écartés</strong>",
+                   "Genou souple, légèrement fléchi",
+                   "Regard fixe sur un point devant",
+                   "Engage le gainage en continu"] }
+        ]},
+      { id: "S1B", letter: "B", day: "Mercredi", title: "Dissociation & gainage",
+        exercises: [
+          { id: "s1b1", name: "Fentes avant", spec: "3 × 10 / jambe", anim: "lunge",
+            cues: ["Grand pas en avant, buste droit",
+                   "<strong>Genou avant à 90°</strong>, au-dessus du pied",
+                   "Genou arrière descend vers le sol (sans toucher)",
+                   "Pousse dans le talon avant pour remonter"] },
+          { id: "s1b2", name: "Planche latérale", spec: "2 × 20s / côté", time: 20, anim: "side_plank",
+            cues: ["Coude sous l'épaule, avant-bras au sol",
+                   "Corps en ligne droite, <strong>hanches hautes</strong>",
+                   "Pieds empilés (ou décalés si plus facile)",
+                   "Engage l'oblique du dessous"] },
+          { id: "s1b3", name: "Superman (extension dorsale)", spec: "3 × 12", anim: "superman",
+            cues: ["Allongé sur le ventre, bras tendus devant",
+                   "Lève <strong>bras + jambes</strong> en même temps",
+                   "Regard vers le sol (nuque neutre)",
+                   "Serre les fessiers en haut"] },
+          { id: "s1b4", name: "Chaise contre le mur", spec: "3 × 30s", time: 30, anim: "wall_sit",
+            cues: ["Dos plaqué au mur, pieds à ~30 cm",
+                   "Glisse jusqu'à <strong>cuisses parallèles au sol</strong>",
+                   "Genoux à 90°, alignés avec les pieds",
+                   "Respire normalement, ne bloque pas"] },
+          { id: "s1b5", name: "Russian twist lent", spec: "3 × 20", anim: "twist",
+            cues: ["Assis, genoux pliés, buste incliné en arrière",
+                   "Mains jointes ou un objet devant",
+                   "Tourne <strong>épaules + bras</strong> côté à côté",
+                   "Ventre engagé, mouvement contrôlé"] }
+        ]},
+      { id: "S1C", letter: "C", day: "Vendredi", title: "Mobilité du bassin",
+        exercises: [
+          { id: "s1c1", name: "Squat sumo (pieds ouverts)", spec: "3 × 12", anim: "squat",
+            cues: ["Pieds <strong>très écartés</strong>, plus que les épaules",
+                   "Pointes ouvertes à ~45°",
+                   "Descend droit (pas vers l'avant)",
+                   "Genoux suivent la direction des pointes"] },
+          { id: "s1c2", name: "Gainage + lever de jambe alterné", spec: "3 × 10", anim: "plank_leg",
+            cues: ["Position de planche solide en départ",
+                   "Lève <strong>une jambe sans bouger le bassin</strong>",
+                   "Pose, alterne lentement",
+                   "Le bassin ne tourne pas, ne s'affaisse pas"] },
+          { id: "s1c3", name: "Pont fessier une jambe", spec: "2 × 8 / jambe", anim: "bridge_single",
+            cues: ["Un pied au sol, l'autre jambe tendue en l'air",
+                   "Pousse dans le <strong>talon au sol</strong>",
+                   "Monte le bassin sans le faire tourner",
+                   "Descente contrôlée, sans s'affaler"] },
+          { id: "s1c4", name: "Mobilité hanches (cercles, papillon)", spec: "5 min", time: 300, anim: "hip_mobility",
+            cues: ["Mains sur les hanches, debout",
+                   "<strong>Dessine de grands cercles</strong> avec le bassin",
+                   "10 dans un sens, 10 dans l'autre",
+                   "Puis papillon assis, dos droit"] }
+        ]}
+    ]
+  },
+  {
+    week: 2, eyebrow: "Semaine 2", title: "Consolidation", emTitle: "Consolidation",
+    subtitle: "Mêmes mouvements. +2 répétitions partout, +10s sur tous les gainages.",
+    sessions: [
+      { id: "S2A", letter: "A", day: "Lundi", title: "Force générale +",
+        exercises: [
+          { id: "s2a1", name: "Squats", spec: "3 × 14", anim: "squat",
+            cues: ["Pieds largeur des hanches, pointes ouvertes",
+                   "Descends bas, fessiers en arrière",
+                   "<strong>Poids dans les talons</strong>",
+                   "Garde le tempo lent"] },
+          { id: "s2a2", name: "Gainage ventral", spec: "3 × 40s", time: 40, anim: "plank",
+            cues: ["Coudes sous les épaules",
+                   "Ligne droite talons → tête",
+                   "<strong>Bassin en rétroversion</strong>",
+                   "Tu peux tenir, accroche-toi"] },
+          { id: "s2a3", name: "Pont fessier", spec: "3 × 17", anim: "bridge",
+            cues: ["Pieds proches des fessiers",
+                   "Pousse dans les talons",
+                   "<strong>Serre fort en haut</strong>",
+                   "Descente contrôlée"] },
+          { id: "s2a4", name: "Adducteurs (ballon serré)", spec: "3 × 30s", time: 30, anim: "adductors",
+            cues: ["Ballon entre les genoux",
+                   "<strong>Serre fort, sans interruption</strong>",
+                   "Pas de tension dans la mâchoire",
+                   "Respire en serrant"] },
+          { id: "s2a5", name: "Équilibre unipodal", spec: "3 × 40s / jambe", time: 40, anim: "balance",
+            cues: ["Pied planté, orteils étalés",
+                   "Genou souple",
+                   "<strong>Regard fixe</strong>",
+                   "Engage le gainage"] }
+        ]},
+      { id: "S2B", letter: "B", day: "Mercredi", title: "Dissociation +",
+        exercises: [
+          { id: "s2b1", name: "Fentes avant", spec: "3 × 12 / jambe", anim: "lunge",
+            cues: ["Grand pas en avant, buste droit",
+                   "Genou avant à 90°, <strong>aligné avec le pied</strong>",
+                   "Genou arrière vers le sol",
+                   "Pousse dans le talon avant"] },
+          { id: "s2b2", name: "Planche latérale", spec: "2 × 30s / côté", time: 30, anim: "side_plank",
+            cues: ["Coude sous l'épaule",
+                   "<strong>Hanches hautes</strong>, corps en ligne",
+                   "Engage l'oblique",
+                   "Tête dans le prolongement"] },
+          { id: "s2b3", name: "Superman", spec: "3 × 14", anim: "superman",
+            cues: ["Allongé sur le ventre",
+                   "Bras et jambes lèvent en même temps",
+                   "<strong>Serre les fessiers</strong>",
+                   "Nuque neutre"] },
+          { id: "s2b4", name: "Chaise contre le mur", spec: "3 × 40s", time: 40, anim: "wall_sit",
+            cues: ["Cuisses parallèles au sol",
+                   "Genoux à 90°",
+                   "<strong>Talons à plat</strong>",
+                   "Respire calmement"] },
+          { id: "s2b5", name: "Russian twist lent", spec: "3 × 22", anim: "twist",
+            cues: ["Assis, buste incliné",
+                   "<strong>Tempo lent</strong>, mouvement contrôlé",
+                   "Touche le sol de chaque côté",
+                   "Ventre engagé en continu"] }
+        ]},
+      { id: "S2C", letter: "C", day: "Vendredi", title: "Mobilité du bassin +",
+        exercises: [
+          { id: "s2c1", name: "Squat sumo", spec: "3 × 14", anim: "squat",
+            cues: ["Pieds très écartés, pointes ouvertes",
+                   "Descends bas, <strong>genoux dehors</strong>",
+                   "Buste droit",
+                   "Pousse dans les talons"] },
+          { id: "s2c2", name: "Gainage + lever de jambe", spec: "3 × 12", anim: "plank_leg",
+            cues: ["Planche solide en départ",
+                   "<strong>Bassin stable</strong> pendant le lever",
+                   "Petit lever suffit, qualité avant amplitude",
+                   "Alterne lentement"] },
+          { id: "s2c3", name: "Pont fessier une jambe", spec: "2 × 10 / jambe", anim: "bridge_single",
+            cues: ["Une jambe tendue en l'air",
+                   "Pousse dans le talon au sol",
+                   "<strong>Bassin reste de niveau</strong>",
+                   "Contrôle la descente"] },
+          { id: "s2c4", name: "Mobilité hanches étendue", spec: "6 min", time: 360, anim: "hip_mobility",
+            cues: ["Cercles bassin (10 par sens)",
+                   "Puis papillon assis (genoux ouverts)",
+                   "<strong>Étirement progressif</strong> sans forcer",
+                   "Termine par pigeon yoga 1 min / côté"] }
+        ]}
+    ]
+  },
+  {
+    week: 3, eyebrow: "Semaine 3", title: "Spécifique cavalier", emTitle: "cavalier",
+    subtitle: "Mouvements ciblés : position en selle, dissociation des jambes, gainage dynamique.",
+    sessions: [
+      { id: "S3A", letter: "A", day: "Lundi", title: "Position en selle",
+        exercises: [
+          { id: "s3a1", name: "Position cavalier au mur", spec: "3 × 45s", time: 45, anim: "wall_sit",
+            cues: ["Dos plaqué au mur, <strong>talons à ~20 cm</strong>",
+                   "Glisse jusqu'à cuisses parallèles au sol",
+                   "Talons bien à plat, jamais en l'air",
+                   "Reproduis ton assiette en selle"] },
+          { id: "s3a2", name: "Squats bulgares (pied arrière surélevé)", spec: "3 × 10 / jambe", anim: "bulgarian",
+            cues: ["<strong>Pied arrière sur banc/chaise</strong>",
+                   "Grand pas en avant avec le pied avant",
+                   "Descends le genou arrière vers le sol",
+                   "Poids 80% sur la jambe avant"] },
+          { id: "s3a3", name: "Gainage ventral", spec: "3 × 45s", time: 45, anim: "plank",
+            cues: ["Ligne droite parfaite",
+                   "<strong>Bassin en rétroversion</strong>",
+                   "Coudes sous épaules",
+                   "Tu es solide, tiens"] },
+          { id: "s3a4", name: "Adducteurs", spec: "3 × 35s", time: 35, anim: "adductors",
+            cues: ["Ballon entre genoux",
+                   "<strong>Serre fort tout le long</strong>",
+                   "C'est dur, c'est normal",
+                   "Respire en serrant"] },
+          { id: "s3a5", name: "Descente du talon sur marche", spec: "3 × 15", anim: "heel_drop",
+            cues: ["Avant-pied sur la marche, <strong>talons dans le vide</strong>",
+                   "Descends lentement les talons sous le niveau",
+                   "Remonte sur la pointe",
+                   "Crucial pour la descente du talon en selle"] }
+        ]},
+      { id: "S3B", letter: "B", day: "Mercredi", title: "Gainage dynamique",
+        exercises: [
+          { id: "s3b1", name: "Planche dynamique (planche → planche latérale)", spec: "3 × 8", anim: "dynamic_plank",
+            cues: ["Planche solide en départ",
+                   "Bascule en planche latérale gauche",
+                   "Retour planche → latérale droite",
+                   "<strong>Bassin stable pendant la rotation</strong>"] },
+          { id: "s3b2", name: "Squat bulgare", spec: "3 × 12 / jambe", anim: "bulgarian",
+            cues: ["Pied arrière sur banc",
+                   "Descends bas avec contrôle",
+                   "<strong>Poids sur la jambe avant</strong>",
+                   "Buste droit"] },
+          { id: "s3b3", name: "Pont fessier une jambe", spec: "3 × 10 / jambe", anim: "bridge_single",
+            cues: ["Une jambe tendue en l'air",
+                   "Pousse dans le talon au sol",
+                   "Bassin de niveau",
+                   "<strong>Serre fort en haut</strong>"] },
+          { id: "s3b4", name: "Chaise contre le mur", spec: "3 × 50s", time: 50, anim: "wall_sit",
+            cues: ["Cuisses parallèles",
+                   "Dos plaqué",
+                   "<strong>Talons à plat</strong>",
+                   "Tiens, tu peux le faire"] },
+          { id: "s3b5", name: "Russian twist", spec: "3 × 24", anim: "twist",
+            cues: ["Buste à 45°",
+                   "Tourne <strong>épaules + bras</strong>",
+                   "Tempo lent",
+                   "Ventre engagé"] }
+        ]},
+      { id: "S3C", letter: "C", day: "Vendredi", title: "Ouverture & psoas",
+        exercises: [
+          { id: "s3c1", name: "Position cavalier au mur", spec: "3 × 60s", time: 60, anim: "wall_sit",
+            cues: ["Cuisses parallèles au sol",
+                   "Talons à 20 cm du mur",
+                   "<strong>Talons bien à plat</strong>",
+                   "Mental : tu tiens en selle, ici aussi"] },
+          { id: "s3c2", name: "Fentes avec rotation du buste", spec: "3 × 10 / jambe", anim: "lunge_rot",
+            cues: ["En position de fente basse",
+                   "Bras tendus à l'horizontale",
+                   "<strong>Tourne le buste vers le genou avant</strong>",
+                   "Hanches stables, ne basculent pas"] },
+          { id: "s3c3", name: "Étirement psoas (fente basse)", spec: "3 × 45s / jambe", time: 45, anim: "psoas",
+            cues: ["Fente basse, <strong>genou arrière au sol</strong>",
+                   "Pousse le bassin en avant",
+                   "Bras vers le haut pour étirer plus",
+                   "Le psoas raide = bassin bloqué en selle"] },
+          { id: "s3c4", name: "Mobilité hanches", spec: "6 min", time: 360, anim: "hip_mobility",
+            cues: ["Cercles bassin",
+                   "Papillon, pigeon",
+                   "<strong>Sans forcer</strong>, écoute le corps",
+                   "Indispensable pour suivre le mouvement du cheval"] }
+        ]}
+    ]
+  },
+  {
+    week: 4, eyebrow: "Semaine 4", title: "Instabilité", emTitle: "Instabilité",
+    subtitle: "Sur surface instable si possible (coussin, Bosu, serviette roulée).",
+    sessions: [
+      { id: "S4A", letter: "A", day: "Lundi", title: "Stabilité unipodale",
+        exercises: [
+          { id: "s4a1", name: "Squat sur une jambe (pistol partiel)", spec: "3 × 6 / jambe", anim: "pistol",
+            cues: ["Une jambe tendue devant",
+                   "Descends lentement sur l'autre",
+                   "Bras devant pour <strong>équilibre</strong>",
+                   "Appui-toi à une chaise si besoin"] },
+          { id: "s4a2", name: "Gainage pieds sur ballon/chaise", spec: "3 × 40s", time: 40, anim: "plank",
+            cues: ["<strong>Pieds surélevés</strong> sur ballon/chaise",
+                   "Coudes au sol, bassin haut",
+                   "Ligne droite",
+                   "Stabilise activement, ça tremble"] },
+          { id: "s4a3", name: "Position cavalier au mur sur coussin", spec: "3 × 45s", time: 45, anim: "wall_sit",
+            cues: ["<strong>Pieds sur coussin instable</strong>",
+                   "Dos au mur, cuisses parallèles",
+                   "Talons à plat malgré l'instabilité",
+                   "Travaille les fines corrections"] },
+          { id: "s4a4", name: "Adducteurs sur instable", spec: "3 × 30s", time: 30, anim: "adductors",
+            cues: ["Ballon entre genoux",
+                   "Pieds sur coussin/serviette",
+                   "<strong>Serre + stabilise</strong>",
+                   "Double travail simultané"] },
+          { id: "s4a5", name: "Équilibre unipodal, yeux fermés", spec: "3 × 20s / jambe", time: 20, anim: "balance",
+            cues: ["Pied bien planté",
+                   "<strong>Ferme les yeux</strong> une fois installé",
+                   "Petites corrections invisibles",
+                   "Le gainage prend le relais de la vue"] }
+        ]},
+      { id: "S4B", letter: "B", day: "Mercredi", title: "Coordination",
+        exercises: [
+          { id: "s4b1", name: "Fentes sur coussin", spec: "3 × 10 / jambe", anim: "lunge",
+            cues: ["<strong>Pied avant sur surface instable</strong>",
+                   "Descends lentement",
+                   "Le pied corrige en permanence",
+                   "Proprioception au max"] },
+          { id: "s4b2", name: "Planche dynamique sur instable", spec: "3 × 8", anim: "dynamic_plank",
+            cues: ["Avant-bras sur coussin",
+                   "Bascule planche ventrale ↔ latérale",
+                   "<strong>Bassin stable</strong> malgré l'instabilité",
+                   "Lent et contrôlé"] },
+          { id: "s4b3", name: "Pont fessier pieds sur ballon", spec: "3 × 12", anim: "bridge_ball",
+            cues: ["Pieds posés sur <strong>ballon ou chaise</strong>",
+                   "Monte le bassin haut, fessiers serrés",
+                   "Le ballon ne doit pas rouler",
+                   "Stabilise activement"] },
+          { id: "s4b4", name: "Équilibre + lancer de balle contre mur", spec: "3 × 30s", time: 30, anim: "balance",
+            cues: ["Sur une jambe, face au mur",
+                   "<strong>Lance balle au mur, attrape</strong>",
+                   "Maintiens l'équilibre malgré la perturbation",
+                   "C'est exactement ce qui se passe à cheval"] },
+          { id: "s4b5", name: "Russian twist avec lest", spec: "3 × 24", anim: "twist",
+            cues: ["Lest dans les mains (livre, bouteille)",
+                   "Buste à 45°",
+                   "<strong>Tourne plus lentement</strong>",
+                   "Contrôle le retour, ne laisse pas tomber"] }
+        ]},
+      { id: "S4C", letter: "C", day: "Vendredi", title: "Test & récupération",
+        exercises: [
+          { id: "s4c1", name: "Position cavalier au mur (test : tenir un maximum)", spec: "1 × max", time: 120, anim: "wall_sit",
+            cues: ["Cuisses parallèles, talons à plat",
+                   "<strong>Tiens le plus longtemps possible</strong>",
+                   "Compare avec ta première séance",
+                   "Tu vas être surpris du progrès"] },
+          { id: "s4c2", name: "Squat sur une jambe", spec: "3 × 8 / jambe", anim: "pistol",
+            cues: ["Plus profond qu'en S4A",
+                   "Bras devant pour équilibre",
+                   "<strong>Contrôle la descente</strong>",
+                   "Appui léger si besoin"] },
+          { id: "s4c3", name: "Gainage 360° (ventral + 2 latéraux)", spec: "1 × 45s chacun", time: 45, anim: "plank",
+            cues: ["45s ventral, sans poser",
+                   "Bascule latéral droit 45s",
+                   "Bascule latéral gauche 45s",
+                   "<strong>Sans pause entre les positions</strong>"] },
+          { id: "s4c4", name: "Étirements complets", spec: "8 min", time: 480, anim: "stretches",
+            cues: ["Psoas (fente basse) 1 min/côté",
+                   "Adducteurs (papillon) 1 min",
+                   "Ischios + dos 2 min",
+                   "<strong>Respire profondément</strong>, savoure"] }
+        ]}
+    ]
+  }
+];
+
+const storage = {
+  async get(key) {
+    try {
+      if (window.storage && window.storage.get) {
+        const r = await window.storage.get(key);
+        return r ? r.value : null;
+      }
+    } catch (e) {}
+    try { return localStorage.getItem(key); } catch(e) { return null; }
+  },
+  async set(key, value) {
+    try {
+      if (window.storage && window.storage.set) {
+        return await window.storage.set(key, value);
+      }
+    } catch (e) {}
+    try { localStorage.setItem(key, value); } catch(e) {}
+  }
+};
+
+let state = { week: 1, progress: {}, expanded: {} };
+const totalExercises = PROGRAM.reduce((n, w) => n + w.sessions.reduce((m, s) => m + s.exercises.length, 0), 0);
+
+async function loadState() {
+  try {
+    const raw = await storage.get('cavalier:state');
+    if (raw) {
+      const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      state = { ...state, ...parsed };
+    }
+  } catch(e) {}
+}
+
+async function saveState() {
+  try { await storage.set('cavalier:state', JSON.stringify(state)); } catch(e) {}
+}
+
+function buildManifestAndIcons() {
+  function genIcon(size) {
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const ctx = c.getContext('2d');
+    const g = ctx.createLinearGradient(0, 0, size, size);
+    g.addColorStop(0, '#6B3F1D');
+    g.addColorStop(1, '#4A2A0F');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, size, size);
+    const cx = size/2, cy = size/2 - size*0.02, r = size*0.30;
+    ctx.strokeStyle = '#F2E8D5';
+    ctx.lineWidth = size * 0.14;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, Math.PI * 1.15, Math.PI * 1.85);
+    ctx.stroke();
+    ctx.fillStyle = '#B89456';
+    const stud = size * 0.05;
+    const a1 = Math.PI * 1.15, a2 = Math.PI * 1.85;
+    ctx.beginPath(); ctx.arc(cx + r*Math.cos(a1), cy + r*Math.sin(a1), stud, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + r*Math.cos(a2), cy + r*Math.sin(a2), stud, 0, Math.PI*2); ctx.fill();
+    return c.toDataURL('image/png');
+  }
+  const manifest = {
+    name: "Cavalier — Programme", short_name: "Cavalier",
+    description: "Programme d'entraînement au sol pour cavalier",
+    start_url: ".", scope: ".", display: "standalone", orientation: "portrait",
+    background_color: "#F2E8D5", theme_color: "#6B3F1D",
+    icons: [
+      { src: genIcon(192), sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: genIcon(512), sizes: "512x512", type: "image/png", purpose: "any maskable" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = URL.createObjectURL(blob);
+  document.head.appendChild(link);
+  const apple = document.createElement('link');
+  apple.rel = 'apple-touch-icon';
+  apple.href = genIcon(192);
+  document.head.appendChild(apple);
+}
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+function isExerciseDone(exId) { return !!state.progress[exId]; }
+function sessionDone(s) { return s.exercises.filter(e => isExerciseDone(e.id)).length; }
+function findExercise(id) {
+  for (const w of PROGRAM) for (const s of w.sessions) {
+    const ex = s.exercises.find(e => e.id === id);
+    if (ex) return ex;
+  }
+  return null;
+}
+
+function checkSvg() {
+  return '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 7 12 13 4"/></svg>';
+}
+function clockSvg() {
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7.5 12 12 15 14"/></svg>';
+}
+function chevronSvg() {
+  return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+}
+function playSvg() {
+  return '<svg viewBox="0 0 12 12" fill="currentColor"><polygon points="3,2 10,6 3,10"/></svg>';
+}
+
+function renderWeekNav() {
+  const nav = $('#week-nav');
+  nav.innerHTML = PROGRAM.map(w =>
+    `<button class="week-pill ${w.week === state.week ? 'active' : ''}" data-week="${w.week}">
+      <span class="num">S${w.week}</span> · ${w.title}
+    </button>`
+  ).join('');
+  nav.querySelectorAll('.week-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.week = parseInt(btn.dataset.week);
+      saveState();
+      renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+}
+
+function renderContent() {
+  const week = PROGRAM.find(w => w.week === state.week);
+  const main = $('#content');
+  main.innerHTML = `
+    <div class="week-head">
+      <div class="week-eyebrow">${week.eyebrow}</div>
+      <h2>${week.title.replace(week.emTitle, `<em>${week.emTitle}</em>`)}</h2>
+      <p>${week.subtitle}</p>
+    </div>
+    <div class="routine-banner">
+      <strong>Avant chaque séance</strong> : 5 min d'échauffement (mobilité hanches, fentes marchées).
+      <strong>Après</strong> : 5 min d'étirements (psoas, adducteurs, ischios).
+      <em style="display:block; margin-top:6px; opacity:0.8;">Touche un exercice pour voir la démo &amp; les points-clés.</em>
+    </div>
+    ${week.sessions.map((s, idx) => renderSession(s, idx)).join('')}
+  `;
+  $$('.session-head').forEach(head => {
+    head.addEventListener('click', () => {
+      const id = head.dataset.session;
+      state.expanded[id] = !state.expanded[id];
+      saveState();
+      renderContent();
+    });
+  });
+  $$('.checkbox').forEach(box => {
+    box.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const exId = box.dataset.exercise;
+      state.progress[exId] = !state.progress[exId];
+      saveState();
+      renderContent();
+      renderHeader();
+    });
+  });
+  $$('.exercise-info').forEach(info => {
+    info.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openDemo(info.dataset.exercise);
+    });
+  });
+  $$('.timer-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openTimer(btn.dataset.time, btn.dataset.name);
+    });
+  });
+}
+
+function renderSession(s, idx) {
+  const done = sessionDone(s);
+  const total = s.exercises.length;
+  const complete = done === total;
+  const expanded = state.expanded[s.id] === true || (state.expanded[s.id] === undefined && idx === 0 && !complete);
+
+  return `
+    <article class="session ${complete ? 'complete' : ''} ${expanded ? 'expanded' : ''}">
+      <div class="session-head" data-session="${s.id}">
+        <div class="session-letter">${s.letter}</div>
+        <div class="session-info">
+          <div class="session-day">${s.day} · ${s.title}</div>
+          <div class="session-title">Séance ${s.letter}</div>
+        </div>
+        <div class="session-meta">${done}/${total}</div>
+        <div class="session-chevron">${chevronSvg()}</div>
+      </div>
+      <div class="session-body">
+        ${s.exercises.map(ex => renderExercise(ex)).join('')}
+      </div>
+    </article>
+  `;
+}
+
+function renderExercise(ex) {
+  const done = isExerciseDone(ex.id);
+  const safeName = ex.name.replace(/"/g, '&quot;');
+  const hint = ex.anim ? `<span class="demo-hint" aria-hidden="true">${playSvg()}</span>` : '';
+  return `
+    <div class="exercise ${done ? 'done' : ''}">
+      <button class="checkbox ${done ? 'checked' : ''}" data-exercise="${ex.id}" aria-label="Cocher l'exercice">
+        ${checkSvg()}
+      </button>
+      <div class="exercise-info" data-exercise="${ex.id}" role="button" tabindex="0" aria-label="Voir la démonstration">
+        <div class="exercise-name">${ex.name}${hint}</div>
+        <div class="exercise-spec">${ex.spec}</div>
+      </div>
+      ${ex.time ? `<button class="timer-btn" data-time="${ex.time}" data-name="${safeName}" aria-label="Lancer le minuteur">${clockSvg()}</button>` : ''}
+    </div>
+  `;
+}
+
+function renderHeader() {
+  const done = Object.values(state.progress).filter(Boolean).length;
+  const pct = totalExercises > 0 ? (done / totalExercises * 100) : 0;
+  $('#overall-fill').style.width = pct + '%';
+  $('#overall-text').textContent = `${done} / ${totalExercises}`;
+}
+
+function renderAll() {
+  renderWeekNav();
+  renderContent();
+  renderHeader();
+}
+
+// --- Demo modal ---
+function openDemo(exerciseId) {
+  const ex = findExercise(exerciseId);
+  if (!ex) return;
+  const anim = ANIMATIONS[ex.anim];
+  $('#demo-exercise-name').textContent = ex.name;
+  if (anim) {
+    $('#demo-pose-1').innerHTML = anim.p1;
+    $('#demo-pose-2').innerHTML = anim.p2;
+  } else {
+    $('#demo-pose-1').innerHTML = '';
+    $('#demo-pose-2').innerHTML = '';
+  }
+  const cues = ex.cues || [];
+  $('#demo-cues').innerHTML = cues.map(c => `<li>${c}</li>`).join('');
+  $('#demo-modal').classList.add('active');
+}
+
+function closeDemo() { $('#demo-modal').classList.remove('active'); }
+
+// --- Timer ---
+let timerState = { duration: 30, remaining: 30, running: false, interval: null };
+const TIMER_CIRC = 2 * Math.PI * 45;
+
+function fmtTime(s) {
+  s = Math.max(0, s);
+  const m = Math.floor(s / 60), sec = s % 60;
+  return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+}
+
+function openTimer(seconds, name) {
+  timerState.duration = parseInt(seconds);
+  timerState.remaining = timerState.duration;
+  timerState.running = false;
+  if (timerState.interval) clearInterval(timerState.interval);
+  $('#timer-exercise-name').textContent = name;
+  $('#timer-time').textContent = fmtTime(timerState.remaining);
+  $('#timer-label').textContent = 'Prêt';
+  $('#timer-toggle').textContent = 'Démarrer';
+  $('#timer-ring-fg').style.strokeDashoffset = 0;
+  $('#timer-modal').classList.add('active');
+}
+
+function closeTimer() {
+  if (timerState.interval) clearInterval(timerState.interval);
+  timerState.running = false;
+  $('#timer-modal').classList.remove('active');
+}
+
+function toggleTimer() {
+  if (timerState.running) {
+    clearInterval(timerState.interval);
+    timerState.running = false;
+    $('#timer-toggle').textContent = 'Reprendre';
+    $('#timer-label').textContent = 'Pause';
+    return;
+  }
+  if (timerState.remaining <= 0) timerState.remaining = timerState.duration;
+  timerState.running = true;
+  $('#timer-toggle').textContent = 'Pause';
+  $('#timer-label').textContent = 'En cours';
+  timerState.interval = setInterval(() => {
+    timerState.remaining--;
+    $('#timer-time').textContent = fmtTime(timerState.remaining);
+    const progress = timerState.remaining / timerState.duration;
+    $('#timer-ring-fg').style.strokeDashoffset = TIMER_CIRC * (1 - progress);
+    if (timerState.remaining <= 0) {
+      clearInterval(timerState.interval);
+      timerState.running = false;
+      $('#timer-toggle').textContent = 'Recommencer';
+      $('#timer-label').textContent = 'Terminé';
+      playBeep();
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+    }
+  }, 1000);
+}
+
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.2, 0.42].forEach(delay => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 880; osc.type = 'sine';
+      gain.gain.setValueAtTime(0.001, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.18);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + 0.2);
+    });
+  } catch(e) {}
+}
+
+async function init() {
+  await loadState();
+  buildManifestAndIcons();
+  renderAll();
+
+  $('#timer-close').addEventListener('click', closeTimer);
+  $('#timer-toggle').addEventListener('click', toggleTimer);
+  $('#timer-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'timer-modal') closeTimer();
+  });
+
+  $('#demo-close').addEventListener('click', closeDemo);
+  $('#demo-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'demo-modal') closeDemo();
+  });
+
+  $('#reset-btn').addEventListener('click', () => {
+    const week = PROGRAM.find(w => w.week === state.week);
+    if (!confirm(`Réinitialiser toutes les coches de la semaine ${state.week} (${week.title}) ?`)) return;
+    week.sessions.forEach(s => s.exercises.forEach(ex => { delete state.progress[ex.id]; }));
+    saveState();
+    renderAll();
+  });
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const dismissed = await storage.get('cavalier:install-dismissed');
+  if (!isStandalone && !dismissed) {
+    setTimeout(() => $('#install-banner').classList.add('show'), 1800);
+  }
+  $('#install-close').addEventListener('click', async () => {
+    $('#install-banner').classList.remove('show');
+    await storage.set('cavalier:install-dismissed', '1');
+  });
+
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+}
+
+init();
+</script>
+</body>
+</html>

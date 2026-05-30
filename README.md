@@ -60,7 +60,7 @@ vercel.json                  / → la PWA (web/), cron de veille, cache OTA
 # Tests du moteur (barème IR, crédit domicile, garde-fous, tri, PASS 48 060…)
 npm test
 
-# Servir la PWA en statique (lancer depuis ce dossier boussole/ ; chemins /shared et /web)
+# Servir la PWA en statique (lancer depuis la racine du dépôt ; chemins /shared et /web)
 npm run dev            # → http://localhost:8000/web/index.html
 ```
 
@@ -74,7 +74,7 @@ npm i -g vercel
 vercel --prod
 ```
 
-- `/` sert la PWA **Boussole** (déploie ce dossier `boussole/` comme racine du projet Vercel).
+- `/` sert la PWA **Boussole** (la racine du dépôt est la racine du projet Vercel).
 - Le proxy `/api/*` est **optionnel** (voir ci-dessous).
 - Un **cron mensuel** déclenche `/api/cron-veille` (à intensifier manuellement en saison PLF).
 

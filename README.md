@@ -1,111 +1,88 @@
-# Boussole — éducation & orientation à l'optimisation financière (France)
+# Cavalier — Déploiement & installation
 
-App d'apprentissage rapide (« micro-learning ») + **bilan d'orientation fiscale et
-budgétaire**, pour les foyers qui ne peuvent pas se payer un conseiller. L'app **éduque et
-oriente** — elle ne **conseille jamais** un produit ni un montant précis (frontière CIF).
+## 1. Déployer sur Vercel (30 secondes)
 
-> Mise en œuvre des documents `docs/SPEC_app_optimisation_financiere.md` et
-> `docs/RUNBOOK_validation_fiscale.md`.
+### Option A — Drag & drop (le plus simple)
 
-## Ce qui est livré
+1. Va sur [vercel.com](https://vercel.com) (compte gratuit, login GitHub ou email)
+2. Sur le dashboard, clique **« Add New… » → « Project »**
+3. Tout en bas de la page, section **« Deploy without Git »** → clique sur **« Browse »** ou glisse-dépose le dossier contenant `cavalier.html` + `vercel.json`
+4. Vercel détecte automatiquement la config, déploie en ~10 secondes
+5. Tu obtiens une URL du type `https://cavalier-xxxxx.vercel.app`
 
-Conformément au choix « les deux » :
-
-1. **PWA web** (`web/`) — déployable sur Vercel, installable Android/iOS, **offline-first**.
-   C'est le MVP fonctionnel complet, vérifiable immédiatement.
-2. **Scaffold React Native** (`mobile/`) — fidèle à la SPEC §1, réutilise le moteur partagé.
-3. **Données partagées** (`shared/`) — `fiscal-params.json`, `veille-fiscale.json`,
-   `modules.json` + moteur TypeScript. **Source de vérité unique** consommée par les deux.
-4. **Proxy Vercel** (`api/`) — `approfondir` (leçons Claude, anti-hallucination §7.2) et
-   `cron-veille` (détection de changements fiscaux §13.3).
-
-## Règle d'or (fiabilité)
-
-**Aucun montant / plafond / taux fiscal n'est codé en dur.** Tout vient de
-`shared/data/fiscal-params.json` (versionné, daté, sourcé). Les seuls nombres dans le code
-sont des **hypothèses illustratives** de montants utilisateur (ex. « 200 €/mois »),
-clairement signalées comme exemples. Un test le vérifie (`npm test`).
-
-## Arborescence
-
-```
-shared/
-  data/
-    fiscal-params.json        LA source de vérité chiffrée (LF 2026, statuts CONFIRME/STABLE/…)
-    veille-fiscale.json       paramètres sous surveillance (bandeaux « susceptible d'évoluer »)
-    modules.json              modules 0–5 du socle pédagogique (offline)
-    annexe_bareme_km.json     barème kilométrique (table annexe)
-  engine/
-    types.ts                  contrats (UserProfile, Lever, LeverResult, FiscalParams…)
-    engine.ts                 TMI, catalogue de leviers, garde-fous, tri, calcIR, badge
-
-web/                          PWA (buildless)
-  index.html  manifest.webmanifest  sw.js (offline-first)
-  css/styles.css
-  js/  data.js (loader OTA+cache+fallback)  engine.js (miroir du moteur)  app.js (UI/écrans)
-  icons/  icon-192.png  icon-512.png  generate-icons.mjs
-
-api/                          proxy Vercel (serverless)
-  approfondir.js              appel Claude borné aux paramètres (clé API côté serveur)
-  cron-veille.js              veille fiscale (fetch + hash + résumé Claude → rapport admin)
-  _lib/systemPrompt.js        gabarit anti-hallucination (§7.2)
-
-mobile/                       scaffold React Native + TS (voir mobile/README.md)
-test/engine.test.mjs         tests du moteur (barème IR, leviers, garde-fous, tri)
-docs/                         SPEC + RUNBOOK (traçabilité)
-vercel.json                  / → Boussole, /cavalier → ancienne app, cron, cache OTA
-```
-
-## Lancer en local
-
-```bash
-# Tests du moteur (barème IR, crédit domicile, garde-fous, tri, PASS 48 060…)
-npm test
-
-# Servir la PWA en statique (les chemins /shared/data et /web sont absolus)
-npm run dev            # → http://localhost:8000/web/index.html
-```
-
-> En statique simple, la racine `/` n'est pas réécrite (c'est `vercel.json` qui le fait en
-> prod) : ouvrir directement `/web/index.html`. Le service worker exige `localhost` ou HTTPS.
-
-## Déployer sur Vercel
+### Option B — Vercel CLI (si tu préfères le terminal)
 
 ```bash
 npm i -g vercel
+cd /chemin/vers/le/dossier
 vercel --prod
 ```
 
-- `/` sert **Boussole**, `/cavalier` sert l'ancienne app.
-- Le proxy `/api/*` nécessite les variables de `.env.example`
-  (`ANTHROPIC_API_KEY`, `CLAUDE_MODEL`, `VEILLE_WEBHOOK_URL`).
-- Un **cron mensuel** déclenche `/api/cron-veille` (à intensifier manuellement en saison PLF).
+À la première exécution, login interactif puis confirme les options par défaut.
 
-## Mise à jour des paramètres fiscaux (le moat)
+### Renommer le domaine (optionnel)
 
-Le cœur de fiabilité est **humain** : l'automatisation détecte, l'humain valide et publie.
-Procédure complète dans `docs/RUNBOOK_validation_fiscale.md` :
-
-1. Le cron `api/cron-veille.js` (ou un jalon du calendrier budgétaire) produit un rapport.
-2. On vérifie chaque valeur sur source officielle (Légifrance / BOFiP / service-public).
-3. On édite `shared/data/fiscal-params.json` (+ `version`, `date_maj`, `source`, `statut`).
-4. Commit + push → le JSON est resservi en **OTA** (cache + fallback bundlé) sans republier
-   les apps. L'historique git rend chaque changement auditable.
-
-## Garde-fous produit (SPEC §2, §10)
-
-- **Orienteur, pas conseiller** : jamais « souscris X pour Y € ».
-- **Coût net partout** : 🟢 Gratuit / 🔵 Réorientation / 🟠 Dépense. Filtre « zéro dépense »
-  **activé par défaut**.
-- **Sourcing systématique** + **bandeau légal permanent** sur bilan et modules.
-- **Savoir dire stop** : succession / expatriation / gros patrimoine → encart « consulte un
-  professionnel », pas de simulation.
-
-> ⚠️ L'auteur de la SPEC n'est ni juriste ni conseiller financier : la frontière
-> éducation / conseil réglementé (CIF) **et** les valeurs de `fiscal-params.json` doivent
-> être validées par des professionnels avant tout lancement.
+Sur le dashboard Vercel → ton projet → **Settings → Domains** → tu peux ajouter un sous-domaine plus propre comme `cavalier-jp.vercel.app` (si dispo).
 
 ---
 
-L'ancienne app **Cavalier** (entraînement au sol) est conservée : voir
-[`README_cavalier.md`](./README_cavalier.md), servie sur `/cavalier`.
+## 2. Installer l'app
+
+### Sur Android (Opera, Chrome, Edge)
+
+1. Ouvre l'URL Vercel dans le navigateur
+2. Menu (☰ ou ⋮) → **« Ajouter à l'écran d'accueil »** ou **« Installer l'application »**
+3. L'icône fer-à-cheval apparaît, lance comme une vraie app (plein écran, sans barre navigateur)
+
+### Sur iPhone (Safari uniquement)
+
+1. Ouvre l'URL dans Safari (pas Chrome — Chrome iOS ne sait pas installer)
+2. Bouton **Partager** (carré + flèche vers le haut)
+3. **« Sur l'écran d'accueil »**
+
+### Sur ordinateur — Chrome ou Edge
+
+1. Ouvre l'URL
+2. Icône **⊕** (petit symbole « installer ») à droite de la barre d'adresse, **ou** menu ⋮ → **« Installer Cavalier… »**
+3. L'app s'ouvre dans sa propre fenêtre, accessible depuis le menu Démarrer / Launchpad
+
+### Sur ordinateur — Opera
+
+Opera desktop **ne supporte pas l'installation PWA native** (limitation connue d'Opera, qui n'a pas réimplémenté la fonctionnalité Chromium).
+
+Trois alternatives :
+- **Installer via Chrome** une fois (Chrome et Opera coexistent sans conflit) — l'app sera lançable depuis le menu Démarrer / Launchpad indépendamment d'Opera
+- **Épingler l'onglet** : clic droit sur l'onglet → « Épingler l'onglet »
+- **Créer un raccourci** : menu Opera → Page → « Créer un raccourci » (mais ouvre dans un onglet classique, pas en mode app)
+
+---
+
+## 3. Mettre à jour l'app
+
+Quand tu modifies `cavalier.html` :
+
+- **Option A (drag & drop)** : refais un drag & drop sur Vercel, ça remplace la version
+- **Option B (CLI)** : `vercel --prod` à nouveau
+
+Les utilisateurs déjà installés verront la mise à jour au prochain lancement (cache `must-revalidate`).
+
+---
+
+## 4. Données stockées
+
+- Les coches d'exercices, la semaine sélectionnée et l'état des dépliants sont stockés dans `localStorage` du navigateur
+- Pas de serveur, pas de compte, pas de tracking
+- Les données sont locales à chaque appareil (pas de sync entre téléphone et ordi)
+- Vider le cache du navigateur efface la progression
+
+---
+
+## 5. Fichiers
+
+```
+cavalier.html    → l'app complète (HTML + CSS + JS en un seul fichier)
+vercel.json      → config Vercel : sert l'app à la racine /
+README.md        → ce fichier
+```
+
+Tu peux héberger ailleurs (Netlify, GitHub Pages, Cloudflare Pages) avec le même fichier `cavalier.html`. Le `vercel.json` est spécifique à Vercel mais optionnel — sans lui, l'app serait simplement servie à `/cavalier.html` au lieu de la racine.

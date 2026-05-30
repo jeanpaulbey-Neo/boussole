@@ -2,30 +2,14 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/", "destination": "/web/index.html" },
-    { "source": "/cavalier", "destination": "/index.html" }
+    { "source": "/", "destination": "/cavalier.html" }
   ],
   "headers": [
     {
-      "source": "/shared/data/(.*).json",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/web/sw.js",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/web/index.html",
+      "source": "/cavalier.html",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
       ]
     }
-  ],
-  "crons": [
-    { "path": "/api/cron-veille", "schedule": "0 6 1 * *" }
   ]
 }

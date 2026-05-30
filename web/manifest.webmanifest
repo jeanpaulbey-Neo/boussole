@@ -1,0 +1,16 @@
+{
+  "name": "Boussole — optimisation financière",
+  "short_name": "Boussole",
+  "description": "Éducation & orientation à l'optimisation financière (France). Réduis tes impôts sans dépenser un euro de plus.",
+  "lang": "fr",
+  "start_url": "/web/",
+  "scope": "/web/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4F1EA",
+  "theme_color": "#0E5C4A",
+  "icons": [
+    { "src": "/web/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/web/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

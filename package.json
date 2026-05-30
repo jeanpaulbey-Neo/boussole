@@ -1,0 +1,12 @@
+{
+  "name": "boussole",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Boussole — éducation & orientation à l'optimisation financière (France). PWA + proxy Vercel.",
+  "scripts": {
+    "dev": "node --version >/dev/null && python3 -m http.server 8000",
+    "test": "node test/engine.test.mjs",
+    "icons": "node web/icons/generate-icons.mjs"
+  }
+}

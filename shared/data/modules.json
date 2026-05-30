@@ -1,0 +1,122 @@
+{
+  "version": "2026.1",
+  "date_maj": "2026-05-30",
+  "modules": [
+    {
+      "id": "module_0_boussole",
+      "ordre": 0,
+      "niveau": "DEBUTANT",
+      "coutNet": "GRATUIT",
+      "ouvertureObligatoire": true,
+      "titre": "Vraie économie ou dépense déguisée ?",
+      "accroche": "« Réduisez vos impôts ! » Méfiance : beaucoup de conseils te font dépenser pour récupérer une fraction. Apprends à distinguer ce qui t'enrichit de ce qui t'appauvrit poliment.",
+      "contenu": "Trois familles de leviers. 🟢 Gratuit : tu réclames ou réorganises ce qui te revient déjà. 🔵 Réorientation : tu rediriges un flux à toi, parfois bloqué un temps. 🟠 Dépense : de l'argent neuf sort, remboursé en partie ; utile seulement si la dépense était de toute façon voulue.",
+      "piege": "Un don de 100 € « qui économise 66 € » te laisse 34 € plus pauvre. Générosité subventionnée ≠ optimisation.",
+      "pourQui": "Tout le monde ; vital si chaque euro compte. C'est la boussole de l'app.",
+      "calcul": "Frais réels (🟢) = 0 € dépensé, ~165 € d'IR en moins → +165 €. Produit de défisc (🟠) = 1 000 € sortis pour 250 € de réduction → −750 € de trésorerie.",
+      "ouAgir": ["Active le filtre « Zéro dépense supplémentaire » (réglage par défaut conseillé)."],
+      "sources": ["Principe de gestion budgétaire", "Guides patrimoniaux (un investissement inadapté peut coûter plus que l'économie d'impôt)"],
+      "quiz": {
+        "question": "Un don de 100 € donnant 66 € de réduction, financièrement…",
+        "options": ["te rapporte 66 €", "te coûte 34 €", "est neutre"],
+        "bonneReponse": 1,
+        "explication": "Tu sors 100 € et l'État t'en rend 66 : il te reste 34 € de moins. C'est une dépense partiellement remboursée, pas un gain."
+      }
+    },
+    {
+      "id": "credit_domicile",
+      "ordre": 1,
+      "niveau": "DEBUTANT",
+      "coutNet": "GRATUIT",
+      "titre": "Le crédit d'impôt emploi à domicile",
+      "accroche": "Ménage, garde d'enfants, soutien scolaire, aide à un proche âgé ? L'État t'en rend la moitié — même sans payer d'impôt.",
+      "contenu": "Crédit de 50 % des sommes versées ; crédit = remboursé même si tu n'es pas imposable ; plafond de dépense de 12 000 €/an majoré selon le foyer ; avance immédiate Urssaf (tu n'avances que 50 %).",
+      "pourQui": "Familles avec garde, aidants, tout employeur d'une aide déclarée — y compris non imposables.",
+      "calcul": "200 €/mois = 2 400 €/an → 1 200 € rendus.",
+      "ouAgir": ["Déclarer via Cesu (cesu.urssaf.fr)", "Activer l'avance immédiate", "Reporter en case dédiée à la déclaration"],
+      "sources": ["service-public.fr", "Urssaf Cesu"],
+      "quiz": {
+        "question": "Si tu ne paies aucun impôt sur le revenu, ce crédit…",
+        "options": ["est perdu", "t'est remboursé quand même", "est reporté à l'an prochain"],
+        "bonneReponse": 1,
+        "explication": "C'est un crédit d'impôt (et non une réduction) : il est versé même aux foyers non imposables."
+      }
+    },
+    {
+      "id": "frais_reels",
+      "ordre": 2,
+      "niveau": "DEBUTANT",
+      "coutNet": "GRATUIT",
+      "titre": "Frais réels ou abattement 10 % ?",
+      "accroche": "Par défaut le fisc enlève 10 % de ton salaire avant impôt ; si tes vrais frais dépassent, déduis-les à la place. Gratuit, il suffit de cocher.",
+      "contenu": "Abattement forfaitaire de 10 % automatique ; alternative = frais réels (trajets/barème km, repas, formation, télétravail) ; tu prends le plus avantageux ; ça change la base imposable, pas le salaire.",
+      "pourQui": "Salariés/fonctionnaires avec trajets longs ou frais notables ; inutile si proche du travail sans frais.",
+      "calcul": "Net imposable 25 000 € → forfait 2 500 € ; mais 40 km A/R quotidiens ≈ 4 000 € → 1 500 € de base en moins → ~165 € à 11 % (~450 € à 30 %).",
+      "ouAgir": ["Option à cocher dans la déclaration", "Détailler les frais", "Conserver les justificatifs"],
+      "sources": ["impots.gouv.fr", "Barème kilométrique annuel"],
+      "quiz": {
+        "question": "Les frais réels remplacent…",
+        "options": ["l'impôt à payer", "l'abattement automatique de 10 %", "le salaire net"],
+        "bonneReponse": 1,
+        "explication": "On choisit entre l'abattement forfaitaire de 10 % et les frais réels — le plus avantageux des deux."
+      }
+    },
+    {
+      "id": "epargne_salariale_pee",
+      "ordre": 3,
+      "niveau": "DEBUTANT",
+      "coutNet": "REORIENTATION",
+      "titre": "L'abondement de l'épargne salariale",
+      "accroche": "Si ton employeur propose un PEE, il peut ajouter de l'argent quand tu y verses. Un des rares repas gratuits.",
+      "contenu": "Sur un PEE, l'employeur peut abonder (dans une limite légale) ; placer l'intéressement/participation sur le PEE l'exonère d'IR (dans les limites) ; blocage 5 ans (sauf cas de déblocage) ; gain immédiat imbattable.",
+      "pourQui": "Tout salarié dont l'entreprise propose PEE/intéressement/participation ; si « je ne sais pas » → demander au service paie (action #1).",
+      "calcul": "1 000 € d'intéressement perçu = imposé ; placé avec abondement 50 % → 1 500 € exonérés d'IR (500 € gratuits + impôt évité).",
+      "ouAgir": ["Service RH/paie", "Choix au moment du versement (délai court)"],
+      "sources": ["service-public.fr (limites en % du PASS à vérifier)"],
+      "quiz": {
+        "question": "Placer l'intéressement sur un PEE plutôt que le percevoir…",
+        "options": ["ne change rien", "peut l'exonérer d'impôt et déclencher un abondement", "le bloque pour toujours"],
+        "bonneReponse": 1,
+        "explication": "Versé sur le PEE, l'intéressement est exonéré d'IR (dans les limites) et peut être abondé par l'employeur — au prix d'un blocage de 5 ans."
+      }
+    },
+    {
+      "id": "dons",
+      "ordre": 4,
+      "niveau": "DEBUTANT",
+      "coutNet": "DEPENSE",
+      "titre": "Les dons : 66 % ou 75 % rendus",
+      "accroche": "Tu donnes déjà ? L'État te rembourse les deux tiers, parfois les trois quarts. Encore faut-il le déclarer.",
+      "contenu": "66 % pour l'intérêt général ; 75 % pour l'aide aux personnes en difficulté (dans une limite annuelle) ; c'est une réduction (s'impute sur l'impôt dû) ; garder les reçus.",
+      "pourQui": "Personnes imposables qui donnent. Si non imposable → aucun effet (on te le dit). Rappel Module 0 : c'est une dépense partiellement remboursée, pas un gain.",
+      "calcul": "300 € à un organisme d'intérêt général → 198 € ; 100 € à une asso d'aide aux démunis → 75 €.",
+      "ouAgir": ["Reporter en case dédiée", "Conserver les reçus fiscaux"],
+      "sources": ["impots.gouv.fr (plafonds annuels à vérifier)"],
+      "quiz": {
+        "question": "Un don de 100 € à une asso d'aide aux plus démunis fait économiser…",
+        "options": ["50 €", "66 €", "75 €"],
+        "bonneReponse": 2,
+        "explication": "Le dispositif « Coluche » ouvre droit à une réduction de 75 % (dans la limite annuelle)."
+      }
+    },
+    {
+      "id": "aides_non_reclamees",
+      "ordre": 5,
+      "niveau": "DEBUTANT",
+      "coutNet": "GRATUIT",
+      "titre": "Les aides que tu ne réclames pas",
+      "accroche": "Chaque année des milliards d'aides ne sont pas versés faute de demande. Sans doute le plus gros gisement pour ton budget — et sans lien avec l'impôt.",
+      "contenu": "Budget pur (prime d'activité, APL, chèque énergie, complémentaire santé solidaire, bourses…) ; le « non-recours » est fréquent ; un simulateur officiel unique liste l'éligibilité ; argent immédiat.",
+      "pourQui": "Surtout revenus modestes, transitions (perte d'emploi, temps partiel), jeunes actifs, familles ; à tester « au cas où » (anonyme, gratuit).",
+      "calcul": "100–200 €/mois = 1 200–2 400 €/an, souvent supérieur à toute optimisation fiscale pour ce profil.",
+      "ouAgir": ["mesdroitssociaux.gouv.fr", "Puis demande CAF/organisme"],
+      "sources": ["mesdroitssociaux.gouv.fr", "service-public.fr"],
+      "quiz": {
+        "question": "Meilleur réflexe pour vérifier toutes ses aides d'un coup…",
+        "options": ["appeler sa banque", "le simulateur mesdroitssociaux.gouv.fr", "attendre un courrier"],
+        "bonneReponse": 1,
+        "explication": "Le simulateur officiel mesdroitssociaux.gouv.fr agrège l'éligibilité à la plupart des aides, de façon anonyme et gratuite."
+      }
+    }
+  ]
+}

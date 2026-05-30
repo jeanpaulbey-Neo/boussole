@@ -1,0 +1,17 @@
+{
+  "version": "2026.0",
+  "date_maj": "2026-05-30",
+  "statut": "STABLE",
+  "source": "impots.gouv.fr (barème kilométrique, publié chaque année)",
+  "_note": "Table annexe placeholder. À mettre à jour chaque année avec le barème officiel. Le moteur ne code aucun chiffre km en dur : il lit cette table.",
+  "voitures": {
+    "_commentaire": "d = distance annuelle en km. Formule par tranche de puissance fiscale (CV).",
+    "bareme": [
+      { "cv": "3", "tranches": [ { "max_km": 5000, "coef": 0.529, "ajout": 0 }, { "max_km": 20000, "coef": 0.316, "ajout": 1065 }, { "max_km": null, "coef": 0.370, "ajout": 0 } ] },
+      { "cv": "4", "tranches": [ { "max_km": 5000, "coef": 0.606, "ajout": 0 }, { "max_km": 20000, "coef": 0.340, "ajout": 1330 }, { "max_km": null, "coef": 0.407, "ajout": 0 } ] },
+      { "cv": "5", "tranches": [ { "max_km": 5000, "coef": 0.636, "ajout": 0 }, { "max_km": 20000, "coef": 0.357, "ajout": 1395 }, { "max_km": null, "coef": 0.427, "ajout": 0 } ] },
+      { "cv": "6", "tranches": [ { "max_km": 5000, "coef": 0.665, "ajout": 0 }, { "max_km": 20000, "coef": 0.374, "ajout": 1457 }, { "max_km": null, "coef": 0.447, "ajout": 0 } ] },
+      { "cv": "7+", "tranches": [ { "max_km": 5000, "coef": 0.697, "ajout": 0 }, { "max_km": 20000, "coef": 0.394, "ajout": 1515 }, { "max_km": null, "coef": 0.470, "ajout": 0 } ] }
+    ]
+  }
+}

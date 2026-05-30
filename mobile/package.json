@@ -1,0 +1,23 @@
+{
+  "name": "boussole-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Boussole — app React Native (Android d'abord) — SPEC §1. Réutilise shared/engine.",
+  "scripts": {
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "tsc": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-native": "0.76.5",
+    "@react-native-async-storage/async-storage": "^2.1.0",
+    "react-native-purchases": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "typescript": "^5.6.0"
+  },
+  "_notes": "Conformité Play (SPEC §1) : AGP 8.5.1+, NDK r28+ (pages mémoire 16 Ko). RevenueCat via react-native-purchases (§9). AsyncStorage pour profil + progression (local-first)."
+}

@@ -1,0 +1,102 @@
+{
+  "version": "2026.1",
+  "date_maj": "2026-05-30",
+  "cadre_legal": "LOI n° 2026-103 du 19 février 2026 de finances pour 2026",
+  "annee_revenus": 2025,
+  "annee_declaration": 2026,
+  "_avertissement": "Valeurs vérifiées au 30/05/2026 contre des sources officielles. RE-CONTRÔLER chaque valeur avant publication et à chaque cycle budgétaire (cf. RUNBOOK). Une info fausse fait perdre de l'argent à l'utilisateur.",
+
+  "bareme_ir": {
+    "statut": "CONFIRME",
+    "source": "service-public.fr / DGFiP",
+    "reference": "art. 4 LF 2026 ; art. 197 CGI",
+    "commentaire": "Barème IR par part — revenus 2025, revalorisé +0,9% (art. 4 LF2026).",
+    "tranches": [
+      { "plafond": 11600, "taux": 0.00 },
+      { "plafond": 29579, "taux": 0.11 },
+      { "plafond": 84577, "taux": 0.30 },
+      { "plafond": 181917, "taux": 0.41 },
+      { "plafond": null, "taux": 0.45 }
+    ],
+    "abattement_10pct_min": 509,
+    "abattement_10pct_max": 14555
+  },
+
+  "credit_emploi_domicile": {
+    "statut": "A_SURVEILLER",
+    "source": "service-public.fr / Urssaf Cesu",
+    "reference": "art. 199 sexdecies CGI",
+    "taux": 0.50,
+    "est_credit_remboursable": true,
+    "plafond_depense_base": 12000,
+    "majoration_par_enfant": 1500,
+    "majoration_par_membre_65plus": 1500,
+    "majorations_cumul_max": 3000,
+    "plafond_depense_majore_max": 15000,
+    "plafond_premiere_annee": 15000,
+    "plafond_handicap_lourd": 20000
+  },
+
+  "frais_reels": {
+    "statut": "CONFIRME",
+    "source": "impots.gouv.fr",
+    "abattement_forfaitaire_taux": 0.10,
+    "abattement_min": 509,
+    "abattement_max": 14555,
+    "forfait_teletravail_jour": 2.70,
+    "_note_bareme_km": "Barème kilométrique : table annexe (annexe_bareme_km.json), publié chaque année."
+  },
+
+  "dons": {
+    "statut": "CONFIRME",
+    "source": "service-public.fr / LégiFiscal",
+    "reference": "art. 200 CGI ; art. 28 LF 2026",
+    "taux_interet_general": 0.66,
+    "plafond_interet_general_pct_revenu": 0.20,
+    "taux_aide_personnes_difficulte": 0.75,
+    "plafond_aide_difficulte_montant": 2000,
+    "coluche_date_effet_plafond_2000": "2025-10-14",
+    "_note_remboursable": "Plusieurs sources évoquent un passage en crédit d'impôt remboursable pour non-imposables — À CONFIRMER sur le texte définitif et le BOFiP avant de l'affirmer dans l'app."
+  },
+
+  "epargne_salariale": {
+    "statut": "CONFIRME",
+    "source": "service-public.fr / BOSS / opérateurs ES",
+    "pass": 48060,
+    "_note_pass": "47 100 € = valeur 2025 (erreur fréquente). PASS 2026 confirmé = 48 060 €.",
+    "abondement_pee_plafond_pct_pass": 0.08,
+    "abondement_pee_multiple_max_versement": 3.0,
+    "interessement_plafond_pct_pass": 0.75,
+    "blocage_pee_annees": 5,
+    "interessement_participation_exonere_ir_si_verse_pee": true
+  },
+
+  "per": {
+    "statut": "STABLE",
+    "source": "service-public.fr",
+    "deductible": true,
+    "bloque_jusqu_retraite": true,
+    "_note_plafond": "Plafond de déduction individualisé (≈10% des revenus pro, bornes liées au PASS) : figure sur l'avis d'impôt de l'usager — NE PAS coder un plafond générique."
+  },
+
+  "assurance_vie": {
+    "statut": "STABLE",
+    "source": "service-public.fr",
+    "seuil_anciennete_annees": 8,
+    "abattement_annuel_solo": 4600,
+    "abattement_annuel_couple": 9200
+  },
+
+  "pea": {
+    "statut": "STABLE",
+    "source": "service-public.fr",
+    "seuil_exoneration_ir_annees": 5,
+    "ps_toujours_dus": true
+  },
+
+  "plafonnement_niches_fiscales": {
+    "statut": "STABLE",
+    "source": "impots.gouv.fr",
+    "montant": 10000
+  }
+}

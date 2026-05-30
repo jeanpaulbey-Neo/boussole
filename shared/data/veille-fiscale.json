@@ -1,0 +1,53 @@
+{
+  "date_maj": "2026-05-30",
+  "plf_en_cours": false,
+  "_regle_affichage": "Si un levier du bilan correspond à une surveillance ELEVEE ou RECURRENTE, afficher une puce discrète « ⚠️ Règle susceptible d'évoluer ([horizon]). Montant à jour pour [année]. » — jamais alarmiste, jamais spéculatif sur le chiffre futur.",
+  "surveillances": [
+    {
+      "parametre": "credit_emploi_domicile",
+      "leviers": ["credit_domicile"],
+      "nature_risque": "Baisse du taux (50% → 40/30/25%) et/ou du plafond (12 000 → 10 000 €) ; possible progressivité selon revenu. 2e niche la plus coûteuse (~5–6,85 Md€) → cible récurrente.",
+      "statut_actuel": "Maintenu en l'état pour 2026",
+      "probabilite_evolution": "ELEVEE",
+      "horizon": "PLF 2027",
+      "nuance": "La ministre des Comptes publics a évoqué préserver le taux pour la garde d'enfant et les personnes âgées.",
+      "source": "Assemblée nationale (amendements PLF) ; La finance pour tous ; Meilleurtaux"
+    },
+    {
+      "parametre": "quotient_familial_majoration_enfants",
+      "leviers": ["parts_fiscales"],
+      "nature_risque": "Recul de l'âge de l'enfant (14 → 18 ans) ouvrant droit à la majoration pour familles de 2 enfants et +.",
+      "statut_actuel": "Non tranché",
+      "probabilite_evolution": "MOYENNE",
+      "horizon": "PLF 2027",
+      "source": "La finance pour tous (PLF 2026)"
+    },
+    {
+      "parametre": "reduction_frais_scolarite",
+      "leviers": [],
+      "nature_risque": "Suppression proposée de la réduction d'impôt pour frais de scolarité (collège/lycée/sup).",
+      "statut_actuel": "Proposé, non tranché",
+      "probabilite_evolution": "MOYENNE",
+      "horizon": "PLF 2027",
+      "source": "La finance pour tous"
+    },
+    {
+      "parametre": "bareme_ir_indexation",
+      "leviers": [],
+      "nature_risque": "Débat annuel gel vs indexation du barème. 2026 = indexé +0,9%. Un gel futur augmenterait l'impôt à revenu constant.",
+      "statut_actuel": "Indexé pour 2026",
+      "probabilite_evolution": "RECURRENTE",
+      "horizon": "chaque PLF (octobre)",
+      "source": "service-public.fr ; débats PLF"
+    },
+    {
+      "parametre": "dons_coluche_remboursable",
+      "leviers": ["dons"],
+      "nature_risque": "Passage possible en crédit d'impôt remboursable (bénéfice étendu aux non-imposables) — à confirmer sur texte définitif/BOFiP.",
+      "statut_actuel": "Plafond 75% doublé à 2 000 € confirmé ; nature (réduction vs crédit) à confirmer",
+      "probabilite_evolution": "A_CONFIRMER",
+      "horizon": "déclaration 2026",
+      "source": "Les Petites Pierres ; service-public.fr (à recouper)"
+    }
+  ]
+}

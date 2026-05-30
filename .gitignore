@@ -1,0 +1,20 @@
+# Dépendances
+node_modules/
+mobile/node_modules/
+
+# Secrets
+.env
+.env.local
+*.local
+
+# Build / natifs RN
+mobile/android/
+mobile/ios/
+mobile/.gradle/
+*.keystore
+
+# Divers
+.DS_Store
+.vercel
+*.log
+/tmp/

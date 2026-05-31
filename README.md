@@ -36,11 +36,12 @@ shared/
   engine/
     types.ts                  contrats (UserProfile, Lever, LeverResult, FiscalParams…)
     engine.ts                 TMI, catalogue de leviers, garde-fous, tri, calcIR, badge
+    avis.ts                   parser d'avis d'impôt (partagé mobile)
 
 index.html                    PWA (buildless), servie à la racine /
 manifest.webmanifest  sw.js   PWA installable + offline-first
 css/styles.css
-js/  data.js (loader OTA+cache+fallback)  engine.js (miroir du moteur)  app.js (UI/écrans)
+js/  data.js (loader OTA+cache+fallback)  engine.js (miroir du moteur)  app.js (UI/écrans)  avis.js (parser avis)
 icons/  icon-192.png  icon-512.png  generate-icons.mjs
 
 api/                          proxy Vercel (serverless)
@@ -49,7 +50,7 @@ api/                          proxy Vercel (serverless)
   _lib/systemPrompt.js        gabarit anti-hallucination (§7.2)
 
 mobile/                       scaffold React Native + TS (voir mobile/README.md)
-test/engine.test.mjs         tests du moteur (barème IR, leviers, garde-fous, tri)
+test/  engine.test.mjs  avis.test.mjs   tests du moteur et du parser d'avis
 docs/                         SPEC + RUNBOOK (traçabilité)
 vercel.json                  en-têtes de cache + cron de veille (index.html servi nativement)
 ```
@@ -57,7 +58,7 @@ vercel.json                  en-têtes de cache + cron de veille (index.html ser
 ## Lancer en local
 
 ```bash
-# Tests du moteur (barème IR, crédit domicile, garde-fous, tri, PASS 48 060…)
+# Tests (barème IR, crédit domicile, garde-fous, tri, PASS 48 060, parser d'avis…)
 npm test
 
 # Servir la PWA en statique (depuis la racine du dépôt)
@@ -101,6 +102,23 @@ Procédure complète dans `docs/RUNBOOK_validation_fiscale.md` :
 3. On édite `shared/data/fiscal-params.json` (+ `version`, `date_maj`, `source`, `statut`).
 4. Commit + push → le JSON est resservi en **OTA** (cache + fallback bundlé) sans republier
    les apps. L'historique git rend chaque changement auditable.
+
+## Import de l'avis d'impôt (v2 — chiffrage personnalisé)
+
+Depuis **Réglages → Importer mon avis d'impôt** (ou le lien « affiner avec mon avis » sur le
+bilan), l'utilisateur peut charger son avis (**PDF** ou **photo**). L'app remplace alors ses
+estimations par ses **vrais chiffres** : TMI exacte, nombre de parts, et surtout le
+**plafond PER personnel** (que la SPEC §4.1 interdit justement de coder en dur).
+
+**Confidentialité — tout est local (SPEC §1/§10).** Le document est analysé **sur l'appareil**
+(pdf.js pour le PDF, OCR tesseract.js pour les photos, chargés à la demande). Seuls ~5 chiffres
+sont extraits ; **rien n'est envoyé à un serveur**, le fichier n'est pas conservé. Un **écran de
+validation** impose à l'utilisateur de vérifier/corriger les valeurs avant qu'elles ne touchent
+un calcul — l'app ne devine jamais à sa place.
+
+- Parser : `js/avis.js` (web) et `shared/engine/avis.ts` (mobile) — `parseAvisText` +
+  `profilDepuisAvis`. Tests : `test/avis.test.mjs`.
+- Le moteur (`estimeTMI`, levier `per`) utilise `tmiExacte` / `plafondPERExact` si présents.
 
 ## Garde-fous produit (SPEC §2, §10)
 

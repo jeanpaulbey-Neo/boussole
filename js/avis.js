@@ -10,7 +10,7 @@
 // l'usager (revenu, parts, TMI, plafond PER) — précisément les valeurs que la SPEC
 // interdit de coder en dur.
 
-// Espaces "exotiques" fréquents dans les PDF DGFiP : insécable ( ), fine ( ).
+// Espaces "exotiques" fréquents dans les PDF DGFiP : insécable (U+00A0), fine (U+202F).
 const NUM = '[\\d\\s\\u00A0\\u202F.,]';
 
 // Normalise un nombre français : "48 060", "1.234,56", "12 000 €" -> number
@@ -51,11 +51,16 @@ const PATTERNS = {
     /taux\s+marginal\s+d['e\s]*imposition[^\d]{0,40}([\d]+[.,]?\d*)\s*%/i,
     /TMI[^\d]{0,20}([\d]+[.,]?\d*)\s*%/i,
   ],
-  tauxMoyen: [/taux\s+moyen\s+d['e\s]*imposition[^\d]{0,40}([\d]+[.,]?\d*)\s*%/i],
+  tauxMoyen: [
+    /taux\s+moyen\s+d['e\s]*imposition[^\d]{0,40}([\d]+[.,]?\d*)\s*%/i,
+  ],
   // Le plafond PER (épargne retraite) figure dans le cadre "plafond épargne retraite".
   plafondPER: [
     new RegExp(`plafond[^\\n]{0,40}(?:[ée]pargne\\s+retraite|d[ée]duction)[^\\d]{0,60}(${NUM}{4,})`, 'i'),
     new RegExp(`disponible[^\\n]{0,30}retraite[^\\d]{0,40}(${NUM}{4,})`, 'i'),
+    // Libellé réel de l'avis : "Plafond calculé sur les revenus de 2024 : 3 245"
+    new RegExp(`plafond\\s+calcul[ée][^\\d]{0,40}(${NUM}{4,})`, 'i'),
+    new RegExp(`plafond\\s+pour\\s+les\\s+revenus[^\\d]{0,40}(${NUM}{4,})`, 'i'),
   ],
   impotNet: [
     new RegExp(`imp[ôo]t\\s+net[^\\d]{0,40}(${NUM}+)`, 'i'),

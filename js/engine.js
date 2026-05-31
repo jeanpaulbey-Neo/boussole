@@ -7,6 +7,9 @@ const euros = (n) => Math.round(n).toLocaleString('fr-FR') + ' €';
 const pct = (t) => Math.round(t * 100) + ' %';
 
 export function estimeTMI(p) {
+  // v2 (SPEC §5/§12) : si l'utilisateur a chargé son avis d'impôt, on utilise la TMI
+  // exacte qui y figure plutôt que l'heuristique grossière par tranche de revenu.
+  if (p.sourceAvis && typeof p.tmiExacte === 'number') return p.tmiExacte;
   if (p.estImposable === 'NON') return 0;
   switch (p.revenuMensuelFoyer) {
     case '<1500': return 0;
@@ -19,6 +22,8 @@ export function estimeTMI(p) {
 }
 
 export function tmiIncertaine(p) {
+  // Plus d'incertitude si la TMI vient de l'avis (valeur exacte).
+  if (p.sourceAvis && typeof p.tmiExacte === 'number') return false;
   return p.revenuMensuelFoyer === '4000-6000' && p.estImposable !== 'NON';
 }
 
@@ -154,12 +159,19 @@ export const CATALOGUE = [
     sources: ['service-public.fr'],
     calcule: (p) => {
       const tmi = estimeTMI(p);
-      const versement = epargneMensuelleIllustrative(p) * 12;
+      let versement = epargneMensuelleIllustrative(p) * 12;
+      let note = '';
+      // v2 : si l'avis a été chargé, on borne l'exemple au plafond de déduction RÉEL
+      // de l'usager (jamais codé en dur — il vient de l'avis). SPEC §4.1.
+      if (p.sourceAvis && typeof p.plafondPERExact === 'number' && p.plafondPERExact > 0) {
+        versement = Math.min(versement, p.plafondPERExact);
+        note = ` Ton plafond de déduction disponible est de ${euros(p.plafondPERExact)} (avis d'impôt).`;
+      }
       const gain = versement * tmi;
       return {
         leverId: 'per', coutNet: 'REORIENTATION', gainEstimeEuros: gain,
-        texteCalcul: `Exemple : ${euros(versement)} versés → ~${euros(gain)} d'IR en moins à ta TMI de ${pct(tmi)}.`,
-        avertissement: "Argent bloqué jusqu'à la retraite (sauf cas de déblocage). Ton plafond exact figure sur ton avis d'impôt.",
+        texteCalcul: `Exemple : ${euros(versement)} versés → ~${euros(gain)} d'IR en moins à ta TMI de ${pct(tmi)}.${note}`,
+        avertissement: "Argent bloqué jusqu'à la retraite (sauf cas de déblocage)." + (note ? '' : " Ton plafond exact figure sur ton avis d'impôt."),
       };
     },
   },

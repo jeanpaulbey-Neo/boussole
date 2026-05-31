@@ -9,6 +9,12 @@
 // On ne code AUCUN paramètre fiscal ici : on lit ce qui est imprimé sur l'avis de
 // l'usager (revenu, parts, TMI, plafond PER) — précisément les valeurs que la SPEC
 // interdit de coder en dur.
+//
+// IMPORTANT — format DGFiP : l'avis est en COLONNES. pdf.js lit d'abord tous les
+// libellés, puis tous les nombres dans un bloc détaché. Les regex « libellé + nombre »
+// sont donc peu fiables : on privilégie une extraction PRUDENTE (on préfère laisser un
+// champ vide plutôt que d'y mettre une valeur fausse — année, n° de renvoi…) et on
+// s'appuie sur la validation/saisie manuelle de l'utilisateur.
 
 // Espaces "exotiques" fréquents dans les PDF DGFiP : insécable (U+00A0), fine (U+202F).
 const NUM = '[\\d\\s\\u00A0\\u202F.,]';
@@ -25,97 +31,94 @@ function toNumber(raw) {
   return Number.isFinite(n) ? n : null;
 }
 
-// Normalise un pourcentage : "30 %", "30,00%", "0,30" -> 0.30 (fraction)
-function toRate(raw) {
-  const n = toNumber(raw);
-  if (n == null) return null;
-  return n > 1 ? n / 100 : n; // "30" -> 0.30 ; "0.3" -> 0.3
+// Un nombre qui ressemble à une année (renvoi de calendrier fiscal) -> à ignorer.
+function estAnnee(n) {
+  return Number.isInteger(n) && n >= 1990 && n <= 2099;
 }
 
-// Libellés rencontrés sur les avis DGFiP (variations d'année en année).
-// Chaque champ : liste de regex ; on prend la 1re capture trouvée.
-const PATTERNS = {
-  revenuNetImposable: [
-    new RegExp(`revenu\\s+net\\s+imposable[^\\d]{0,40}(${NUM}+)`, 'i'),
-    new RegExp(`revenu\\s+imposable[^\\d]{0,40}(${NUM}+)`, 'i'),
-  ],
-  revenuFiscalReference: [
-    new RegExp(`revenu\\s+fiscal\\s+de\\s+r[ée]f[ée]rence[^\\d]{0,40}(${NUM}+)`, 'i'),
-    new RegExp(`\\bRFR\\b[^\\d]{0,20}(${NUM}+)`, 'i'),
-  ],
-  nombreParts: [
-    /nombre\s+de\s+parts[^\d]{0,40}([\d]+[.,]?\d*)/i,
-    /quotient\s+familial[^\d]{0,40}([\d]+[.,]?\d*)\s*parts?/i,
-  ],
-  tmi: [
-    /taux\s+marginal\s+d['e\s]*imposition[^\d]{0,40}([\d]+[.,]?\d*)\s*%/i,
-    /TMI[^\d]{0,20}([\d]+[.,]?\d*)\s*%/i,
-  ],
-  tauxMoyen: [
-    /taux\s+moyen\s+d['e\s]*imposition[^\d]{0,40}([\d]+[.,]?\d*)\s*%/i,
-  ],
-  // Le plafond PER (épargne retraite) figure dans le cadre "plafond épargne retraite".
-  plafondPER: [
-    new RegExp(`plafond[^\\n]{0,40}(?:[ée]pargne\\s+retraite|d[ée]duction)[^\\d]{0,60}(${NUM}{4,})`, 'i'),
-    new RegExp(`disponible[^\\n]{0,30}retraite[^\\d]{0,40}(${NUM}{4,})`, 'i'),
-    // Libellé réel de l'avis : "Plafond calculé sur les revenus de 2024 : 3 245"
-    new RegExp(`plafond\\s+calcul[ée][^\\d]{0,40}(${NUM}{4,})`, 'i'),
-    new RegExp(`plafond\\s+pour\\s+les\\s+revenus[^\\d]{0,40}(${NUM}{4,})`, 'i'),
-  ],
-  impotNet: [
-    new RegExp(`imp[ôo]t\\s+net[^\\d]{0,40}(${NUM}+)`, 'i'),
-    new RegExp(`montant\\s+de\\s+(?:votre\\s+)?imp[ôo]t[^\\d]{0,40}(${NUM}+)`, 'i'),
-  ],
-};
+// ── Extracteurs spécialisés (robustes au format colonnaire) ──────────────────
 
-function firstMatch(text, regexes, conv) {
-  for (const re of regexes) {
-    const m = text.match(re);
-    if (m && m[1] != null) {
-      const v = conv(m[1]);
-      if (v != null) return v;
-    }
-  }
-  return null;
+// TMI : on relève TOUS les pourcentages du document et on garde celui qui
+// correspond à une tranche connue du barème (0/11/30/41/45 %). C'est fiable même
+// quand le pourcentage est détaché de son libellé (cas réel des avis DGFiP).
+function extraireTMI(text) {
+  const tranches = [0, 0.11, 0.3, 0.41, 0.45];
+  const pourcentages = [...text.matchAll(/(\d{1,2}[.,]\d{1,2})\s*%/g)]
+    .map((m) => toNumber(m[1]) / 100)
+    .filter((v) => v != null);
+  // On ne garde que ceux qui matchent une tranche, et on prend le plus élevé
+  // (la TMI est la tranche marginale = la plus haute applicable).
+  const candidats = pourcentages.filter((v) => tranches.some((t) => Math.abs(t - v) < 0.005));
+  if (candidats.length === 0) return null;
+  return Math.max(...candidats);
+}
+
+// Taux moyen : pourcentage explicitement étiqueté, sinon null.
+function extraireTauxMoyen(text) {
+  const m = text.match(/taux\s+moyen\s+d['e\s]*imposition[^%]{0,200}?(\d{1,2}[.,]\d{1,2})\s*%/i);
+  return m ? toNumber(m[1]) / 100 : null;
+}
+
+// Nombre de parts : "Nombre de parts ... 1,5" — valeur entre 1 et 15, proche du libellé.
+function extraireParts(text) {
+  const m = text.match(/nombre\s+de\s+parts[^\d]{0,30}([1-9](?:[.,]\d{1,2})?)\b/i);
+  if (!m) return null;
+  const n = toNumber(m[1]);
+  return n != null && n >= 1 && n <= 15 ? n : null;
+}
+
+// Grand nombre (revenu, RFR, impôt) : 1er nombre >= 1000 (hors année) dans la zone
+// qui suit le libellé. Best-effort sur le format colonnaire ; souvent à compléter.
+function extraireGrandNombre(text, labelRegex) {
+  const m = text.match(labelRegex);
+  if (!m) return null;
+  const apres = text.slice(m.index + m[0].length, m.index + m[0].length + 400);
+  const nums = [...apres.matchAll(new RegExp(`(${NUM}{4,})`, 'g'))]
+    .map((x) => toNumber(x[1]))
+    .filter((v) => v != null && v >= 1000 && !estAnnee(v));
+  return nums.length ? nums[0] : null;
 }
 
 /**
- * Parse le texte brut d'un avis d'imposition.
+ * Parse le texte brut d'un avis d'imposition (extraction PRUDENTE).
  * @param {string} rawText texte extrait localement (pdf.js / OCR)
  * @returns {{champs:object, confiance:string, avertissements:string[]}}
  */
 export function parseAvisText(rawText) {
-  const text = String(rawText || '').replace(/\r/g, ' ');
+  const text = String(rawText || '').replace(/[\r\n]+/g, ' ');
+
+  const tmi = extraireTMI(text);
   const champs = {
-    revenuNetImposable: firstMatch(text, PATTERNS.revenuNetImposable, toNumber),
-    revenuFiscalReference: firstMatch(text, PATTERNS.revenuFiscalReference, toNumber),
-    nombreParts: firstMatch(text, PATTERNS.nombreParts, toNumber),
-    tmi: firstMatch(text, PATTERNS.tmi, toRate),
-    tauxMoyen: firstMatch(text, PATTERNS.tauxMoyen, toRate),
-    plafondPER: firstMatch(text, PATTERNS.plafondPER, toNumber),
-    impotNet: firstMatch(text, PATTERNS.impotNet, toNumber),
+    // Revenu imposable et RFR : grands nombres détachés -> extraction best-effort,
+    // souvent à compléter à la main (format colonnaire).
+    revenuNetImposable: extraireGrandNombre(text, /revenu\s+(?:net\s+)?imposable/i),
+    revenuFiscalReference: extraireGrandNombre(text, /revenu\s+fiscal\s+de\s+r[ée]f[ée]rence/i),
+    nombreParts: extraireParts(text),
+    tmi,
+    tauxMoyen: extraireTauxMoyen(text),
+    // Plafond PER : valeur très détachée + lignes multiples (total, non utilisé…).
+    // Trop ambigu pour être fiable -> on NE devine PAS, l'utilisateur le saisit.
+    plafondPER: null,
+    impotNet: extraireGrandNombre(text, /imp[ôo]t\s+net/i),
   };
 
-  // Garde-fous de cohérence (valeurs aberrantes => on annule + on signale).
+  // Garde-fous de cohérence (valeurs aberrantes => on annule).
   const avertissements = [];
   if (champs.nombreParts != null && (champs.nombreParts < 1 || champs.nombreParts > 15)) {
-    avertissements.push('Nombre de parts hors plage plausible — à vérifier.');
     champs.nombreParts = null;
-  }
-  if (champs.tmi != null && ![0, 0.11, 0.3, 0.41, 0.45].some((t) => Math.abs(t - champs.tmi) < 0.011)) {
-    avertissements.push('Le taux marginal lu ne correspond pas à une tranche connue — à vérifier.');
   }
   if (champs.revenuNetImposable != null && champs.revenuNetImposable < 0) {
     champs.revenuNetImposable = null;
   }
 
+  avertissements.push(
+    "Format d'avis variable : vérifie chaque valeur ci-dessous (et complète celles laissées vides) avant de valider. En cas de doute, recopie depuis ton avis.",
+  );
+
   // Niveau de confiance = combien de champs clés ont été trouvés.
   const cles = ['revenuNetImposable', 'nombreParts', 'tmi'];
   const trouves = cles.filter((k) => champs[k] != null).length;
   const confiance = trouves >= 2 ? 'BONNE' : trouves === 1 ? 'PARTIELLE' : 'FAIBLE';
-  if (confiance !== 'BONNE') {
-    avertissements.push("Lecture incomplète : complète ou corrige les champs à la main avant de valider.");
-  }
 
   return { champs, confiance, avertissements };
 }

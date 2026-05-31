@@ -49,3 +49,16 @@ npm run tsc          # vérification de types
 
 L'« Approfondir » d'un module appelle le **proxy Vercel** (`/api/approfondir`) — la clé API
 ne transite jamais par le client (SPEC §7.2).
+
+## Import de l'avis d'impôt (v2)
+
+Le parser est partagé : `@shared/engine/avis.ts` (`parseAvisText`, `profilDepuisAvis`).
+Seule l'**extraction de texte** diffère du web (où l'on utilise pdf.js / tesseract.js) :
+
+- **PDF** : `react-native-pdf` ou un lecteur natif → texte → `parseAvisText`.
+- **Photo** : OCR natif (ML Kit via `@react-native-ml-kit/text-recognition`, ou `tesseract`).
+
+Le reste est identique : extraction **100 % sur l'appareil**, aucun upload, écran de
+validation obligatoire, on ne persiste que les chiffres (jamais le document). Le profil
+reçoit `sourceAvis/tmiExacte/plafondPERExact` via `profilDepuisAvis`, et le moteur partagé
+les exploite automatiquement.

@@ -20,6 +20,31 @@ export interface UserProfile {
   objectif: 'SECURISER' | 'PROJET' | 'RETRAITE' | 'IMPOTS'; // Q14
   situationParticuliere: 'SUCCESSION' | 'EXPATRIATION' | 'CREATION_ENTREPRISE' | 'GROS_PATRIMOINE' | 'AUCUNE'; // Q15
   filtreZeroDepense: boolean; // défaut: true
+
+  // v2 (SPEC §5/§12) — chiffres exacts issus de l'avis d'impôt, validés par l'utilisateur.
+  // Optionnels : absents tant que l'avis n'a pas été importé. Extraction 100 % locale.
+  sourceAvis?: boolean;
+  tmiExacte?: number;               // TMI réelle (fraction, ex. 0.30)
+  revenuNetImposableExact?: number; // € (pour le chiffrage fin par barème)
+  nombrePartsExact?: number;        // quotient familial réel
+  plafondPERExact?: number;         // € — plafond de déduction PER personnel (SPEC §4.1)
+}
+
+// Données extraites d'un avis d'imposition (texte parsé localement).
+export interface AvisChamps {
+  revenuNetImposable: number | null;
+  revenuFiscalReference: number | null;
+  nombreParts: number | null;
+  tmi: number | null;        // fraction
+  tauxMoyen: number | null;  // fraction
+  plafondPER: number | null;
+  impotNet: number | null;
+}
+
+export interface AvisResultat {
+  champs: AvisChamps;
+  confiance: 'BONNE' | 'PARTIELLE' | 'FAIBLE';
+  avertissements: string[];
 }
 
 export interface FiscalParams {

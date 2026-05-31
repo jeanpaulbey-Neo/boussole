@@ -3,7 +3,7 @@
 // Lance : node test/engine.test.mjs
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { calcIR, orienter, estimeTMI, CATALOGUE } from '../web/js/engine.js';
+import { calcIR, orienter, estimeTMI, CATALOGUE } from '../js/engine.js';
 
 const params = JSON.parse(readFileSync(fileURLToPath(new URL('../shared/data/fiscal-params.json', import.meta.url))));
 const veille = JSON.parse(readFileSync(fileURLToPath(new URL('../shared/data/veille-fiscale.json', import.meta.url))));

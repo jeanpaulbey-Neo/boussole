@@ -443,7 +443,7 @@ async function boot() {
   store.route = store.profile ? 'bilan' : 'onboarding';
   render();
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/web/sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 }
 boot();

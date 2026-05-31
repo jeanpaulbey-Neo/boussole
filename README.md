@@ -9,8 +9,8 @@ oriente** — elle ne **conseille jamais** un produit ni un montant précis (fro
 
 ## Ce qui est livré
 
-1. **PWA web** (`web/`) — déployable sur Vercel, installable Android/iOS, **offline-first**.
-   C'est le MVP fonctionnel complet, vérifiable immédiatement.
+1. **PWA web** (à la racine : `index.html`, `js/`, `css/`, `icons/`, `sw.js`) — déployable
+   sur Vercel, installable Android/iOS, **offline-first**. MVP complet, vérifiable de suite.
 2. **Scaffold React Native** (`mobile/`) — fidèle à la SPEC §1, réutilise le moteur partagé.
 3. **Données partagées** (`shared/`) — `fiscal-params.json`, `veille-fiscale.json`,
    `modules.json` + moteur TypeScript. **Source de vérité unique** consommée par les deux.
@@ -37,11 +37,11 @@ shared/
     types.ts                  contrats (UserProfile, Lever, LeverResult, FiscalParams…)
     engine.ts                 TMI, catalogue de leviers, garde-fous, tri, calcIR, badge
 
-web/                          PWA (buildless)
-  index.html  manifest.webmanifest  sw.js (offline-first)
-  css/styles.css
-  js/  data.js (loader OTA+cache+fallback)  engine.js (miroir du moteur)  app.js (UI/écrans)
-  icons/  icon-192.png  icon-512.png  generate-icons.mjs
+index.html                    PWA (buildless), servie à la racine /
+manifest.webmanifest  sw.js   PWA installable + offline-first
+css/styles.css
+js/  data.js (loader OTA+cache+fallback)  engine.js (miroir du moteur)  app.js (UI/écrans)
+icons/  icon-192.png  icon-512.png  generate-icons.mjs
 
 api/                          proxy Vercel (serverless)
   approfondir.js              appel Claude borné aux paramètres (clé API côté serveur)
@@ -51,7 +51,7 @@ api/                          proxy Vercel (serverless)
 mobile/                       scaffold React Native + TS (voir mobile/README.md)
 test/engine.test.mjs         tests du moteur (barème IR, leviers, garde-fous, tri)
 docs/                         SPEC + RUNBOOK (traçabilité)
-vercel.json                  / → la PWA (web/), cron de veille, cache OTA
+vercel.json                  en-têtes de cache + cron de veille (index.html servi nativement)
 ```
 
 ## Lancer en local
@@ -60,12 +60,11 @@ vercel.json                  / → la PWA (web/), cron de veille, cache OTA
 # Tests du moteur (barème IR, crédit domicile, garde-fous, tri, PASS 48 060…)
 npm test
 
-# Servir la PWA en statique (lancer depuis la racine du dépôt ; chemins /shared et /web)
-npm run dev            # → http://localhost:8000/web/index.html
+# Servir la PWA en statique (depuis la racine du dépôt)
+npm run dev            # → http://localhost:8000/
 ```
 
-> En statique simple, la racine `/` n'est pas réécrite (c'est `vercel.json` qui le fait en
-> prod) : ouvrir directement `/web/index.html`. Le service worker exige `localhost` ou HTTPS.
+> La PWA est servie à la racine `/`. Le service worker exige `localhost` ou HTTPS.
 
 ## Déployer sur Vercel
 

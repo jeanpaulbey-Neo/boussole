@@ -3,15 +3,15 @@
 // repli sur le cache, pour servir la version OTA la plus fraîche tout en restant lisible
 // hors-ligne (cohérent avec data.js qui cache aussi la dernière bonne valeur).
 
-const VERSION = 'boussole-v1';
+const VERSION = 'boussole-v2';
 const SHELL = [
-  '/web/',
-  '/web/index.html',
-  '/web/css/styles.css',
-  '/web/js/app.js',
-  '/web/js/engine.js',
-  '/web/js/data.js',
-  '/web/manifest.webmanifest',
+  '/',
+  '/index.html',
+  '/css/styles.css',
+  '/js/app.js',
+  '/js/engine.js',
+  '/js/data.js',
+  '/manifest.webmanifest',
   '/shared/data/fiscal-params.json',
   '/shared/data/veille-fiscale.json',
   '/shared/data/modules.json',

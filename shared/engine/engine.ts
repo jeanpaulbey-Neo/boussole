@@ -21,9 +21,11 @@ const pct = (t: number): string => Math.round(t * 100) + ' %';
 const clamp = (v: number, min: number, max: number): number =>
   Math.max(min, Math.min(max, v));
 
-// ── §5 : estimation TMI à partir de Q4, croisée avec Q3 ──────────────────────
+// ── §5 : estimation TMI à partir de Q4, croisée avec Q3 ────────────────────────────
 // Heuristique grossière (MVP). v2 : barème réel par part de quotient familial.
 export function estimeTMI(p: UserProfile): number {
+  // v2 : si l'avis d'impôt a été importé, on utilise la TMI exacte qui y figure.
+  if (p.sourceAvis && typeof p.tmiExacte === 'number') return p.tmiExacte;
   if (p.estImposable === 'NON') return 0; // pivot : force TMI = 0
   switch (p.revenuMensuelFoyer) {
     case '<1500':
@@ -43,6 +45,7 @@ export function estimeTMI(p: UserProfile): number {
 
 // Incertitude sur la TMI (pour afficher un avertissement). SPEC §5.
 export function tmiIncertaine(p: UserProfile): boolean {
+  if (p.sourceAvis && typeof p.tmiExacte === 'number') return false; // valeur exacte
   return p.revenuMensuelFoyer === '4000-6000' && p.estImposable !== 'NON';
 }
 
@@ -66,7 +69,7 @@ function plafondCreditDomicile(p: UserProfile, c: FiscalParams['credit_emploi_do
   return Math.min(c.plafond_depense_base + majoration, c.plafond_depense_majore_max);
 }
 
-// ── §6.5 : formules de calcul ────────────────────────────────────────────────
+// ── §6.5 : formules de calcul ────────────────────────────────────────────
 // Toutes lisent FiscalParams. Résultats ILLUSTRATIFS (« estimation, à vérifier sur impots.gouv.fr »).
 
 export const CATALOGUE: Lever[] = [
@@ -216,7 +219,13 @@ export const CATALOGUE: Lever[] = [
     sources: ['service-public.fr'],
     calcule: (p) => {
       const tmi = estimeTMI(p);
-      const versementAnnuel = epargneMensuelleIllustrative(p) * 12;
+      let versementAnnuel = epargneMensuelleIllustrative(p) * 12;
+      let note = '';
+      // v2 : si l'avis a été importé, on borne au plafond de déduction RÉEL (jamais codé en dur).
+      if (p.sourceAvis && typeof p.plafondPERExact === 'number' && p.plafondPERExact > 0) {
+        versementAnnuel = Math.min(versementAnnuel, p.plafondPERExact);
+        note = ` Ton plafond de déduction disponible est de ${euros(p.plafondPERExact)} (avis d'impôt).`;
+      }
       const gain = versementAnnuel * tmi;
       return {
         leverId: 'per',
@@ -224,8 +233,10 @@ export const CATALOGUE: Lever[] = [
         gainEstimeEuros: gain,
         texteCalcul: `Exemple : ${euros(versementAnnuel)} versés → ~${euros(
           gain,
-        )} d'IR en moins à ta TMI de ${pct(tmi)}.`,
-        avertissement: 'Argent bloqué jusqu\'à la retraite (sauf cas de déblocage). Ton plafond exact figure sur ton avis d\'impôt.',
+        )} d'IR en moins à ta TMI de ${pct(tmi)}.${note}`,
+        avertissement:
+          "Argent bloqué jusqu'à la retraite (sauf cas de déblocage)." +
+          (note ? '' : " Ton plafond exact figure sur ton avis d'impôt."),
       };
     },
   },
@@ -317,7 +328,7 @@ export const CATALOGUE: Lever[] = [
   },
 ];
 
-// ── §6.3 : garde-fous appliqués AVANT le tri ─────────────────────────────────
+// ── §6.3 : garde-fous appliqués AVANT le tri ────────────────────────────────
 export interface OrientationOutput {
   leviers: { lever: Lever; result: LeverResult; surveillance?: Surveillance }[];
   bannieres: string[];

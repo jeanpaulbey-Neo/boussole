@@ -182,3 +182,31 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .surv-list { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
 .surv-list li { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
 .surv-list em { color: var(--orange); font-style: normal; font-weight: 600; }
+
+/* ── Import avis d'imposition (v2) ──────────────────────────────── */
+.avis-intro h2 { font-size: 22px; }
+.avis-intro p { font-size: 14px; color: var(--ink-soft); margin-top: 8px; }
+.avis-privacy { background: var(--green-light); border: 1px solid var(--green); border-radius: var(--radius); padding: 14px; font-size: 13.5px; color: var(--green-dark); line-height: 1.5; }
+.avis-privacy-mini { font-size: 12px; color: var(--ink-mute); text-align: center; }
+.avis-drop { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 2px dashed var(--border-strong); border-radius: var(--radius); padding: 20px 16px; cursor: pointer; }
+.avis-drop:active { background: var(--surface-2); border-color: var(--green); }
+.avis-drop-icon { font-size: 34px; }
+.avis-drop small { color: var(--ink-mute); }
+.avis-status { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; font-size: 13.5px; color: var(--ink-soft); }
+.avis-or { text-align: center; color: var(--ink-mute); font-size: 13px; }
+.avis-conf { border-radius: 12px; padding: 12px 14px; font-size: 13.5px; }
+.avis-conf-BONNE { background: var(--green-light); color: var(--green-dark); }
+.avis-conf-PARTIELLE { background: #FBEEE2; color: #7a3c10; }
+.avis-conf-FAIBLE { background: #F8E9DC; color: var(--orange); }
+.champs { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: var(--radius); overflow: hidden; }
+.champ-row { background: var(--surface); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.champ-row > span:first-child { font-size: 14px; font-weight: 600; color: var(--ink); flex: 1; }
+.champ-input { display: flex; align-items: center; gap: 6px; }
+.champ-input input { width: 110px; text-align: right; font-size: 15px; font-weight: 700; color: var(--green-dark); border: 1.5px solid var(--border-strong); border-radius: 8px; padding: 8px 10px; font-family: var(--font-body); }
+.champ-input input:focus { outline: none; border-color: var(--green); }
+.champ-input em { font-style: normal; color: var(--ink-mute); font-size: 13px; min-width: 34px; }
+.tmi-exact { color: var(--green); font-weight: 600; font-size: 13px; }
+.tmi-est { color: var(--ink-mute); font-size: 13px; }
+.lien-inline { color: var(--green); font-weight: 600; text-decoration: underline; font-size: 13px; padding: 0; }
+.set-flag { font-size: 11px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 3px 8px; border-radius: 12px; margin-left: 6px; }
+.set-flag-soft { color: var(--ink-mute); background: var(--surface-2); }

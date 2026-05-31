@@ -2,6 +2,7 @@
 // SPEC : profilage (§5) → moteur d'orientation (§6) → micro-learning (§7).
 import { loadData } from './data.js';
 import { orienter, estimeTMI, badgeFraicheur, CATALOGUE } from './engine.js';
+import { parseAvisText, profilDepuisAvis } from './avis.js';
 
 const BANDEAU_LEGAL =
   "Informations pédagogiques fondées sur les règles fiscales en vigueur. Ce n'est pas un conseil personnalisé. Vérifie ta situation sur impots.gouv.fr ou auprès d'un professionnel.";
@@ -12,7 +13,7 @@ const TAGS = {
   DEPENSE: { emoji: '🟠', label: 'Dépense' },
 };
 
-// ── Profilage : 15 questions (§5) ────────────────────────────────────────────
+// ── Profilage : 15 questions (§5) ────────────────────────────────────────
 const QUESTIONS = [
   { field: 'situationFamiliale', q: 'Situation familiale ?', opts: [['CELIBATAIRE', 'Célibataire'], ['COUPLE', 'En couple'], ['PARENT_ISOLE', 'Parent isolé']] },
   { field: 'nbCharges', q: 'Enfants ou personnes à charge ?', opts: [[0, '0'], [1, '1'], [2, '2'], [3, '3 +']] },
@@ -31,7 +32,7 @@ const QUESTIONS = [
   { field: 'situationParticuliere', q: 'Situation particulière en vue ?', opts: [['SUCCESSION', 'Succession'], ['EXPATRIATION', 'Expatriation'], ['CREATION_ENTREPRISE', "Création d'entreprise"], ['GROS_PATRIMOINE', 'Gros patrimoine'], ['AUCUNE', 'Aucune']] },
 ];
 
-// ── État global + persistance ────────────────────────────────────────────────
+// ── État global + persistance ────────────────────────────────────────
 const store = {
   route: 'onboarding',
   data: null,
@@ -42,6 +43,7 @@ const store = {
   progression: {},  // { moduleId: { fait: true, quizOk: bool } }
   currentLeverId: null,
   currentModuleId: null,
+  avis: null,        // { champs, confiance, avertissements } en cours de validation (jamais persisté tel quel)
 };
 
 const K = { profile: 'boussole.profile', prog: 'boussole.progression', prem: 'boussole.premium' };
@@ -60,7 +62,7 @@ const app = document.getElementById('app');
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const go = (route, extra = {}) => { Object.assign(store, extra); store.route = route; render(); window.scrollTo(0, 0); };
 
-// ── Composants réutilisables ─────────────────────────────────────────────────
+// ── Composants réutilisables ───────────────────────────────────────
 function bandeauLegal() {
   return `<p class="legal">⚖️ ${BANDEAU_LEGAL}</p>`;
 }
@@ -77,7 +79,7 @@ function tabbar() {
   return `<nav class="tabbar">${tabs.map(([r, e, l]) => `<button class="tab ${store.route === r ? 'active' : ''}" data-go="${r}">${e}<span>${l}</span></button>`).join('')}</nav>`;
 }
 
-// ── Écrans ───────────────────────────────────────────────────────────────────
+// ── Écrans ──────────────────────────────────────────────────
 function screenOnboarding() {
   const refaire = store.profile ? `<button class="btn-ghost" data-go="bilan">Revoir mon bilan</button>` : '';
   return `<div class="screen onboarding">
@@ -151,7 +153,10 @@ function screenBilan() {
     <div><strong>Filtre « Zéro dépense supplémentaire »</strong><br><small>${store.profile.filtreZeroDepense ? 'Actif : seuls les leviers 🟢 et 🔵.' : 'Inactif : les leviers 🟠 (dépense) sont aussi affichés.'}</small></div>
   </div>`;
 
-  body += `<p class="tmi-line">Tranche marginale estimée : <strong>${Math.round(tmi * 100)} %</strong></p>`;
+  const tmiSource = store.profile.sourceAvis && typeof store.profile.tmiExacte === 'number'
+    ? `<span class="tmi-exact">✓ d'après ton avis d'impôt</span>`
+    : `<span class="tmi-est">estimée — <button class="lien-inline" data-go="avis-import">affiner avec mon avis</button></span>`;
+  body += `<p class="tmi-line">Tranche marginale : <strong>${Math.round(tmi * 100)} %</strong> ${tmiSource}</p>`;
 
   if (out.encartPro) {
     body += `<div class="encart-pro">🧑‍⚖️ <strong>Situation particulière détectée.</strong> Pour ${esc(libelleSituation(store.profile.situationParticuliere))}, consulte un professionnel (notaire / CGP / expert-comptable). On ne simule pas ce cas.</div>`;
@@ -307,6 +312,66 @@ function screenPaywall(msg) {
   </div>`;
 }
 
+// ── Import de l'avis d'imposition (v2, SPEC §5/§12) ────────────────────────
+// Tout se passe SUR L'APPAREIL : le fichier est lu en local (pdf.js / OCR), seuls
+// quelques chiffres sont extraits, le document n'est jamais envoyé ni conservé.
+function screenAvisImport() {
+  return `<div class="screen">${header('Importer mon avis', 'settings')}
+    <div class="scroll">
+      <div class="avis-intro">
+        <h2>Affine ton bilan avec ton avis d'impôt</h2>
+        <p>En lisant ton avis, l'app remplace ses estimations par <strong>tes vrais chiffres</strong> :
+        taux marginal exact, nombre de parts, et surtout ton <strong>plafond PER personnel</strong>.</p>
+      </div>
+      <div class="avis-privacy">
+        🔒 <strong>Confidentialité.</strong> Ton document est analysé <strong>uniquement sur cet appareil</strong>.
+        Rien n'est envoyé sur un serveur. On n'en garde que quelques chiffres ; le fichier est aussitôt oublié.
+        Tu pourras tout vérifier et corriger avant validation.
+      </div>
+      <label class="avis-drop" for="avisFile">
+        <span class="avis-drop-icon">📄</span>
+        <span><strong>Choisir mon avis</strong><br><small>PDF (impots.gouv.fr) ou photo de l'avis papier</small></span>
+        <input type="file" id="avisFile" accept="application/pdf,image/*" hidden>
+      </label>
+      <div id="avisStatus" class="avis-status" hidden></div>
+      <p class="avis-or">— ou —</p>
+      <button class="btn-ghost" data-action="avisManuel">Saisir mes chiffres à la main</button>
+      ${bandeauLegal()}
+    </div>
+  </div>`;
+}
+
+function champRow(label, key, value, type = 'number', suffix = '') {
+  const v = value == null ? '' : (type === 'pct' ? Math.round(value * 100) : value);
+  return `<label class="champ-row">
+    <span>${esc(label)}</span>
+    <span class="champ-input"><input type="number" step="any" data-champ="${key}" data-type="${type}" value="${v}" inputmode="decimal">${suffix ? `<em>${esc(suffix)}</em>` : ''}</span>
+  </label>`;
+}
+
+function screenAvisValidation() {
+  const a = store.avis || { champs: {}, confiance: 'FAIBLE', avertissements: [] };
+  const c = a.champs;
+  const confBadge = { BONNE: '🟢 Bonne lecture', PARTIELLE: '🟠 Lecture partielle', FAIBLE: '🔴 Lecture difficile' }[a.confiance] || '';
+  return `<div class="screen">${header('Vérifie tes chiffres', 'avis-import')}
+    <div class="scroll">
+      <div class="avis-conf avis-conf-${a.confiance}">${confBadge} — <strong>vérifie et corrige</strong> avant de valider. L'app ne devine jamais à ta place.</div>
+      ${a.avertissements.map((w) => `<p class="warn">⚠️ ${esc(w)}</p>`).join('')}
+      <div class="champs">
+        ${champRow("Revenu net imposable", 'revenuNetImposable', c.revenuNetImposable, 'number', '€')}
+        ${champRow("Nombre de parts", 'nombreParts', c.nombreParts, 'number', 'parts')}
+        ${champRow("Taux marginal (TMI)", 'tmi', c.tmi, 'pct', '%')}
+        ${champRow("Plafond épargne retraite (PER)", 'plafondPER', c.plafondPER, 'number', '€')}
+        ${champRow("Impôt net", 'impotNet', c.impotNet, 'number', '€')}
+      </div>
+      <button class="btn-primary" data-action="avisValider">Utiliser ces chiffres dans mon bilan</button>
+      <button class="btn-ghost" data-action="avisAnnuler">Annuler</button>
+      <p class="avis-privacy-mini">🔒 Ces valeurs restent sur ton appareil. Le document importé n'a pas été conservé.</p>
+      ${bandeauLegal()}
+    </div>
+  </div>`;
+}
+
 function screenSettings() {
   const fp = store.data.fiscalParams;
   return `<div class="screen">${header('Réglages')}
@@ -314,6 +379,7 @@ function screenSettings() {
       ${badge()}
       <div class="set-group">
         <button class="set-row" data-action="restart">🔄 Refaire mon profil</button>
+        <button class="set-row" data-go="avis-import">📄 Importer mon avis d'impôt ${store.profile && store.profile.sourceAvis ? '<span class="set-flag">✓ chiffres exacts actifs</span>' : '<span class="set-flag set-flag-soft">affiner le bilan</span>'}</button>
         <div class="set-row set-row-toggle"><span>${store.premium ? '⭐ Premium actif' : '🔒 Version gratuite'}</span><button class="btn-small" data-action="togglePrem">${store.premium ? 'Désactiver' : 'Activer (démo)'}</button></div>
       </div>
       <h3 class="section-h">Sources &amp; données fiscales</h3>
@@ -329,12 +395,13 @@ function screenSettings() {
   </div>`;
 }
 
-// ── Rendu + délégation d'événements ──────────────────────────────────────────
+// ── Rendu + délégation d'événements ─────────────────────────────────
 function render() {
   const screens = {
     onboarding: screenOnboarding, profiling: screenProfiling, bilan: screenBilan,
     'lever-detail': screenLeverDetail, module: screenModule, library: screenLibrary,
     checklist: screenChecklist, paywall: () => screenPaywall(), settings: screenSettings,
+    'avis-import': screenAvisImport, 'avis-validation': screenAvisValidation,
   };
   app.innerHTML = (screens[store.route] || screenOnboarding)();
 }
@@ -370,19 +437,101 @@ app.addEventListener('click', async (e) => {
   const a = t.dataset.action;
   if (a === 'start') { store.draft = {}; store.step = 0; return go('profiling'); }
   if (a === 'prev') { if (store.step > 0) { store.step--; render(); } return; }
-  if (a === 'restart') { store.draft = {}; store.step = 0; return go('profiling'); }
+  if (a === 'restart') { store.draft = {}; store.step = 0; store.avis = null; return go('profiling'); }
   if (a === 'buy' || a === 'togglePrem') { store.premium = a === 'buy' ? true : !store.premium; save(); return go(a === 'buy' ? 'bilan' : 'settings'); }
   if (a === 'approfondir') return approfondir(t.dataset.moduleId);
+  if (a === 'avisManuel') { store.avis = { champs: {}, confiance: 'FAIBLE', avertissements: [] }; return go('avis-validation'); }
+  if (a === 'avisAnnuler') { store.avis = null; return go('settings'); }
+  if (a === 'avisValider') return validerAvis();
 });
 
-// filtre zéro dépense (toggle)
+// filtre zéro dépense (toggle) + import de fichier avis
 app.addEventListener('change', (e) => {
   if (e.target.id === 'zeroDep') {
     store.profile.filtreZeroDepense = e.target.checked;
     save();
     render();
+    return;
+  }
+  if (e.target.id === 'avisFile' && e.target.files && e.target.files[0]) {
+    traiterFichierAvis(e.target.files[0]);
   }
 });
+
+// Extraction LOCALE du texte de l'avis (PDF via pdf.js, image via tesseract.js),
+// chargées à la demande depuis un CDN. Aucune donnée n'est envoyée : les libs
+// tournent dans le navigateur, le fichier ne quitte jamais l'appareil.
+const CDN = {
+  pdfjs: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs',
+  pdfWorker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs',
+  tesseract: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.esm.min.js',
+};
+
+function setAvisStatus(html) {
+  const el = document.getElementById('avisStatus');
+  if (el) { el.hidden = false; el.innerHTML = html; }
+}
+
+async function extraireTextePDF(file) {
+  const pdfjs = await import(/* @vite-ignore */ CDN.pdfjs);
+  pdfjs.GlobalWorkerOptions.workerSrc = CDN.pdfWorker;
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjs.getDocument({ data: buf }).promise;
+  let texte = '';
+  const max = Math.min(pdf.numPages, 4); // l'info utile est sur les 1res pages
+  for (let i = 1; i <= max; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    texte += ' ' + content.items.map((it) => it.str).join(' ');
+  }
+  return texte;
+}
+
+async function extraireTexteImage(file) {
+  const mod = await import(/* @vite-ignore */ CDN.tesseract);
+  const Tesseract = mod.default || mod;
+  setAvisStatus('🔍 Lecture de l\'image (OCR) en cours sur ton appareil… cela peut prendre quelques secondes.');
+  const { data } = await Tesseract.recognize(file, 'fra');
+  return data.text || '';
+}
+
+async function traiterFichierAvis(file) {
+  try {
+    setAvisStatus('⏳ Analyse du document sur ton appareil…');
+    const isPDF = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+    const texte = isPDF ? await extraireTextePDF(file) : await extraireTexteImage(file);
+    const res = parseAvisText(texte);
+    store.avis = res; // on garde seulement le texte extrait/les champs, pas le fichier
+    go('avis-validation');
+  } catch (err) {
+    setAvisStatus(
+      `⚠️ Lecture automatique impossible ${navigator.onLine ? '' : '(hors-ligne : l\'analyse PDF/image nécessite une connexion la 1re fois)'}. ` +
+        `Tu peux <strong>saisir tes chiffres à la main</strong> ci-dessous.`,
+    );
+    // Laisse l'utilisateur basculer en saisie manuelle.
+  }
+}
+
+// Applique les chiffres validés au profil, puis recalcule le bilan.
+function validerAvis() {
+  // On relit les inputs (l'utilisateur a pu corriger).
+  const champs = {};
+  document.querySelectorAll('[data-champ]').forEach((input) => {
+    const key = input.dataset.champ;
+    const raw = input.value.trim();
+    if (raw === '') { champs[key] = null; return; }
+    let n = parseFloat(raw.replace(',', '.'));
+    if (!Number.isFinite(n)) { champs[key] = null; return; }
+    if (input.dataset.type === 'pct') n = n > 1 ? n / 100 : n; // % saisi -> fraction
+    champs[key] = n;
+  });
+  const patch = profilDepuisAvis(champs);
+  if (!store.profile) store.profile = {};
+  Object.assign(store.profile, patch);
+  store.avis = null;
+  save();
+  go('bilan');
+}
 
 function handleQuiz(btn) {
   const quiz = document.getElementById('quiz');
@@ -435,7 +584,7 @@ function extraitPertinent(moduleId) {
   return sub;
 }
 
-// ── Boot ─────────────────────────────────────────────────────────────────────
+// ── Boot ────────────────────────────────────────────────────
 async function boot() {
   restore();
   app.innerHTML = '<div class="boot">🧭<p>Chargement…</p></div>';

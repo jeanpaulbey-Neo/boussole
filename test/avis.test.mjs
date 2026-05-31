@@ -55,7 +55,10 @@ check('plus d\'incertitude TMI avec avis', tmiIncertaine(profil) === false);
 // 4) Le PER borne l'exemple au plafond réel de l'avis (4 114 €), pas l'illustratif (4 800 €)
 const per = CATALOGUE.find((l) => l.id === 'per').calcule(profil, params);
 check('PER : gain ≈ 4114 * 0.30', Math.abs(per.gainEstimeEuros - 4114 * 0.30) < 0.5, `=> ${per.gainEstimeEuros}`);
-check('PER : texte mentionne le plafond de l\'avis', per.texteCalcul.includes('4 114') || per.texteCalcul.includes('4 114'), `=> ${per.texteCalcul}`);
+// On compare en retirant tous les espaces (toLocaleString peut produire des espaces
+// insécables/fines selon l'environnement) : seule la présence de "4114" importe.
+const perSansEspaces = per.texteCalcul.replace(/\s/g, '').normalize();
+check('PER : texte mentionne le plafond de l avis', perSansEspaces.includes('4114'), `=> ${per.texteCalcul}`);
 
 // 5) Avis illisible => confiance FAIBLE + avertissement (pas de crash)
 const vide = parseAvisText('document flou sans chiffres exploitables');

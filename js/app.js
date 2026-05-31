@@ -13,7 +13,7 @@ const TAGS = {
   DEPENSE: { emoji: '🟠', label: 'Dépense' },
 };
 
-// ── Profilage : 15 questions (§5) ────────────────────────────────────────
+// ── Profilage : 15 questions (§5) ──
 const QUESTIONS = [
   { field: 'situationFamiliale', q: 'Situation familiale ?', opts: [['CELIBATAIRE', 'Célibataire'], ['COUPLE', 'En couple'], ['PARENT_ISOLE', 'Parent isolé']] },
   { field: 'nbCharges', q: 'Enfants ou personnes à charge ?', opts: [[0, '0'], [1, '1'], [2, '2'], [3, '3 +']] },
@@ -32,18 +32,18 @@ const QUESTIONS = [
   { field: 'situationParticuliere', q: 'Situation particulière en vue ?', opts: [['SUCCESSION', 'Succession'], ['EXPATRIATION', 'Expatriation'], ['CREATION_ENTREPRISE', "Création d'entreprise"], ['GROS_PATRIMOINE', 'Gros patrimoine'], ['AUCUNE', 'Aucune']] },
 ];
 
-// ── État global + persistance ────────────────────────────────────────
+// ── État global + persistance ──
 const store = {
   route: 'onboarding',
   data: null,
   profile: null,
-  draft: {},        // profil en cours de saisie
+  draft: {},
   step: 0,
   premium: false,
-  progression: {},  // { moduleId: { fait: true, quizOk: bool } }
+  progression: {},
   currentLeverId: null,
   currentModuleId: null,
-  avis: null,        // { champs, confiance, avertissements } en cours de validation (jamais persisté tel quel)
+  avis: null,
 };
 
 const K = { profile: 'boussole.profile', prog: 'boussole.progression', prem: 'boussole.premium' };
@@ -62,7 +62,7 @@ const app = document.getElementById('app');
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const go = (route, extra = {}) => { Object.assign(store, extra); store.route = route; render(); window.scrollTo(0, 0); };
 
-// ── Composants réutilisables ───────────────────────────────────────
+// ── Composants réutilisables ──
 function bandeauLegal() {
   return `<p class="legal">⚖️ ${BANDEAU_LEGAL}</p>`;
 }
@@ -79,7 +79,7 @@ function tabbar() {
   return `<nav class="tabbar">${tabs.map(([r, e, l]) => `<button class="tab ${store.route === r ? 'active' : ''}" data-go="${r}">${e}<span>${l}</span></button>`).join('')}</nav>`;
 }
 
-// ── Écrans ──────────────────────────────────────────────────
+// ── Écrans ──
 function screenOnboarding() {
   const refaire = store.profile ? `<button class="btn-ghost" data-go="bilan">Revoir mon bilan</button>` : '';
   return `<div class="screen onboarding">
@@ -312,7 +312,7 @@ function screenPaywall(msg) {
   </div>`;
 }
 
-// ── Import de l'avis d'imposition (v2, SPEC §5/§12) ────────────────────────
+// ── Import de l'avis d'imposition (v2, SPEC §5/§12) ──
 // Tout se passe SUR L'APPAREIL : le fichier est lu en local (pdf.js / OCR), seuls
 // quelques chiffres sont extraits, le document n'est jamais envoyé ni conservé.
 function screenAvisImport() {
@@ -395,7 +395,7 @@ function screenSettings() {
   </div>`;
 }
 
-// ── Rendu + délégation d'événements ─────────────────────────────────
+// ── Rendu + délégation d'événements ──
 function render() {
   const screens = {
     onboarding: screenOnboarding, profiling: screenProfiling, bilan: screenBilan,
@@ -462,8 +462,8 @@ app.addEventListener('change', (e) => {
 // chargées à la demande depuis un CDN. Aucune donnée n'est envoyée : les libs
 // tournent dans le navigateur, le fichier ne quitte jamais l'appareil.
 const CDN = {
-  pdfjs: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs',
-  pdfWorker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs',
+  pdfjs: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.min.mjs',
+  pdfWorker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.worker.min.mjs',
   tesseract: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.esm.min.js',
 };
 
@@ -474,15 +474,26 @@ function setAvisStatus(html) {
 
 async function extraireTextePDF(file) {
   const pdfjs = await import(/* @vite-ignore */ CDN.pdfjs);
-  pdfjs.GlobalWorkerOptions.workerSrc = CDN.pdfWorker;
+  // Le worker est sur un autre domaine (CDN). On le charge en blob same-origin pour
+  // éviter le blocage cross-origin du constructeur Worker (cause n°1 d'échec pdf.js v4).
+  if (pdfjs.GlobalWorkerOptions) {
+    try {
+      const code = await (await fetch(CDN.pdfWorker)).text();
+      pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(
+        new Blob([code], { type: 'text/javascript' }),
+      );
+    } catch (_) {
+      pdfjs.GlobalWorkerOptions.workerSrc = CDN.pdfWorker; // repli : URL directe
+    }
+  }
   const buf = await file.arrayBuffer();
-  const pdf = await pdfjs.getDocument({ data: buf }).promise;
+  const pdf = await pdfjs.getDocument({ data: new Uint8Array(buf) }).promise;
   let texte = '';
   const max = Math.min(pdf.numPages, 4); // l'info utile est sur les 1res pages
   for (let i = 1; i <= max; i++) {
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
-    texte += ' ' + content.items.map((it) => it.str).join(' ');
+    texte += ' ' + content.items.map((it) => (it.str || '')).join(' ');
   }
   return texte;
 }
@@ -500,15 +511,21 @@ async function traiterFichierAvis(file) {
     setAvisStatus('⏳ Analyse du document sur ton appareil…');
     const isPDF = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
     const texte = isPDF ? await extraireTextePDF(file) : await extraireTexteImage(file);
+    // PDF scanné (image, sans couche texte) -> peu/pas de texte : on signale et on bascule.
+    if (isPDF && texte.replace(/\s/g, '').length < 30) {
+      throw new Error('PDF sans texte sélectionnable (probablement scanné). Réessaie avec une photo de l\'avis (lecture par OCR), ou saisis tes chiffres à la main.');
+    }
     const res = parseAvisText(texte);
     store.avis = res; // on garde seulement le texte extrait/les champs, pas le fichier
     go('avis-validation');
   } catch (err) {
+    const cause = !navigator.onLine
+      ? 'Hors-ligne : la lecture PDF/photo nécessite une connexion la première fois (téléchargement de l\'outil de lecture).'
+      : `Détail : ${esc(String(err && err.message ? err.message : err))}`;
     setAvisStatus(
-      `⚠️ Lecture automatique impossible ${navigator.onLine ? '' : '(hors-ligne : l\'analyse PDF/image nécessite une connexion la 1re fois)'}. ` +
-        `Tu peux <strong>saisir tes chiffres à la main</strong> ci-dessous.`,
+      `⚠️ <strong>Lecture automatique impossible.</strong><br>${cause}<br>` +
+        `Tu peux <strong>saisir tes chiffres à la main</strong> avec le bouton ci-dessous.`,
     );
-    // Laisse l'utilisateur basculer en saisie manuelle.
   }
 }
 
@@ -584,7 +601,7 @@ function extraitPertinent(moduleId) {
   return sub;
 }
 
-// ── Boot ────────────────────────────────────────────────────
+// ── Boot ──
 async function boot() {
   restore();
   app.innerHTML = '<div class="boot">🧭<p>Chargement…</p></div>';

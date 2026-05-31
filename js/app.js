@@ -341,11 +341,12 @@ function screenAvisImport() {
   </div>`;
 }
 
-function champRow(label, key, value, type = 'number', suffix = '') {
+function champRow(label, key, value, type = 'number', suffix = '', hint = '') {
   const v = value == null ? '' : (type === 'pct' ? Math.round(value * 100) : value);
-  return `<label class="champ-row">
-    <span>${esc(label)}</span>
-    <span class="champ-input"><input type="number" step="any" data-champ="${key}" data-type="${type}" value="${v}" inputmode="decimal">${suffix ? `<em>${esc(suffix)}</em>` : ''}</span>
+  const vide = value == null;
+  return `<label class="champ-row${vide ? ' champ-vide' : ''}">
+    <span class="champ-label">${esc(label)}${hint ? `<small class="champ-hint">${esc(hint)}</small>` : ''}</span>
+    <span class="champ-input"><input type="number" step="any" data-champ="${key}" data-type="${type}" value="${v}" inputmode="decimal" placeholder="${vide ? 'à saisir' : ''}">${suffix ? `<em>${esc(suffix)}</em>` : ''}</span>
   </label>`;
 }
 
@@ -358,11 +359,11 @@ function screenAvisValidation() {
       <div class="avis-conf avis-conf-${a.confiance}">${confBadge} — <strong>vérifie et corrige</strong> avant de valider. L'app ne devine jamais à ta place.</div>
       ${a.avertissements.map((w) => `<p class="warn">⚠️ ${esc(w)}</p>`).join('')}
       <div class="champs">
-        ${champRow("Revenu net imposable", 'revenuNetImposable', c.revenuNetImposable, 'number', '€')}
-        ${champRow("Nombre de parts", 'nombreParts', c.nombreParts, 'number', 'parts')}
-        ${champRow("Taux marginal (TMI)", 'tmi', c.tmi, 'pct', '%')}
-        ${champRow("Plafond épargne retraite (PER)", 'plafondPER', c.plafondPER, 'number', '€')}
-        ${champRow("Impôt net", 'impotNet', c.impotNet, 'number', '€')}
+        ${champRow("Revenu net imposable", 'revenuNetImposable', c.revenuNetImposable, 'number', '€', 'ligne « Revenu imposable »')}
+        ${champRow("Nombre de parts", 'nombreParts', c.nombreParts, 'number', 'parts', 'en haut de l\'avis')}
+        ${champRow("Taux marginal (TMI)", 'tmi', c.tmi, 'pct', '%', 'cadre « Taux marginal d\'imposition »')}
+        ${champRow("Plafond épargne retraite (PER)", 'plafondPER', c.plafondPER, 'number', '€', 'cadre « Plafond épargne retraite » → ligne « Plafond pour les cotisations versées »')}
+        ${champRow("Impôt net", 'impotNet', c.impotNet, 'number', '€', 'ligne « Impôt net » / « Impôt sur le revenu net »')}
       </div>
       <button class="btn-primary" data-action="avisValider">Utiliser ces chiffres dans mon bilan</button>
       <button class="btn-ghost" data-action="avisAnnuler">Annuler</button>

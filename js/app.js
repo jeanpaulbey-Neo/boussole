@@ -618,11 +618,37 @@ function handleQuiz(btn) {
   save();
 }
 
+// Cache local des réponses « Approfondir » : une même demande (module + version des
+// paramètres fiscaux) n'appelle l'API qu'une fois. Économise les appels facturés et
+// permet de relire hors-ligne. Clé liée à la version des params : un changement de
+// fiscal-params.json invalide naturellement le cache.
+const APPRO_CACHE_KEY = 'boussole.approCache.v1';
+function approCacheLire(k) {
+  try { return (JSON.parse(localStorage.getItem(APPRO_CACHE_KEY)) || {})[k] || null; } catch (_) { return null; }
+}
+function approCacheEcrire(k, data) {
+  try {
+    const c = JSON.parse(localStorage.getItem(APPRO_CACHE_KEY)) || {};
+    c[k] = data;
+    localStorage.setItem(APPRO_CACHE_KEY, JSON.stringify(c));
+  } catch (_) { /* quota plein : on ignore, ce n'est qu'un cache */ }
+}
+
+function renduAppro(out, data, cached) {
+  out.innerHTML = `<div class="appro-card"><p>${esc(data.reponse || '')}</p>${data.sources ? `<small>Sources : ${esc((data.sources || []).join(', '))}${cached ? ' · réponse mémorisée' : ''}</small>` : ''}</div>`;
+}
+
 async function approfondir(moduleId) {
   const out = document.getElementById('approOut');
   out.hidden = false;
-  out.innerHTML = '<p class="loading">Recherche dans la base de connaissances…</p>';
   const m = store.data.modules.find((x) => x.id === moduleId);
+  const cacheKey = `${moduleId}@${store.data.fiscalParams.version}`;
+
+  // 1) Cache : si déjà demandé, on réutilise (aucun appel API).
+  const hit = approCacheLire(cacheKey);
+  if (hit) { renduAppro(out, hit, true); return; }
+
+  out.innerHTML = '<p class="loading">Recherche dans la base de connaissances…</p>';
   try {
     const res = await fetch('/api/approfondir', {
       method: 'POST',
@@ -635,7 +661,8 @@ async function approfondir(moduleId) {
     });
     if (!res.ok) throw new Error('proxy indisponible');
     const data = await res.json();
-    out.innerHTML = `<div class="appro-card"><p>${esc(data.reponse || '')}</p>${data.sources ? `<small>Sources : ${esc((data.sources || []).join(', '))}</small>` : ''}</div>`;
+    if (data.reponse) approCacheEcrire(cacheKey, { reponse: data.reponse, sources: data.sources || [] });
+    renduAppro(out, data, false);
   } catch (err) {
     out.innerHTML = `<div class="appro-card appro-offline"><p>L'approfondissement à la demande nécessite une connexion et le proxy Claude (clé API côté serveur). Hors-ligne, le module ci-dessus reste complet et fiable.</p><small>Configure ANTHROPIC_API_KEY sur Vercel pour activer cette fonction.</small></div>`;
   }

@@ -525,10 +525,11 @@ function screenDroits() {
   return `<div class="screen">${header('Droits sociaux', 'bilan')}
     <div class="scroll">
       ${badge()}
-      <p class="lib-intro">Panorama des principales aides accessibles aux particuliers (${res.length}), classées selon <strong>ton profil déclaré</strong>. <strong>${nbPrio}</strong> ressortent à simuler en priorité. Pour beaucoup de profils, des droits non réclamés pèsent plus lourd que toute optimisation fiscale.</p>
-      <a class="btn-primary" href="${esc(simulateur)}" target="_blank" rel="noopener">🧮 Ouvrir le simulateur officiel ↗</a>
-      ${corps}
+      <p class="lib-intro">Renseigne tes montants pour estimer tes aides, puis explore le panorama des dispositifs. Pour beaucoup de profils, des droits non réclamés pèsent plus lourd que toute optimisation fiscale.</p>
       ${blocEstimationDroits()}
+      <a class="btn-primary" href="${esc(simulateur)}" target="_blank" rel="noopener">🧮 Ouvrir le simulateur officiel ↗</a>
+      <h3 class="section-h">Panorama des aides (${res.length}) — ${nbPrio} à simuler en priorité pour ton profil</h3>
+      ${corps}
       ${bandeauLegal()}
     </div>
     ${tabbar()}

@@ -3,7 +3,7 @@
   "date_maj": "2026-06-01",
   "_avertissement": "Panorama PÉDAGOGIQUE des principales prestations et aides sociales accessibles aux particuliers en France. NON exhaustif. Aucune valeur d'éligibilité ou de montant n'est un conseil personnalisé : seuls les organismes (CAF, CPAM, France Travail, conseil départemental, Carsat…) et le simulateur officiel font foi. Les conditions évoluent fréquemment.",
   "_confidentialite": "Le classement par profil est calculé 100% sur l'appareil. Le chiffrage optionnel (moteur OpenFisca) est le SEUL traitement qui envoie des données hors de l'appareil, et uniquement après consentement explicite.",
-  "simulateur_officiel": "https://www.mesdroitssociaux.gouv.fr/votre-simulateur/accederSimulateur",
+  "simulateur_officiel": "https://www.mesdroitssociaux.gouv.fr/votre-simulateur/",
   "categories": [
     { "id": "REVENUS", "titre": "Revenus & solidarité" },
     { "id": "LOGEMENT", "titre": "Logement & énergie" },

@@ -20,7 +20,15 @@ const stat = (res, id) => res.find((r) => r.niche.id === id).statut;
 // 1) Toutes les niches sont classées, sans crash.
 const rA = adequationNiches(base, niches, params);
 check('toutes les niches classées', rA.length === niches.length);
-check('chaque statut valide', rA.every((r) => ['ADAPTEE', 'SOUS_CONDITIONS', 'SANS_OBJET'].includes(r.statut)));
+check('chaque statut valide', rA.every((r) => ['ADAPTEE', 'SOUS_CONDITIONS', 'A_EXPLORER', 'SANS_OBJET'].includes(r.statut)));
+check('chaque niche a une raison', rA.every((r) => typeof r.raison === 'string' && r.raison.length > 0));
+
+// 1bis) Catalogue étendu : les niches sans levier (panorama) sont classées A_EXPLORER
+// pour un imposable (ou SANS_OBJET si réduction/déduction et non imposable).
+const sansLevier = rA.filter((r) => !r.niche.leverId);
+if (sansLevier.length) {
+  check('panorama (sans levier) classé A_EXPLORER pour imposable', sansLevier.every((r) => r.statut === 'A_EXPLORER'));
+}
 
 // 2) Profil imposable 30% + bailleur + épargne : dons/PER/déficit/frais adaptés.
 check('A: dons ADAPTEE', stat(rA, 'dons') === 'ADAPTEE');

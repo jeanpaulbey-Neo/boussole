@@ -45,38 +45,46 @@ async function fetchJson(name) {
 }
 
 // Niches : optionnel, ne doit jamais faire échouer le chargement.
+// Retourne { niches, categories } pour permettre le regroupement à l'écran.
 async function fetchNichesSafe() {
   try {
     const d = await fetchJson('niches-fiscales');
-    return d.niches || [];
+    return { niches: d.niches || [], categories: d.categories || [] };
   } catch (_) {
-    return [];
+    return { niches: [], categories: [] };
   }
 }
 
 export async function loadData() {
   try {
-    const [fiscalParams, veille, modulesDoc, niches] = await Promise.all([
+    const [fiscalParams, veille, modulesDoc, nichesDoc] = await Promise.all([
       fetchJson('fiscal-params'),
       fetchJson('veille-fiscale'),
       fetchJson('modules'),
       fetchNichesSafe(),
     ]);
     verifierIntegrite(fiscalParams);
-    const data = { fiscalParams, veille, modules: modulesDoc.modules || [], niches, source: 'reseau' };
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ fiscalParams, veille, modulesDoc, niches }));
+    const data = {
+      fiscalParams, veille, modules: modulesDoc.modules || [],
+      niches: nichesDoc.niches, nichesCategories: nichesDoc.categories, source: 'reseau',
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ fiscalParams, veille, modulesDoc, nichesDoc }));
     return data;
   } catch (e) {
     console.warn('[data] fetch réseau échoué, tentative cache local :', e.message);
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
       try {
-        const { fiscalParams, veille, modulesDoc, niches } = JSON.parse(cached);
+        const { fiscalParams, veille, modulesDoc, nichesDoc } = JSON.parse(cached);
         verifierIntegrite(fiscalParams);
-        return { fiscalParams, veille, modules: modulesDoc.modules || [], niches: niches || [], source: 'cache' };
+        return {
+          fiscalParams, veille, modules: modulesDoc.modules || [],
+          niches: (nichesDoc && nichesDoc.niches) || [], nichesCategories: (nichesDoc && nichesDoc.categories) || [],
+          source: 'cache',
+        };
       } catch (_) { /* tombe sur le fallback */ }
     }
     console.warn('[data] aucun cache, utilisation du fallback bundlé');
-    return { fiscalParams: FALLBACK.fiscalParams, veille: FALLBACK.veille, modules: FALLBACK.modules, niches: [], source: 'fallback' };
+    return { fiscalParams: FALLBACK.fiscalParams, veille: FALLBACK.veille, modules: FALLBACK.modules, niches: [], nichesCategories: [], source: 'fallback' };
   }
 }

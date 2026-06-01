@@ -316,41 +316,56 @@ export function calcIR(revenuNetImposable, nbParts, params) {
 
 // Adéquation des niches fiscales au profil. Pour chaque niche, on s'appuie sur
 // l'éligibilité du levier correspondant (CATALOGUE) + les garde-fous (matelas, TMI,
-// imposable) pour classer : ADAPTEE / SOUS_CONDITIONS / SANS_OBJET. Indicatif.
+// imposable) pour classer : ADAPTEE / SOUS_CONDITIONS / SANS_OBJET / A_EXPLORER. Indicatif.
+// Idée directrice : élargir l'éventail des solutions possibles (panorama), sans jamais
+// pousser un produit nommé. Beaucoup de dispositifs n'ont pas de calcul dédié -> A_EXPLORER.
 export function adequationNiches(profile, niches, params) {
   const tmi = estimeTMI(profile);
   const matelas = profile.epargnePrecaution === 'OUI';
+  const imposable = profile.estImposable !== 'NON' && tmi > 0;
 
   return (niches || []).map((niche) => {
-    const lever = CATALOGUE.find((l) => l.id === niche.leverId);
-    const eligible = lever ? lever.eligible(profile) : false;
+    const lever = niche.leverId ? CATALOGUE.find((l) => l.id === niche.leverId) : null;
 
-    let statut = 'SANS_OBJET';
-    let raison = '';
+    let statut;
+    let raison;
 
-    // Déductions/réductions sans effet si non imposable (TMI 0).
-    const sansEffetSiNonImposable = ['per', 'dons', 'frais_reels', 'deficit_foncier'].includes(niche.leverId);
-    if (sansEffetSiNonImposable && (profile.estImposable === 'NON' || tmi === 0)) {
-      statut = 'SANS_OBJET';
-      raison = "Sans impôt à payer, cette déduction/réduction ne rapporte rien.";
-    } else if (eligible) {
-      // Investissements bloqués sans matelas -> sous conditions (garde-fou §6.3).
-      if ((niche.leverId === 'per' || niche.leverId === 'pea') && !matelas) {
-        statut = 'SOUS_CONDITIONS';
-        raison = "Sécurise d'abord ton épargne de précaution avant d'immobiliser de l'argent.";
+    // Cas 1 : niche AVEC levier moteur -> on calcule l'adéquation fine.
+    if (lever) {
+      const eligible = lever.eligible(profile);
+      const sansEffetSiNonImposable = ['per', 'dons', 'frais_reels', 'deficit_foncier'].includes(niche.leverId);
+      if (sansEffetSiNonImposable && !imposable) {
+        statut = 'SANS_OBJET';
+        raison = "Sans impôt à payer, cette déduction/réduction ne rapporte rien.";
+      } else if (eligible) {
+        if ((niche.leverId === 'per' || niche.leverId === 'pea') && !matelas) {
+          statut = 'SOUS_CONDITIONS';
+          raison = "Sécurise d'abord ton épargne de précaution avant d'immobiliser de l'argent.";
+        } else {
+          statut = 'ADAPTEE';
+          raison = "Correspond à ta situation déclarée.";
+        }
       } else {
-        statut = 'ADAPTEE';
-        raison = "Correspond à ta situation déclarée.";
+        statut = 'SOUS_CONDITIONS';
+        raison = "Possible si ta situation remplit les conditions (voir le détail).";
       }
-    } else {
-      // Non éligible : on dit pourquoi, sans fermer la porte si la situation évolue.
-      statut = 'SOUS_CONDITIONS';
-      raison = "Possible si ta situation remplit les conditions (voir le détail).";
+      return { niche, statut, raison };
     }
 
+    // Cas 2 : niche SANS levier (panorama). On donne un aiguillage simple selon le type
+    // et le profil, sans prétendre à un chiffrage : on élargit le champ des possibles.
+    const reductionOuDeduction = ['REDUCTION', 'DEDUCTION'].includes(niche.type);
+    if (reductionOuDeduction && !imposable) {
+      statut = 'SANS_OBJET';
+      raison = "Réduction/déduction sans effet tant que tu n'es pas imposable.";
+    } else {
+      statut = 'A_EXPLORER';
+      raison = "Dispositif à connaître : vérifie les conditions si ta situation s'y prête.";
+    }
     return { niche, statut, raison };
   });
 }
+
 
 export function badgeFraicheur(params, veille) {
   const texte = `Données fiscales à jour au ${params.date_maj}`;

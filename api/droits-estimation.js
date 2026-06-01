@@ -13,14 +13,16 @@
 
 const OPENFISCA = 'https://api.fr.openfisca.org/latest/calculate';
 
-// Mois courant + 3 mois précédents, au format AAAA-MM.
+// Mois courant + 11 précédents (12 mois glissants), au format AAAA-MM.
+// Les 4 premiers servent au trimestre de référence (RSA / prime d'activité) ;
+// les 12 servent à la base ressources annuelle des aides au logement.
 function moisReference(d = new Date()) {
   const out = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 12; i++) {
     const m = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - i, 1));
     out.push(`${m.getUTCFullYear()}-${String(m.getUTCMonth() + 1).padStart(2, '0')}`);
   }
-  return out; // [courant, M-1, M-2, M-3]
+  return out; // [courant, M-1, …, M-11]
 }
 
 function construireSituation(input) {
@@ -32,19 +34,30 @@ function construireSituation(input) {
   const nbEnfants = Math.min(8, Math.max(0, Number(input.nbEnfants) || 0));
   const loyer = Math.max(0, Number(input.loyer) || 0);
 
-  // Le revenu net du foyer : réparti entre les adultes (la prime d'activité est
-  // individualisée — une répartition même approximative vaut mieux que tout sur un seul).
+  // Le revenu du foyer, réparti entre les adultes (la prime d'activité est individualisée).
+  // SUBTILITÉ CRITIQUE validée contre OpenFisca : selon la prestation, la base ressources
+  // n'utilise PAS la même variable ni la même période :
+  //   • RSA / prime d'activité (ppa)  -> `salaire_net`, sur le TRIMESTRE de référence (4 mois).
+  //   • aides au logement (APL/ALS/ALF) -> `salaire_imposable`, sur 12 mois (base annuelle).
+  // Si on ne renseigne que `salaire_net`, l'APL ne « voit » aucun revenu et se calcule comme
+  // pour un foyer sans ressources (montant aberrant à revenu élevé). On renseigne donc LES DEUX.
   const nbAdultes = couple ? 2 : 1;
-  const netParAdulte = net / nbAdultes;
-  const salaireMensuel = {};
-  mois.forEach((m) => { salaireMensuel[m] = Math.round(netParAdulte); });
+  const parAdulte = Math.round(net / nbAdultes);
+  const moisTrimestre = mois.slice(0, 4);
+  const salaireNet = {};
+  moisTrimestre.forEach((m) => { salaireNet[m] = parAdulte; });
+  const salaireImposable = {};
+  mois.forEach((m) => { salaireImposable[m] = parAdulte; });
+  const revenusAdulte = () => ({
+    salaire_net: { ...salaireNet },
+    salaire_imposable: { ...salaireImposable },
+    date_naissance: { ETERNITY: '1985-01-01' },
+  });
 
-  const individus = {
-    demandeur: { salaire_net: { ...salaireMensuel }, date_naissance: { ETERNITY: '1985-01-01' } },
-  };
+  const individus = { demandeur: revenusAdulte() };
   const parents = ['demandeur'];
   if (couple) {
-    individus.conjoint = { salaire_net: { ...salaireMensuel }, date_naissance: { ETERNITY: '1985-01-01' } };
+    individus.conjoint = revenusAdulte();
     parents.push('conjoint');
   }
   const enfants = [];

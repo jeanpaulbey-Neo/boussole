@@ -475,7 +475,7 @@ function blocEstimationDroits() {
   const couple = p.situationFamiliale === 'COUPLE' ? 'COUPLE' : 'SEUL';
   const nbEnf = Number(p.nbCharges) || 0;
   return `<div class="droits-estim">
-    <h3 class="section-h">Estimer mes aides (RSA, prime d'activité, logement, prestations familiales…)</h3>
+    <h3 class="section-h">Estimer 3 aides (RSA, prime d'activité, aide au logement)</h3>
     <div class="avis-conf avis-conf-PARTIELLE">
       ⚠️ <strong>Ce calcul sort de ton appareil.</strong> À ta demande, les éléments saisis ci-dessous
       (sans nom ni identité) sont envoyés au moteur public <strong>OpenFisca</strong> de l'État pour produire
@@ -796,11 +796,7 @@ function extraitPertinent(moduleId) {
 // Chiffrage opt-in des droits sociaux via le proxy OpenFisca (/api/droits-estimation).
 // Seul appel de l'app qui transmet des données — déclenché uniquement sur action explicite.
 const EURO = (n) => Math.round(n).toLocaleString('fr-FR') + ' €';
-const LIBELLE_AIDE = {
-  rsa: 'RSA', prime_activite: "Prime d'activité", aide_logement: 'Aide au logement',
-  allocations_familiales: 'Allocations familiales', complement_familial: 'Complément familial',
-  asf: 'Allocation de soutien familial', ars: 'Allocation de rentrée scolaire',
-};
+const LIBELLE_AIDE = { rsa: 'RSA', prime_activite: "Prime d'activité", aide_logement: 'Aide au logement' };
 
 async function estimerDroits() {
   const out = document.getElementById('estimOut');

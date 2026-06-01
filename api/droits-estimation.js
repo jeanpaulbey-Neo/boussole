@@ -26,7 +26,6 @@ function moisReference(d = new Date()) {
 function construireSituation(input) {
   const mois = moisReference();
   const moisCourant = mois[0];
-  const annee = moisCourant.slice(0, 4);
   const net = Math.max(0, Number(input.revenuNetMensuel) || 0);
   const couple = input.situation === 'COUPLE';
   const nbEnfants = Math.min(8, Math.max(0, Number(input.nbEnfants) || 0));
@@ -65,20 +64,15 @@ function construireSituation(input) {
     menage.depcom = { [moisCourant]: String(input.depcom) };
   }
 
-  // Variables famille demandées. Les 3 socles toujours ; les prestations familiales
-  // seulement s'il y a des enfants (sinon elles valent 0 et encombrent l'affichage).
-  // Subtilités OpenFisca validées : « ars » se calcule à l'ANNÉE, les autres au mois.
+  // On se limite à 3 prestations chiffrables de façon fiable à partir des éléments
+  // saisis : RSA, prime d'activité (ppa) et aide au logement. Les prestations
+  // familiales et minima (AF, ASF, AAH, ASPA…) restent au panorama, où ils renvoient
+  // vers le simulateur officiel.
   const famVars = {
     rsa: { [moisCourant]: null },
     ppa: { [moisCourant]: null },
     aide_logement: { [moisCourant]: null },
   };
-  if (nbEnfants > 0) {
-    famVars.af = { [moisCourant]: null };
-    famVars.cf = { [moisCourant]: null };
-    famVars.asf = { [moisCourant]: null };
-    famVars.ars = { [annee]: null };
-  }
 
   return {
     situation: {
@@ -88,8 +82,6 @@ function construireSituation(input) {
       menages: { men: menage },
     },
     moisCourant,
-    annee,
-    avecEnfants: nbEnfants > 0,
   };
 }
 
@@ -137,7 +129,7 @@ export default async function handler(req, res) {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
     // Le client envoie un code postal (optionnel) ; on le convertit en code commune INSEE.
     const depcom = await codePostalVersInsee(body.codePostal);
-    const { situation: sit, moisCourant, annee, avecEnfants } = construireSituation({ ...body, depcom });
+    const { situation: sit, moisCourant } = construireSituation({ ...body, depcom });
 
     let data;
     try {
@@ -154,22 +146,13 @@ export default async function handler(req, res) {
 
     const fam = (data.familles && data.familles.fam) || {};
     const moisVal = (k) => (fam[k] && typeof fam[k][moisCourant] === 'number' ? Math.round(fam[k][moisCourant]) : null);
-    const anVal = (k) => (fam[k] && typeof fam[k][annee] === 'number' ? Math.round(fam[k][annee]) : null);
 
-    // Liste ordonnée, avec la période (mois/an) pour un affichage correct.
+    // Liste ordonnée, avec la période pour un affichage correct.
     const estimations = [
       { id: 'rsa', montant: moisVal('rsa'), periode: 'mois' },
       { id: 'prime_activite', montant: moisVal('ppa'), periode: 'mois' },
       { id: 'aide_logement', montant: moisVal('aide_logement'), periode: 'mois' },
     ];
-    if (avecEnfants) {
-      estimations.push(
-        { id: 'allocations_familiales', montant: moisVal('af'), periode: 'mois' },
-        { id: 'complement_familial', montant: moisVal('cf'), periode: 'mois' },
-        { id: 'asf', montant: moisVal('asf'), periode: 'mois' },
-        { id: 'ars', montant: anVal('ars'), periode: 'an' },
-      );
-    }
 
     res.status(200).json({
       moisCourant,

@@ -314,6 +314,44 @@ export function calcIR(revenuNetImposable, nbParts, params) {
   return Math.round(impot * nbParts);
 }
 
+// Adéquation des niches fiscales au profil. Pour chaque niche, on s'appuie sur
+// l'éligibilité du levier correspondant (CATALOGUE) + les garde-fous (matelas, TMI,
+// imposable) pour classer : ADAPTEE / SOUS_CONDITIONS / SANS_OBJET. Indicatif.
+export function adequationNiches(profile, niches, params) {
+  const tmi = estimeTMI(profile);
+  const matelas = profile.epargnePrecaution === 'OUI';
+
+  return (niches || []).map((niche) => {
+    const lever = CATALOGUE.find((l) => l.id === niche.leverId);
+    const eligible = lever ? lever.eligible(profile) : false;
+
+    let statut = 'SANS_OBJET';
+    let raison = '';
+
+    // Déductions/réductions sans effet si non imposable (TMI 0).
+    const sansEffetSiNonImposable = ['per', 'dons', 'frais_reels', 'deficit_foncier'].includes(niche.leverId);
+    if (sansEffetSiNonImposable && (profile.estImposable === 'NON' || tmi === 0)) {
+      statut = 'SANS_OBJET';
+      raison = "Sans impôt à payer, cette déduction/réduction ne rapporte rien.";
+    } else if (eligible) {
+      // Investissements bloqués sans matelas -> sous conditions (garde-fou §6.3).
+      if ((niche.leverId === 'per' || niche.leverId === 'pea') && !matelas) {
+        statut = 'SOUS_CONDITIONS';
+        raison = "Sécurise d'abord ton épargne de précaution avant d'immobiliser de l'argent.";
+      } else {
+        statut = 'ADAPTEE';
+        raison = "Correspond à ta situation déclarée.";
+      }
+    } else {
+      // Non éligible : on dit pourquoi, sans fermer la porte si la situation évolue.
+      statut = 'SOUS_CONDITIONS';
+      raison = "Possible si ta situation remplit les conditions (voir le détail).";
+    }
+
+    return { niche, statut, raison };
+  });
+}
+
 export function badgeFraicheur(params, veille) {
   const texte = `Données fiscales à jour au ${params.date_maj}`;
   const moisEcoules = (Date.now() - new Date(params.date_maj).getTime()) / (1000 * 60 * 60 * 24 * 30.4);

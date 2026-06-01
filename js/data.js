@@ -55,36 +55,51 @@ async function fetchNichesSafe() {
   }
 }
 
+// Droits sociaux : optionnel également. Retourne { aides, categories, simulateur }.
+async function fetchDroitsSafe() {
+  try {
+    const d = await fetchJson('droits-sociaux');
+    return { aides: d.aides || [], categories: d.categories || [], simulateur: d.simulateur_officiel || '' };
+  } catch (_) {
+    return { aides: [], categories: [], simulateur: '' };
+  }
+}
+
 export async function loadData() {
   try {
-    const [fiscalParams, veille, modulesDoc, nichesDoc] = await Promise.all([
+    const [fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc] = await Promise.all([
       fetchJson('fiscal-params'),
       fetchJson('veille-fiscale'),
       fetchJson('modules'),
       fetchNichesSafe(),
+      fetchDroitsSafe(),
     ]);
     verifierIntegrite(fiscalParams);
     const data = {
       fiscalParams, veille, modules: modulesDoc.modules || [],
-      niches: nichesDoc.niches, nichesCategories: nichesDoc.categories, source: 'reseau',
+      niches: nichesDoc.niches, nichesCategories: nichesDoc.categories,
+      droits: droitsDoc.aides, droitsCategories: droitsDoc.categories, droitsSimulateur: droitsDoc.simulateur,
+      source: 'reseau',
     };
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ fiscalParams, veille, modulesDoc, nichesDoc }));
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc }));
     return data;
   } catch (e) {
     console.warn('[data] fetch réseau échoué, tentative cache local :', e.message);
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
       try {
-        const { fiscalParams, veille, modulesDoc, nichesDoc } = JSON.parse(cached);
+        const { fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc } = JSON.parse(cached);
         verifierIntegrite(fiscalParams);
         return {
           fiscalParams, veille, modules: modulesDoc.modules || [],
           niches: (nichesDoc && nichesDoc.niches) || [], nichesCategories: (nichesDoc && nichesDoc.categories) || [],
+          droits: (droitsDoc && droitsDoc.aides) || [], droitsCategories: (droitsDoc && droitsDoc.categories) || [],
+          droitsSimulateur: (droitsDoc && droitsDoc.simulateur) || '',
           source: 'cache',
         };
       } catch (_) { /* tombe sur le fallback */ }
     }
     console.warn('[data] aucun cache, utilisation du fallback bundlé');
-    return { fiscalParams: FALLBACK.fiscalParams, veille: FALLBACK.veille, modules: FALLBACK.modules, niches: [], nichesCategories: [], source: 'fallback' };
+    return { fiscalParams: FALLBACK.fiscalParams, veille: FALLBACK.veille, modules: FALLBACK.modules, niches: [], nichesCategories: [], droits: [], droitsCategories: [], droitsSimulateur: '', source: 'fallback' };
   }
 }

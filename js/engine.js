@@ -366,6 +366,64 @@ export function adequationNiches(profile, niches, params) {
   });
 }
 
+// Ordre ordinal des paliers de revenu mensuel du foyer (du plus bas au plus haut).
+const REV_ORDRE = { '<1500': 0, '1500-2500': 1, '2500-4000': 2, '4000-6000': 3, '>6000': 4 };
+
+// Adéquation des DROITS SOCIAUX au profil (panorama mesdroitssociaux/CAF/…).
+// Logique distincte des niches fiscales : ici l'éligibilité dépend des RESSOURCES
+// (faibles), de la composition du foyer et du statut, pas de l'impôt. On ne calcule
+// AUCUN montant : seul le simulateur officiel (ou le chiffrage OpenFisca opt-in) le fait.
+// Statuts : PRIORITAIRE (profil dans la cible) / A_EXPLORER (dépend de critères non
+// mesurés : handicap, âge, ressources exactes) / PEU_PROBABLE (hors cible apparente).
+export function adequationDroits(profile, aides) {
+  const revIdx = REV_ORDRE[profile.revenuMensuelFoyer] ?? 99;
+  const nbCharges = Number(profile.nbCharges) || 0;
+
+  return (aides || []).map((aide) => {
+    const cr = aide.criteres || {};
+    let hasCritere = false;
+    let bloquant = false;
+
+    if (cr.revenuMax !== undefined) {
+      hasCritere = true;
+      if (revIdx > (REV_ORDRE[cr.revenuMax] ?? 99)) bloquant = true; // revenu au-dessus de la cible
+    }
+    if (cr.minCharges !== undefined) {
+      hasCritere = true;
+      if (nbCharges < cr.minCharges) bloquant = true;
+    }
+    if (cr.statuts) {
+      hasCritere = true;
+      if (!cr.statuts.includes(profile.statut)) bloquant = true;
+    }
+    if (cr.situations) {
+      hasCritere = true;
+      if (!cr.situations.includes(profile.situationFamiliale)) bloquant = true;
+    }
+    if (cr.locataire) {
+      hasCritere = true;
+      if (profile.logement !== 'LOCATAIRE') bloquant = true;
+    }
+    if (cr.retraite) {
+      hasCritere = true;
+      if (profile.statut !== 'RETRAITE') bloquant = true;
+    }
+
+    let statut;
+    let raison;
+    if (!hasCritere) {
+      statut = 'A_EXPLORER';
+      raison = "Dépend de critères que l'app ne mesure pas (handicap, âge, ressources exactes) : à vérifier sur le simulateur officiel.";
+    } else if (bloquant) {
+      statut = 'PEU_PROBABLE';
+      raison = "Peu probable au vu de ton profil déclaré — mais seul le simulateur officiel tranche.";
+    } else {
+      statut = 'PRIORITAIRE';
+      raison = "Ton profil entre dans la cible : à simuler en priorité sur le simulateur officiel.";
+    }
+    return { aide, statut, raison };
+  });
+}
 
 export function badgeFraicheur(params, veille) {
   const texte = `Données fiscales à jour au ${params.date_maj}`;

@@ -490,8 +490,8 @@ function blocEstimationDroits() {
         <span class="champ-input"><input type="number" step="1" min="0" inputmode="numeric" id="estEnfants" value="${nbEnf}"></span></label>
       <label class="champ-row"><span class="champ-label">Loyer mensuel<small class="champ-hint">0 si tu n'es pas locataire</small></span>
         <span class="champ-input"><input type="number" step="any" inputmode="decimal" id="estLoyer" placeholder="ex : 700"><em>€</em></span></label>
-      <label class="champ-row"><span class="champ-label">Code commune (INSEE)<small class="champ-hint">facultatif — affine la zone du logement</small></span>
-        <span class="champ-input"><input type="text" inputmode="numeric" id="estCommune" placeholder="ex : 75056" maxlength="5"></span></label>
+      <label class="champ-row"><span class="champ-label">Code postal<small class="champ-hint">facultatif — affine la zone de l'aide au logement</small></span>
+        <span class="champ-input"><input type="text" inputmode="numeric" id="estCodePostal" placeholder="ex : 75011" maxlength="5"></span></label>
     </div>
     <button class="btn-primary" data-action="estimerDroits">Estimer avec OpenFisca</button>
     <div class="approfondir-out" id="estimOut" hidden></div>
@@ -807,7 +807,7 @@ async function estimerDroits() {
     situation: val('estSituation') || 'SEUL',
     nbEnfants: Number(val('estEnfants')) || 0,
     loyer: Number(val('estLoyer')) || 0,
-    codeCommune: (val('estCommune') || '').trim(),
+    codePostal: (val('estCodePostal') || '').trim(),
   };
   out.hidden = false;
   out.innerHTML = '<p class="loading">Estimation en cours via le moteur public OpenFisca…</p>';

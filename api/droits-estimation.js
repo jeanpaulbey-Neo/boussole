@@ -9,7 +9,7 @@
 //
 // Aucune donnée nominative n'est demandée ni transmise (pas de nom, NIR, adresse
 // précise) : seulement revenu net, composition du foyer, loyer et, optionnellement,
-// le code commune pour la zone APL. Rien n'est journalisé côté Boussole.
+// le code postal pour la zone APL. Rien n'est journalisé côté Boussole.
 
 const OPENFISCA = 'https://api.fr.openfisca.org/latest/calculate';
 
@@ -60,8 +60,8 @@ function construireSituation(input) {
     loyer: { [moisCourant]: loyer },
     statut_occupation_logement: { [moisCourant]: 'locataire_vide' },
   };
-  if (/^\d{5}$/.test(String(input.codeCommune || ''))) {
-    menage.depcom = { [moisCourant]: String(input.codeCommune) };
+  if (/^\d{5}$/.test(String(input.depcom || ''))) {
+    menage.depcom = { [moisCourant]: String(input.depcom) };
   }
 
   return {
@@ -75,6 +75,25 @@ function construireSituation(input) {
     },
     moisCourant,
   };
+}
+
+// Code postal -> code commune INSEE (depcom), via l'API Géo officielle.
+// Un code postal peut couvrir plusieurs communes : on prend la première (la zone
+// APL est en pratique identique). Best-effort : toute erreur renvoie null (on calcule
+// alors sans zone, légèrement moins précis pour l'aide au logement).
+async function codePostalVersInsee(codePostal) {
+  if (!/^\d{5}$/.test(String(codePostal || ''))) return null;
+  try {
+    const res = await fetch(
+      `https://geo.api.gouv.fr/communes?codePostal=${codePostal}&fields=code&format=json`,
+      { headers: { accept: 'application/json' } },
+    );
+    if (!res.ok) return null;
+    const arr = await res.json();
+    return Array.isArray(arr) && arr[0] && arr[0].code ? arr[0].code : null;
+  } catch (_) {
+    return null;
+  }
 }
 
 async function appelerOpenFisca(situation) {
@@ -100,7 +119,9 @@ export default async function handler(req, res) {
   }
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
-    const { situation: sit, moisCourant } = construireSituation(body);
+    // Le client envoie un code postal (optionnel) ; on le convertit en code commune INSEE.
+    const depcom = await codePostalVersInsee(body.codePostal);
+    const { situation: sit, moisCourant } = construireSituation({ ...body, depcom });
 
     let data;
     try {

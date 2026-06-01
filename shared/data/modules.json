@@ -117,6 +117,111 @@
         "bonneReponse": 1,
         "explication": "Le simulateur officiel mesdroitssociaux.gouv.fr agrège l'éligibilité à la plupart des aides, de façon anonyme et gratuite."
       }
+    },
+    {
+      "id": "per_detaille",
+      "ordre": 6,
+      "niveau": "SACHANT",
+      "coutNet": "REORIENTATION",
+      "premium": true,
+      "titre": "Le PER en détail : déduire aujourd'hui, bloquer jusqu'à la retraite",
+      "accroche": "Verser sur un PER réduit ton revenu imposable cette année. En échange, l'argent est immobilisé jusqu'à la retraite. Rentable surtout si ta tranche est élevée.",
+      "contenu": "Les versements volontaires sont déductibles dans la limite d'un plafond personnel (≈10 % des revenus pro, borné par le PASS) qui figure sur ton avis d'impôt. L'économie d'impôt = versement × ta TMI. À la sortie, le capital est imposé : l'intérêt vient surtout de l'écart de tranche entre aujourd'hui (actif) et la retraite (souvent plus basse).",
+      "piege": "À 11 % de TMI, l'avantage est faible et l'argent reste bloqué : le PER est rarement le bon premier réflexe. Vérifie d'abord ton matelas de précaution et ton plafond réel.",
+      "pourQui": "TMI à 30 % ou plus, épargne de précaution déjà constituée, horizon retraite lointain.",
+      "calcul": "Plafond 4 000 € versés à 30 % de TMI → 1 200 € d'IR en moins l'année du versement.",
+      "ouAgir": ["Vérifier ton plafond de déduction sur ton avis d'impôt", "Comparer les frais (versement, gestion, arrérages)", "Ne verser que ce que tu peux immobiliser"],
+      "sources": ["service-public.fr", "impots.gouv.fr (plafond sur l'avis)"],
+      "quiz": {
+        "question": "L'économie d'impôt d'un versement PER dépend surtout…",
+        "options": ["du montant versé seulement", "de ta tranche marginale (TMI)", "de ton âge"],
+        "bonneReponse": 1,
+        "explication": "L'économie ≈ versement × TMI : plus ta tranche est élevée, plus la déduction rapporte."
+      }
+    },
+    {
+      "id": "assurance_vie_detaillee",
+      "ordre": 7,
+      "niveau": "SACHANT",
+      "coutNet": "REORIENTATION",
+      "premium": true,
+      "titre": "L'assurance-vie : l'enveloppe souple des 8 ans",
+      "accroche": "Pas de réduction d'impôt à l'entrée, mais une fiscalité allégée sur les gains après 8 ans — et une grande liberté de retrait à tout moment.",
+      "contenu": "L'argent reste disponible (contrairement au PER). Après 8 ans, les retraits bénéficient d'un abattement annuel sur les gains (4 600 € seul / 9 200 € couple) ; au-delà, taux réduit. Avant 8 ans, les gains restent imposables. Atout transmission : régime spécifique hors succession dans les limites légales.",
+      "piege": "« Assurance-vie » ne veut pas dire « sans risque » : tout dépend des supports choisis (fonds euros vs unités de compte). Et les frais varient énormément d'un contrat à l'autre.",
+      "pourQui": "Projet à moyen/long terme, besoin de souplesse, objectif de transmission.",
+      "calcul": "Après 8 ans, un couple retire des gains : 9 200 € d'abattement annuel → 0 € d'IR sur cette part (prélèvements sociaux dus).",
+      "ouAgir": ["Prendre date tôt (le compteur des 8 ans tourne dès l'ouverture)", "Comparer les frais d'entrée et de gestion", "Choisir les supports selon ton horizon et ton risque"],
+      "sources": ["service-public.fr"],
+      "quiz": {
+        "question": "L'avantage fiscal principal de l'assurance-vie arrive…",
+        "options": ["dès le 1er versement", "après 8 ans de détention", "jamais"],
+        "bonneReponse": 1,
+        "explication": "Après 8 ans, un abattement annuel s'applique sur les gains retirés — d'où l'intérêt de prendre date tôt."
+      }
+    },
+    {
+      "id": "pea_detaille",
+      "ordre": 8,
+      "niveau": "SACHANT",
+      "coutNet": "REORIENTATION",
+      "premium": true,
+      "titre": "Le PEA : actions européennes, gains exonérés à 5 ans",
+      "accroche": "Investir en actions via un PEA : après 5 ans, les gains échappent à l'impôt sur le revenu (les prélèvements sociaux restent dus).",
+      "contenu": "Le PEA loge des actions européennes et fonds éligibles. Avant 5 ans, un retrait clôture le plan et les gains sont imposés. Après 5 ans : exonération d'IR sur les gains, PS toujours dus. Plafond de versement légal. Capital soumis aux marchés : pas de garantie.",
+      "piege": "Réservé à un horizon long et à un matelas déjà constitué : on n'y met pas l'argent dont on aura besoin avant 5 ans, ni son épargne de précaution.",
+      "pourQui": "Horizon long (5 ans et +), tolérance au risque actions, matelas de sécurité en place.",
+      "calcul": "5 000 € de gains après 5 ans → 0 € d'IR (contre 12,8 % hors PEA), seuls les prélèvements sociaux s'appliquent.",
+      "ouAgir": ["Ouvrir le PEA tôt (le compteur des 5 ans démarre à l'ouverture)", "Investir progressivement", "Diversifier pour limiter le risque"],
+      "sources": ["service-public.fr"],
+      "quiz": {
+        "question": "Après 5 ans, les gains d'un PEA sont…",
+        "options": ["totalement défiscalisés (rien à payer)", "exonérés d'IR mais soumis aux prélèvements sociaux", "imposés comme un salaire"],
+        "bonneReponse": 1,
+        "explication": "Après 5 ans : exonération d'impôt sur le revenu, mais les prélèvements sociaux restent dus."
+      }
+    },
+    {
+      "id": "frais_reels_avances",
+      "ordre": 9,
+      "niveau": "EXPERT",
+      "coutNet": "GRATUIT",
+      "premium": true,
+      "titre": "Frais réels avancés : le barème kilométrique",
+      "accroche": "Tu fais beaucoup de route pour le travail ? Le barème kilométrique chiffre tes trajets — souvent bien au-delà de l'abattement de 10 %.",
+      "contenu": "Le barème officiel (publié chaque année) calcule un montant déductible selon la puissance fiscale du véhicule et la distance annuelle. S'ajoutent repas, formation, télétravail (forfait journalier). Tu compares le total « frais réels » au forfait de 10 % et tu gardes le plus avantageux. Conserve tes justificatifs.",
+      "piege": "Les frais réels remplacent l'abattement de 10 %, ils ne s'y ajoutent pas. Et il faut pouvoir justifier chaque dépense.",
+      "pourQui": "Salariés/fonctionnaires avec longs trajets domicile-travail ou frais professionnels élevés.",
+      "calcul": "40 km aller-retour/jour ≈ 4 000 €/an de barème km vs forfait 2 500 € → 1 500 € de base imposable en moins → ~450 € d'IR à 30 %.",
+      "ouAgir": ["Estimer ta distance annuelle domicile-travail", "Appliquer le barème km de l'année (annexe officielle)", "Cocher « frais réels » et conserver les justificatifs"],
+      "sources": ["impots.gouv.fr", "Barème kilométrique annuel (annexe)"],
+      "quiz": {
+        "question": "Le barème kilométrique sert à…",
+        "options": ["ajouter un bonus aux 10 %", "chiffrer tes frais réels de trajet (à comparer aux 10 %)", "réduire directement l'impôt"],
+        "bonneReponse": 1,
+        "explication": "Il chiffre le coût de tes trajets ; tu le compares au forfait de 10 % et tu choisis le plus avantageux."
+      }
+    },
+    {
+      "id": "renovation_energetique_detaillee",
+      "ordre": 10,
+      "niveau": "SACHANT",
+      "coutNet": "DEPENSE",
+      "premium": true,
+      "titre": "Rénovation énergétique : aides aux travaux (propriétaires)",
+      "accroche": "Isolation, chauffage, ventilation : des aides existent (MaPrimeRénov', CEE…). Utile seulement si les travaux étaient de toute façon prévus.",
+      "contenu": "Pour ta résidence principale, plusieurs dispositifs prennent en charge une partie des travaux d'amélioration énergétique, sous conditions (artisans RGE, ressources, type de travaux). Ce sont des aides à la dépense, pas un cadeau : on n'engage des travaux que s'ils sont voulus et bien dimensionnés.",
+      "piege": "Rappel Module 0 : une dépense subventionnée reste une dépense. Faire des travaux « pour l'aide » sans en avoir besoin t'appauvrit.",
+      "pourQui": "Propriétaires occupants avec un projet de travaux énergétiques réel.",
+      "calcul": "10 000 € de travaux d'isolation, aides 40 % → 4 000 € pris en charge, 6 000 € à ta charge (à comparer aux économies de chauffage).",
+      "ouAgir": ["Simuler les aides sur france-renov.gouv.fr AVANT d'engager", "Faire établir des devis par des artisans RGE", "Vérifier les conditions de ressources et de cumul"],
+      "sources": ["service-public.fr", "france-renov.gouv.fr"],
+      "quiz": {
+        "question": "Engager des travaux de rénovation surtout « pour toucher l'aide »…",
+        "options": ["est toujours gagnant", "reste une dépense : rentable seulement si les travaux sont voulus", "rapporte de l'argent"],
+        "bonneReponse": 1,
+        "explication": "Une aide réduit le coût mais ne le supprime pas : la rénovation n'est pertinente que si elle répond à un vrai besoin."
+      }
     }
   ]
 }

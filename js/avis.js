@@ -11,13 +11,9 @@
 // interdit de coder en dur.
 //
 // IMPORTANT — format DGFiP : l'avis est en COLONNES. pdf.js lit d'abord tous les
-// libellés, puis tous les nombres dans un bloc détaché. Les regex « libellé + nombre »
-// sont donc peu fiables : on privilégie une extraction PRUDENTE (on préfère laisser un
-// champ vide plutôt que d'y mettre une valeur fausse — année, n° de renvoi…) et on
-// s'appuie sur la validation/saisie manuelle de l'utilisateur.
-
-// Espaces "exotiques" fréquents dans les PDF DGFiP : insécable (U+00A0), fine (U+202F).
-const NUM = '[\\d\\s\\u00A0\\u202F.,]';
+// libellés, puis tous les nombres dans un bloc détaché. On combine donc : extraction
+// par proximité (format simple) + replis best-effort (plus fréquent, soulignements).
+// L'utilisateur valide/complète toujours avant que ça touche un calcul.
 
 // Normalise un nombre français : "48 060", "1.234,56", "12 000 €" -> number
 function toNumber(raw) {
@@ -36,7 +32,21 @@ function estAnnee(n) {
   return Number.isInteger(n) && n >= 1990 && n <= 2099;
 }
 
-// ── Extracteurs spécialisés (robustes au format colonnaire) ──────────────────
+// Montant monétaire STRICT : soit une suite simple de 4 à 7 chiffres (74390),
+// soit un groupement français des milliers — 1 à 3 chiffres puis des groupes de
+// EXACTEMENT 3 chiffres séparés par une espace ou un point (74 390 ; 1.234.567). Les
+// numéros de référence/identifiants (« 09 44 284 614 049 ») ont un groupement irrégulier
+// et ne matchent donc PAS — c'est ce qui évite de coller des chiffres parasites. Borné
+// à 9 M€ pour exclure téléphones/identifiants restants.
+const MONTANT_MAX_PLAUSIBLE = 9000000;
+function montantsStricts(text) {
+  const re = /\b\d{1,3}(?:[   ]\d{3})+\b|\b\d{1,3}(?:\.\d{3})+\b|\b\d{4,7}\b/g;
+  return [...String(text).matchAll(re)]
+    .map((x) => toNumber(x[0]))
+    .filter((v) => v != null && v >= 1000 && v <= MONTANT_MAX_PLAUSIBLE && !estAnnee(v));
+}
+
+// ── Extracteurs spécialisés ──────────────────────────────────────────────────
 
 // TMI : on relève TOUS les pourcentages du document et on garde celui qui
 // correspond à une tranche connue du barème (0/11/30/41/45 %). C'est fiable même
@@ -46,11 +56,9 @@ function extraireTMI(text) {
   const pourcentages = [...text.matchAll(/(\d{1,2}(?:[.,]\d{1,2})?)\s*%/g)]
     .map((m) => toNumber(m[1]) / 100)
     .filter((v) => v != null);
-  // On ne garde que ceux qui matchent une tranche, et on prend le plus élevé
-  // (la TMI est la tranche marginale = la plus haute applicable).
   const candidats = pourcentages.filter((v) => tranches.some((t) => Math.abs(t - v) < 0.005));
   if (candidats.length === 0) return null;
-  return Math.max(...candidats);
+  return Math.max(...candidats); // TMI = tranche marginale = la plus haute applicable
 }
 
 // Taux moyen : pourcentage explicitement étiqueté, sinon null.
@@ -67,22 +75,40 @@ function extraireParts(text) {
   return n != null && n >= 1 && n <= 15 ? n : null;
 }
 
-// Grand nombre (revenu, RFR, impôt) : 1er nombre >= 1000 (hors année) dans la zone
-// qui suit le libellé. Best-effort sur le format colonnaire ; souvent à compléter.
+// Montant >= 1000 le plus proche après le libellé (format simple : libellé↔valeur proches).
 function extraireGrandNombre(text, labelRegex) {
   const m = text.match(labelRegex);
   if (!m) return null;
-  const apres = text.slice(m.index + m[0].length, m.index + m[0].length + 400);
-  // Un nombre commence par un chiffre puis tolère espaces (insécables/fines) et points
-  // de milliers. On évite ainsi de capturer les points de conduite « ...... » des avis.
-  const nums = [...apres.matchAll(/\d[\d\s  .]{3,}/g)]
-    .map((x) => toNumber(x[0]))
-    .filter((v) => v != null && v >= 1000 && !estAnnee(v));
+  const apres = text.slice(m.index + m[0].length, m.index + m[0].length + 200);
+  const nums = montantsStricts(apres);
   return nums.length ? nums[0] : null;
 }
 
+// Repli (format colonnaire DGFiP) : le revenu net imposable est RÉPÉTÉ sur l'avis
+// (salaires nets, revenu brut global, total…). On prend le montant le PLUS FRÉQUENT
+// (apparu >= 2 fois). À défaut, null.
+function nombreLePlusFrequent(nums) {
+  const c = new Map();
+  let best = null;
+  let bestN = 0;
+  for (const n of nums) {
+    const k = (c.get(n) || 0) + 1;
+    c.set(n, k);
+    if (k > bestN || (k === bestN && best != null && n > best)) { bestN = k; best = n; }
+  }
+  return bestN >= 2 ? best : null;
+}
+
+// Repli pour l'impôt net : total encadré de soulignements « ___ 13 576 ___ ».
+function impotEntreSoulignements(text) {
+  const nums = [...text.matchAll(/_[\s_]*(\d[\d   .]{2,})\s*_/g)]
+    .map((x) => toNumber(x[1]))
+    .filter((v) => v != null && v >= 1000 && !estAnnee(v));
+  return nums.length ? Math.max(...nums) : null;
+}
+
 /**
- * Parse le texte brut d'un avis d'imposition (extraction PRUDENTE).
+ * Parse le texte brut d'un avis d'imposition (extraction best-effort, validée par l'usager).
  * @param {string} rawText texte extrait localement (pdf.js / OCR)
  * @returns {{champs:object, confiance:string, avertissements:string[]}}
  */
@@ -90,19 +116,23 @@ export function parseAvisText(rawText) {
   const text = String(rawText || '').replace(/[\r\n]+/g, ' ');
 
   const tmi = extraireTMI(text);
+  const grands = montantsStricts(text);
+  const frequent = nombreLePlusFrequent(grands); // souvent = revenu net imposable
+
   const champs = {
-    // Revenu imposable et RFR : grands nombres détachés -> extraction best-effort,
-    // souvent à compléter à la main (format colonnaire).
-    revenuNetImposable: extraireGrandNombre(text, /revenu\s+(?:net\s+)?imposable/i),
+    // 1) proximité libellé↔valeur (format simple) ; 2) repli "plus fréquent" (colonnaire).
+    revenuNetImposable: extraireGrandNombre(text, /revenu\s+(?:net\s+)?imposable/i) || frequent,
     revenuFiscalReference: extraireGrandNombre(text, /revenu\s+fiscal\s+de\s+r[ée]f[ée]rence/i),
     nombreParts: extraireParts(text),
     tmi,
     tauxMoyen: extraireTauxMoyen(text),
-    // Plafond PER : valeur très détachée + lignes multiples (total, non utilisé…).
-    // Trop ambigu pour être fiable -> on NE devine PAS, l'utilisateur le saisit.
+    // Plafond PER : lignes multiples (total, non utilisé, calculé…) -> trop ambigu, saisie.
     plafondPER: null,
-    impotNet: extraireGrandNombre(text, /imp[ôo]t\s+net/i),
+    impotNet: extraireGrandNombre(text, /imp[ôo]t\s+net/i) || impotEntreSoulignements(text),
   };
+
+  // RFR : uniquement par proximité du libellé (un "plus grand montant" capterait des
+  // numéros parasites — téléphone, référence). Non utilisé dans les calculs : vide > faux.
 
   // Garde-fous de cohérence (valeurs aberrantes => on annule).
   const avertissements = [];
@@ -114,7 +144,7 @@ export function parseAvisText(rawText) {
   }
 
   avertissements.push(
-    "Format d'avis variable : vérifie chaque valeur ci-dessous (et complète celles laissées vides) avant de valider. En cas de doute, recopie depuis ton avis.",
+    "Valeurs lues automatiquement : vérifie chaque montant ci-dessous (et complète ceux laissés vides) avant de valider. En cas de doute, recopie depuis ton avis.",
   );
 
   // Niveau de confiance = combien de champs clés ont été trouvés.

@@ -475,7 +475,7 @@ function blocEstimationDroits() {
   const couple = p.situationFamiliale === 'COUPLE' ? 'COUPLE' : 'SEUL';
   const nbEnf = Number(p.nbCharges) || 0;
   return `<div class="droits-estim">
-    <h3 class="section-h">Estimer 3 aides (RSA, prime d'activité, aide au logement)</h3>
+    <h3 class="section-h">Estimer mes aides (RSA, prime d'activité, logement, prestations familiales…)</h3>
     <div class="avis-conf avis-conf-PARTIELLE">
       ⚠️ <strong>Ce calcul sort de ton appareil.</strong> À ta demande, les éléments saisis ci-dessous
       (sans nom ni identité) sont envoyés au moteur public <strong>OpenFisca</strong> de l'État pour produire
@@ -796,7 +796,11 @@ function extraitPertinent(moduleId) {
 // Chiffrage opt-in des droits sociaux via le proxy OpenFisca (/api/droits-estimation).
 // Seul appel de l'app qui transmet des données — déclenché uniquement sur action explicite.
 const EURO = (n) => Math.round(n).toLocaleString('fr-FR') + ' €';
-const LIBELLE_AIDE = { rsa: 'RSA', prime_activite: "Prime d'activité", aide_logement: 'Aide au logement' };
+const LIBELLE_AIDE = {
+  rsa: 'RSA', prime_activite: "Prime d'activité", aide_logement: 'Aide au logement',
+  allocations_familiales: 'Allocations familiales', complement_familial: 'Complément familial',
+  asf: 'Allocation de soutien familial', ars: 'Allocation de rentrée scolaire',
+};
 
 async function estimerDroits() {
   const out = document.getElementById('estimOut');
@@ -816,11 +820,12 @@ async function estimerDroits() {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
     });
     const data = await res.json();
-    if (!res.ok || !data.estimations) throw new Error(data.message || 'indisponible');
-    const lignes = Object.entries(data.estimations).map(([k, v]) => {
-      const lib = LIBELLE_AIDE[k] || k;
-      if (v === null) return `<li>${esc(lib)} : <em>non calculable avec ces éléments</em></li>`;
-      return `<li><strong>${esc(lib)}</strong> : ${v > 0 ? '≈ ' + EURO(v) + ' / mois' : 'aucun droit estimé'}</li>`;
+    if (!res.ok || !Array.isArray(data.estimations)) throw new Error(data.message || 'indisponible');
+    const lignes = data.estimations.map(({ id, montant, periode }) => {
+      const lib = LIBELLE_AIDE[id] || id;
+      if (montant === null) return `<li>${esc(lib)} : <em>non calculable avec ces éléments</em></li>`;
+      const par = periode === 'an' ? '/ an' : '/ mois';
+      return `<li><strong>${esc(lib)}</strong> : ${montant > 0 ? '≈ ' + EURO(montant) + ' ' + par : 'aucun droit estimé'}</li>`;
     }).join('');
     out.innerHTML = `<div class="appro-card"><ul class="estim-list">${lignes}</ul><small>⚠️ ${esc(data.avertissement || '')} Source : ${esc(data.moteur || 'OpenFisca')}.</small></div>`;
   } catch (err) {

@@ -474,6 +474,11 @@ function blocEstimationDroits() {
   // Pré-remplissage doux à partir du profil (jamais de valeur exacte devinée).
   const couple = p.situationFamiliale === 'COUPLE' ? 'COUPLE' : 'SEUL';
   const nbEnf = Number(p.nbCharges) || 0;
+  // Pré-remplissage du revenu : on prend le milieu de la tranche déclarée au profil
+  // (le profil ne stocke qu'une fourchette, jamais un montant exact). Modifiable.
+  const REV_MID = { '<1500': 1200, '1500-2500': 2000, '2500-4000': 3200, '4000-6000': 5000, '>6000': 7000 };
+  const revPre = REV_MID[p.revenuMensuelFoyer] || '';
+  const revHint = revPre ? 'estimé depuis ta tranche de profil — ajuste avec ton montant exact' : 'salaires nets, hors prestations';
   return `<div class="droits-estim">
     <h3 class="section-h">Estimer mes aides (RSA, prime d'activité, logement, prestations familiales…)</h3>
     <div class="avis-conf avis-conf-PARTIELLE">
@@ -482,8 +487,8 @@ function blocEstimationDroits() {
       une estimation indicative. Le reste de Boussole, lui, ne transmet rien. Le simulateur officiel reste la référence.
     </div>
     <div class="champs">
-      <label class="champ-row"><span class="champ-label">Revenu net mensuel du foyer<small class="champ-hint">salaires nets, hors prestations</small></span>
-        <span class="champ-input"><input type="number" step="any" inputmode="decimal" id="estRevenu" placeholder="ex : 1500"><em>€</em></span></label>
+      <label class="champ-row"><span class="champ-label">Revenu net mensuel du foyer<small class="champ-hint">${revHint}</small></span>
+        <span class="champ-input"><input type="number" step="any" inputmode="decimal" id="estRevenu" value="${revPre}" placeholder="ex : 1500"><em>€</em></span></label>
       <label class="champ-row"><span class="champ-label">Situation</span>
         <span class="champ-input"><select id="estSituation"><option value="SEUL"${couple === 'SEUL' ? ' selected' : ''}>Seul(e)</option><option value="COUPLE"${couple === 'COUPLE' ? ' selected' : ''}>En couple</option></select></span></label>
       <label class="champ-row"><span class="champ-label">Enfants à charge</span>

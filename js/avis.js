@@ -43,7 +43,7 @@ function estAnnee(n) {
 // quand le pourcentage est détaché de son libellé (cas réel des avis DGFiP).
 function extraireTMI(text) {
   const tranches = [0, 0.11, 0.3, 0.41, 0.45];
-  const pourcentages = [...text.matchAll(/(\d{1,2}[.,]\d{1,2})\s*%/g)]
+  const pourcentages = [...text.matchAll(/(\d{1,2}(?:[.,]\d{1,2})?)\s*%/g)]
     .map((m) => toNumber(m[1]) / 100)
     .filter((v) => v != null);
   // On ne garde que ceux qui matchent une tranche, et on prend le plus élevé
@@ -73,8 +73,10 @@ function extraireGrandNombre(text, labelRegex) {
   const m = text.match(labelRegex);
   if (!m) return null;
   const apres = text.slice(m.index + m[0].length, m.index + m[0].length + 400);
-  const nums = [...apres.matchAll(new RegExp(`(${NUM}{4,})`, 'g'))]
-    .map((x) => toNumber(x[1]))
+  // Un nombre commence par un chiffre puis tolère espaces (insécables/fines) et points
+  // de milliers. On évite ainsi de capturer les points de conduite « ...... » des avis.
+  const nums = [...apres.matchAll(/\d[\d\s  .]{3,}/g)]
+    .map((x) => toNumber(x[0]))
     .filter((v) => v != null && v >= 1000 && !estAnnee(v));
   return nums.length ? nums[0] : null;
 }

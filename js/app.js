@@ -1,7 +1,7 @@
 // Boussole — app PWA d'éducation & d'orientation à l'optimisation financière.
 // SPEC : profilage (§5) → moteur d'orientation (§6) → micro-learning (§7).
 import { loadData } from './data.js';
-import { orienter, estimeTMI, badgeFraicheur, CATALOGUE } from './engine.js';
+import { orienter, estimeTMI, badgeFraicheur, CATALOGUE, adequationNiches } from './engine.js';
 import { parseAvisText, profilDepuisAvis } from './avis.js';
 
 const BANDEAU_LEGAL =
@@ -176,6 +176,8 @@ function screenBilan() {
     }
   }
 
+  body += `<button class="btn-ghost" data-go="niches">🗂️ Voir toutes les niches fiscales & leur adéquation</button>`;
+
   return `<div class="screen">${header('Ton bilan d\'orientation')}
     <div class="scroll">
       ${badge()}
@@ -215,6 +217,8 @@ function screenLeverDetail() {
 function screenModule() {
   const m = store.data.modules.find((x) => x.id === store.currentModuleId);
   if (!m) return screenBilan();
+  // Garde-fou : un module premium non débloqué renvoie au paywall.
+  if (m.premium && !store.premium) return screenPaywall('Ce module avancé fait partie de Boussole Premium.');
   const prog = store.progression[m.id] || {};
   return `<div class="screen">${header('Apprendre', store.currentLeverId ? 'lever-detail' : 'library')}
     <div class="scroll module">
@@ -245,24 +249,29 @@ function screenModule() {
 }
 
 function screenLibrary() {
-  const cards = store.data.modules
-    .slice()
-    .sort((a, b) => a.ordre - b.ordre)
-    .map((m) => {
-      const prog = store.progression[m.id] || {};
-      return `<button class="lib-card" data-module="${m.id}">
-        <div class="lib-top">${tag(m.coutNet)}${prog.fait ? '<span class="done-dot">✓</span>' : ''}</div>
+  const carte = (m) => {
+    const prog = store.progression[m.id] || {};
+    const verrou = m.premium && !store.premium;
+    // Module premium non débloqué -> renvoie au paywall ; sinon ouvre le module.
+    const action = verrou ? `data-go="paywall"` : `data-module="${m.id}"`;
+    return `<button class="lib-card${verrou ? ' lib-card-prem' : ''}" ${action}>
+        <div class="lib-top">${tag(m.coutNet)}${verrou ? '<span class="lock">🔒</span>' : (prog.fait ? '<span class="done-dot">✓</span>' : '')}</div>
         <h3>${esc(m.titre)}</h3>
         <p>${esc(m.accroche)}</p>
-        <span class="niveau">${esc(m.niveau)}</span>
+        <span class="niveau">${esc(m.niveau)}${m.premium ? ' · Premium' : ''}</span>
       </button>`;
-    }).join('');
+  };
+  const mods = store.data.modules.slice().sort((a, b) => a.ordre - b.ordre);
+  const socle = mods.filter((m) => !m.premium).map(carte).join('');
+  const avances = mods.filter((m) => m.premium).map(carte).join('');
   return `<div class="screen">${header('Bibliothèque')}
     <div class="scroll">
       ${badge()}
-      <p class="lib-intro">Modules de 60 secondes. Le socle (0–5) est gratuit et disponible hors-ligne. La bibliothèque avancée (PER, assurance-vie, PEA, barème km, rénovation) arrive en Premium.</p>
-      <div class="lib-grid">${cards}</div>
-      <div class="lib-card lib-card-locked" data-go="paywall"><div class="lib-top">🔒</div><h3>Modules avancés 6–10</h3><p>PER détaillé, assurance-vie, PEA, frais réels (barème km), rénovation énergétique.</p><span class="niveau">Premium</span></div>
+      <p class="lib-intro">Modules de 60 secondes. Le socle (0–5) est gratuit et disponible hors-ligne.</p>
+      <div class="lib-grid">${socle}</div>
+      <h3 class="section-h">Modules avancés ${store.premium ? '' : '· Premium'}</h3>
+      <p class="lib-intro">PER, assurance-vie, PEA, frais réels (barème km), rénovation énergétique.${store.premium ? '' : ' Débloque-les avec Premium.'}</p>
+      <div class="lib-grid">${avances}</div>
       ${bandeauLegal()}
     </div>
     ${tabbar()}
@@ -373,6 +382,48 @@ function screenAvisValidation() {
   </div>`;
 }
 
+// ── Niches fiscales : panorama + adéquation au profil ────────────────────────
+function screenNiches() {
+  const niches = store.data.niches || [];
+  if (!store.profile) return screenOnboarding();
+  const res = adequationNiches(store.profile, niches, store.data.fiscalParams);
+
+  const ORDRE = { ADAPTEE: 0, SOUS_CONDITIONS: 1, SANS_OBJET: 2 };
+  const LABEL = {
+    ADAPTEE: { txt: '✅ Adaptée à ton profil', cls: 'niche-ok' },
+    SOUS_CONDITIONS: { txt: '🟠 Sous conditions', cls: 'niche-cond' },
+    SANS_OBJET: { txt: '⚪️ Sans objet pour toi', cls: 'niche-na' },
+  };
+  res.sort((a, b) => ORDRE[a.statut] - ORDRE[b.statut]);
+
+  const cartes = res.map(({ niche, statut, raison }) => {
+    const L = LABEL[statut];
+    return `<article class="niche-card ${L.cls}">
+      <div class="niche-head">${tag(niche.coutNet)}<span class="niche-statut">${L.txt}</span></div>
+      <h3>${esc(niche.titre)}</h3>
+      <p class="niche-principe">${esc(niche.principe)}</p>
+      <p class="niche-raison">${esc(raison)}</p>
+      <ul class="niche-cond">${niche.conditionsClefs.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>
+      ${niche.plafonnement_global ? '<p class="niche-plafond">↳ Entre dans le plafond global des niches (10 000 €/an).</p>' : ''}
+      <div class="niche-actions">
+        ${niche.moduleId ? `<button class="btn-small" data-module="${niche.moduleId}">Apprendre (60 s)</button>` : ''}
+        ${niche.leverId && CATALOGUE.find((l) => l.id === niche.leverId) ? `<button class="btn-small btn-small-ghost" data-lever-detail="${niche.leverId}">Où agir</button>` : ''}
+      </div>
+      <p class="niche-src">${niche.sources.map((s) => `<span class="src">${esc(s)}</span>`).join('')}</p>
+    </article>`;
+  }).join('');
+
+  return `<div class="screen">${header('Niches fiscales', 'bilan')}
+    <div class="scroll">
+      ${badge()}
+      <p class="lib-intro">Panorama des principaux dispositifs fiscaux des particuliers, classés selon <strong>ton profil déclaré</strong>. Indicatif et non exhaustif — l'éligibilité exacte se vérifie sur impots.gouv.fr.</p>
+      <div class="niche-list">${cartes}</div>
+      ${bandeauLegal()}
+    </div>
+    ${tabbar()}
+  </div>`;
+}
+
 function screenSettings() {
   const fp = store.data.fiscalParams;
   return `<div class="screen">${header('Réglages')}
@@ -403,6 +454,7 @@ function render() {
     'lever-detail': screenLeverDetail, module: screenModule, library: screenLibrary,
     checklist: screenChecklist, paywall: () => screenPaywall(), settings: screenSettings,
     'avis-import': screenAvisImport, 'avis-validation': screenAvisValidation,
+    niches: screenNiches,
   };
   app.innerHTML = (screens[store.route] || screenOnboarding)();
 }

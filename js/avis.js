@@ -67,12 +67,25 @@ function extraireTauxMoyen(text) {
   return m ? toNumber(m[1]) / 100 : null;
 }
 
-// Nombre de parts : "Nombre de parts ... 1,5" — valeur entre 1 et 15, proche du libellé.
+// Nombre de parts : valide si 1 à 15 ET multiple de 0,25 (les parts vont de 0,25 en 0,25).
+function partsValide(n) {
+  return n != null && n >= 1 && n <= 15 && Math.abs(n * 4 - Math.round(n * 4)) < 1e-6;
+}
+
+// Nombre de parts. 1) libellé explicite « Nombre de parts ... 1,5 ». 2) repli format
+// réel DGFiP : la valeur (ex. « 1,00 ») précède immédiatement « IMPOT SUR LE REVENU ».
 function extraireParts(text) {
-  const m = text.match(/nombre\s+de\s+parts[^\d]{0,30}([1-9](?:[.,]\d{1,2})?)\b/i);
-  if (!m) return null;
-  const n = toNumber(m[1]);
-  return n != null && n >= 1 && n <= 15 ? n : null;
+  const m = text.match(/nombre\s+de\s+parts[^\d]{0,30}(\d(?:[.,]\d{1,2})?)\b/i);
+  if (m) {
+    const n = toNumber(m[1]);
+    if (partsValide(n)) return n;
+  }
+  const m2 = text.match(/(\d(?:[.,]\d{1,2})?)\s*(?:IMPOT|IMPÔT)\s+SUR\s+LE\s+REVENU/i);
+  if (m2) {
+    const n = toNumber(m2[1]);
+    if (partsValide(n)) return n;
+  }
+  return null;
 }
 
 // Montant >= 1000 le plus proche après le libellé (format simple : libellé↔valeur proches).

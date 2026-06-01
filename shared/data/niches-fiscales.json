@@ -1,0 +1,104 @@
+{
+  "version": "2026.1",
+  "date_maj": "2026-05-30",
+  "_avertissement": "Panorama pédagogique des principaux dispositifs (« niches ») fiscaux des particuliers. NON exhaustif. Aucune valeur n'est un conseil personnalisé : vérifier l'éligibilité exacte sur impots.gouv.fr / BOFiP. L'adéquation au profil est indicative.",
+  "_plafond_global": "La plupart des avantages entrent dans le plafonnement global des niches (10 000 €/an, certains dispositifs y échappent). cf. fiscal-params.plafonnement_niches_fiscales.",
+  "niches": [
+    {
+      "id": "credit_emploi_domicile",
+      "titre": "Crédit d'impôt emploi à domicile",
+      "type": "CREDIT",
+      "coutNet": "GRATUIT",
+      "moduleId": "credit_domicile",
+      "leverId": "credit_domicile",
+      "principe": "50 % des sommes versées pour un emploi à domicile (ménage, garde, soutien, aide à un proche). Crédit remboursable même si non imposable.",
+      "conditionsClefs": ["Employer une personne à domicile (Cesu) ou un organisme agréé"],
+      "plafonnement_global": true,
+      "sources": ["service-public.fr", "Urssaf Cesu", "art. 199 sexdecies CGI"]
+    },
+    {
+      "id": "dons",
+      "titre": "Dons aux associations",
+      "type": "REDUCTION",
+      "coutNet": "DEPENSE",
+      "moduleId": "dons",
+      "leverId": "dons",
+      "principe": "Réduction de 66 % (intérêt général) ou 75 % (aide aux personnes en difficulté) des dons, dans les limites annuelles.",
+      "conditionsClefs": ["Être imposable (réduction sans effet sinon)", "Conserver les reçus fiscaux"],
+      "plafonnement_global": false,
+      "sources": ["impots.gouv.fr", "art. 200 CGI"]
+    },
+    {
+      "id": "per",
+      "titre": "Plan d'épargne retraite (PER)",
+      "type": "DEDUCTION",
+      "coutNet": "REORIENTATION",
+      "moduleId": "per_detaille",
+      "leverId": "per",
+      "principe": "Les versements volontaires se déduisent du revenu imposable (économie = versement × TMI), dans la limite d'un plafond personnel figurant sur l'avis.",
+      "conditionsClefs": ["TMI élevée pour que la déduction soit intéressante", "Épargne de précaution déjà constituée", "Argent bloqué jusqu'à la retraite"],
+      "plafonnement_global": false,
+      "sources": ["service-public.fr", "plafond sur l'avis d'impôt"]
+    },
+    {
+      "id": "deficit_foncier",
+      "titre": "Déficit foncier (location nue)",
+      "type": "DEDUCTION",
+      "coutNet": "REORIENTATION",
+      "moduleId": "module_0_boussole",
+      "leverId": "deficit_foncier",
+      "principe": "Les charges et travaux d'un bien loué nu peuvent créer un déficit imputable sur le revenu foncier, et en partie sur le revenu global, dans les limites légales.",
+      "conditionsClefs": ["Être propriétaire bailleur (location nue)", "Travaux/charges déductibles réels"],
+      "plafonnement_global": false,
+      "sources": ["impots.gouv.fr", "BOFiP"]
+    },
+    {
+      "id": "pea",
+      "titre": "PEA (actions, exonération à 5 ans)",
+      "type": "EXONERATION",
+      "coutNet": "REORIENTATION",
+      "moduleId": "pea_detaille",
+      "leverId": "pea",
+      "principe": "Après 5 ans, les gains sont exonérés d'impôt sur le revenu (prélèvements sociaux dus). Pour un horizon long.",
+      "conditionsClefs": ["Horizon long (≥ 5 ans)", "Tolérance au risque actions", "Matelas de précaution en place"],
+      "plafonnement_global": false,
+      "sources": ["service-public.fr"]
+    },
+    {
+      "id": "assurance_vie",
+      "titre": "Assurance-vie (cadre des 8 ans)",
+      "type": "EXONERATION",
+      "coutNet": "REORIENTATION",
+      "moduleId": "assurance_vie_detaillee",
+      "leverId": "assurance_vie",
+      "principe": "Pas d'avantage à l'entrée, mais abattement annuel sur les gains après 8 ans (4 600 € seul / 9 200 € couple) et cadre de transmission favorable.",
+      "conditionsClefs": ["Horizon moyen/long", "Besoin de souplesse ou objectif de transmission"],
+      "plafonnement_global": false,
+      "sources": ["service-public.fr"]
+    },
+    {
+      "id": "renovation_energetique",
+      "titre": "Rénovation énergétique (MaPrimeRénov')",
+      "type": "AIDE",
+      "coutNet": "DEPENSE",
+      "moduleId": "renovation_energetique_detaillee",
+      "leverId": "renovation_energetique",
+      "principe": "Aides aux travaux d'amélioration énergétique de la résidence principale (sous conditions, artisans RGE).",
+      "conditionsClefs": ["Propriétaire occupant", "Travaux énergétiques réellement voulus"],
+      "plafonnement_global": false,
+      "sources": ["france-renov.gouv.fr", "service-public.fr"]
+    },
+    {
+      "id": "frais_reels",
+      "titre": "Frais réels (dont barème km)",
+      "type": "DEDUCTION",
+      "coutNet": "GRATUIT",
+      "moduleId": "frais_reels_avances",
+      "leverId": "frais_reels",
+      "principe": "Déduire ses frais professionnels réels (trajets, repas, formation…) au lieu de l'abattement de 10 %, si c'est plus avantageux.",
+      "conditionsClefs": ["Salarié ou fonctionnaire", "Frais pro élevés (longs trajets…)", "Être imposable"],
+      "plafonnement_global": false,
+      "sources": ["impots.gouv.fr", "barème kilométrique annuel"]
+    }
+  ]
+}

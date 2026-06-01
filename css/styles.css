@@ -235,3 +235,13 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .niche-card.niche-expl { border-left-color: var(--blue); }
 .niche-type { font-size: 11px; font-weight: 600; color: var(--ink-mute); background: var(--surface-2); padding: 2px 8px; border-radius: 12px; }
 .src-cgi { background: #EFEAFB; color: #5a3ea0; border-color: #ddd0f5; }
+
+/* ── Droits sociaux : chiffrage opt-in ── */
+.droits-estim { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-strong); }
+.champ-input select { font-size: 15px; font-weight: 600; color: var(--green-dark); border: 1.5px solid var(--border-strong); border-radius: 8px; padding: 8px 10px; font-family: var(--font-body); background: var(--surface); }
+.champ-input input[type="text"] { width: 110px; text-align: right; font-size: 15px; font-weight: 700; color: var(--green-dark); border: 1.5px solid var(--border-strong); border-radius: 8px; padding: 8px 10px; font-family: var(--font-body); }
+.estim-list { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 15px; }
+.estim-list li { padding: 8px 0; border-bottom: 1px solid var(--border); }
+.estim-list li:last-child { border-bottom: none; }
+a.btn-small { display: inline-flex; align-items: center; text-decoration: none; }
+a.btn-primary { display: flex; align-items: center; justify-content: center; text-decoration: none; }

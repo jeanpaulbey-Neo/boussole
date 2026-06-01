@@ -1,7 +1,7 @@
 // Boussole — app PWA d'éducation & d'orientation à l'optimisation financière.
 // SPEC : profilage (§5) → moteur d'orientation (§6) → micro-learning (§7).
 import { loadData } from './data.js';
-import { orienter, estimeTMI, badgeFraicheur, CATALOGUE, adequationNiches } from './engine.js';
+import { orienter, estimeTMI, badgeFraicheur, CATALOGUE, adequationNiches, adequationDroits } from './engine.js';
 import { parseAvisText, profilDepuisAvis } from './avis.js';
 
 const BANDEAU_LEGAL =
@@ -177,6 +177,7 @@ function screenBilan() {
   }
 
   body += `<button class="btn-ghost" data-go="niches">🗂️ Voir toutes les niches fiscales & leur adéquation</button>`;
+  body += `<button class="btn-ghost" data-go="droits">🤝 Explorer mes droits sociaux (CAF, aides…)</button>`;
 
   return `<div class="screen">${header('Ton bilan d\'orientation')}
     <div class="scroll">
@@ -446,6 +447,94 @@ function screenNiches() {
   </div>`;
 }
 
+// ── Droits sociaux : panorama + adéquation au profil + chiffrage opt-in ───
+const DROIT_LABEL = {
+  PRIORITAIRE: { txt: '🟢 À simuler en priorité', cls: 'niche-ok', ordre: 0 },
+  A_EXPLORER: { txt: '🔎 À explorer', cls: 'niche-expl', ordre: 1 },
+  PEU_PROBABLE: { txt: '⚪️ Peu probable', cls: 'niche-na', ordre: 2 },
+};
+
+function droitCard({ aide, statut, raison }) {
+  const L = DROIT_LABEL[statut] || DROIT_LABEL.A_EXPLORER;
+  return `<article class="niche-card ${L.cls}">
+    <div class="niche-head"><span class="niche-statut">${L.txt}</span>${aide.organisme ? `<span class="niche-type">${esc(aide.organisme)}</span>` : ''}</div>
+    <h3>${esc(aide.titre)}</h3>
+    <p class="niche-principe">${esc(aide.principe)}</p>
+    <p class="niche-raison">${esc(raison)}</p>
+    <ul class="niche-cond">${(aide.conditionsClefs || []).map((c) => `<li>${esc(c)}</li>`).join('')}</ul>
+    <div class="niche-actions">
+      ${aide.lien ? `<a class="btn-small btn-small-ghost" href="${esc(aide.lien)}" target="_blank" rel="noopener">En savoir plus ↗</a>` : ''}
+    </div>
+    <p class="niche-src">${(aide.sources || []).map((s) => `<span class="src">${esc(s)}</span>`).join('')}</p>
+  </article>`;
+}
+
+function blocEstimationDroits() {
+  const p = store.profile || {};
+  // Pré-remplissage doux à partir du profil (jamais de valeur exacte devinée).
+  const couple = p.situationFamiliale === 'COUPLE' ? 'COUPLE' : 'SEUL';
+  const nbEnf = Number(p.nbCharges) || 0;
+  return `<div class="droits-estim">
+    <h3 class="section-h">Estimer 3 aides (RSA, prime d'activité, aide au logement)</h3>
+    <div class="avis-conf avis-conf-PARTIELLE">
+      ⚠️ <strong>Ce calcul sort de ton appareil.</strong> À ta demande, les éléments saisis ci-dessous
+      (sans nom ni identité) sont envoyés au moteur public <strong>OpenFisca</strong> de l'État pour produire
+      une estimation indicative. Le reste de Boussole, lui, ne transmet rien. Le simulateur officiel reste la référence.
+    </div>
+    <div class="champs">
+      <label class="champ-row"><span class="champ-label">Revenu net mensuel du foyer<small class="champ-hint">salaires nets, hors prestations</small></span>
+        <span class="champ-input"><input type="number" step="any" inputmode="decimal" id="estRevenu" placeholder="ex : 1500"><em>€</em></span></label>
+      <label class="champ-row"><span class="champ-label">Situation</span>
+        <span class="champ-input"><select id="estSituation"><option value="SEUL"${couple === 'SEUL' ? ' selected' : ''}>Seul(e)</option><option value="COUPLE"${couple === 'COUPLE' ? ' selected' : ''}>En couple</option></select></span></label>
+      <label class="champ-row"><span class="champ-label">Enfants à charge</span>
+        <span class="champ-input"><input type="number" step="1" min="0" inputmode="numeric" id="estEnfants" value="${nbEnf}"></span></label>
+      <label class="champ-row"><span class="champ-label">Loyer mensuel<small class="champ-hint">0 si tu n'es pas locataire</small></span>
+        <span class="champ-input"><input type="number" step="any" inputmode="decimal" id="estLoyer" placeholder="ex : 700"><em>€</em></span></label>
+      <label class="champ-row"><span class="champ-label">Code commune (INSEE)<small class="champ-hint">facultatif — affine la zone du logement</small></span>
+        <span class="champ-input"><input type="text" inputmode="numeric" id="estCommune" placeholder="ex : 75056" maxlength="5"></span></label>
+    </div>
+    <button class="btn-primary" data-action="estimerDroits">Estimer avec OpenFisca</button>
+    <div class="approfondir-out" id="estimOut" hidden></div>
+    <p class="avis-privacy-mini">🔒 Aucune donnée nominative n'est demandée ni conservée. Estimation indicative, non opposable.</p>
+  </div>`;
+}
+
+function screenDroits() {
+  const aides = store.data.droits || [];
+  if (!store.profile) return screenOnboarding();
+  const res = adequationDroits(store.profile, aides);
+  const cats = store.data.droitsCategories || [];
+  const simulateur = store.data.droitsSimulateur || 'https://www.mesdroitssociaux.gouv.fr';
+
+  let corps = '';
+  if (cats.length) {
+    const byId = {};
+    res.forEach((r) => { (byId[r.aide.categorie] = byId[r.aide.categorie] || []).push(r); });
+    corps = cats.map((cat) => {
+      const items = (byId[cat.id] || []).sort((a, b) => DROIT_LABEL[a.statut].ordre - DROIT_LABEL[b.statut].ordre);
+      if (!items.length) return '';
+      return `<h3 class="section-h">${esc(cat.titre)}</h3><div class="niche-list">${items.map(droitCard).join('')}</div>`;
+    }).join('');
+  } else {
+    const sorted = res.slice().sort((a, b) => DROIT_LABEL[a.statut].ordre - DROIT_LABEL[b.statut].ordre);
+    corps = `<div class="niche-list">${sorted.map(droitCard).join('')}</div>`;
+  }
+
+  const nbPrio = res.filter((r) => r.statut === 'PRIORITAIRE').length;
+
+  return `<div class="screen">${header('Droits sociaux', 'bilan')}
+    <div class="scroll">
+      ${badge()}
+      <p class="lib-intro">Panorama des principales aides accessibles aux particuliers (${res.length}), classées selon <strong>ton profil déclaré</strong>. <strong>${nbPrio}</strong> ressortent à simuler en priorité. Pour beaucoup de profils, des droits non réclamés pèsent plus lourd que toute optimisation fiscale.</p>
+      <a class="btn-primary" href="${esc(simulateur)}" target="_blank" rel="noopener">🧮 Ouvrir le simulateur officiel ↗</a>
+      ${corps}
+      ${blocEstimationDroits()}
+      ${bandeauLegal()}
+    </div>
+    ${tabbar()}
+  </div>`;
+}
+
 function screenSettings() {
   const fp = store.data.fiscalParams;
   return `<div class="screen">${header('Réglages')}
@@ -476,7 +565,7 @@ function render() {
     'lever-detail': screenLeverDetail, module: screenModule, library: screenLibrary,
     checklist: screenChecklist, paywall: () => screenPaywall(), settings: screenSettings,
     'avis-import': screenAvisImport, 'avis-validation': screenAvisValidation,
-    niches: screenNiches,
+    niches: screenNiches, droits: screenDroits,
   };
   app.innerHTML = (screens[store.route] || screenOnboarding)();
 }
@@ -518,6 +607,7 @@ app.addEventListener('click', async (e) => {
   if (a === 'avisManuel') { store.avis = { champs: {}, confiance: 'FAIBLE', avertissements: [] }; return go('avis-validation'); }
   if (a === 'avisAnnuler') { store.avis = null; return go('settings'); }
   if (a === 'avisValider') return validerAvis();
+  if (a === 'estimerDroits') return estimerDroits();
 });
 
 // filtre zéro dépense (toggle) + import de fichier avis
@@ -701,6 +791,41 @@ function extraitPertinent(moduleId) {
   const sub = { version: fp.version, date_maj: fp.date_maj, cadre_legal: fp.cadre_legal };
   keys.forEach((k) => { sub[k] = fp[k]; });
   return sub;
+}
+
+// Chiffrage opt-in des droits sociaux via le proxy OpenFisca (/api/droits-estimation).
+// Seul appel de l'app qui transmet des données — déclenché uniquement sur action explicite.
+const EURO = (n) => Math.round(n).toLocaleString('fr-FR') + ' €';
+const LIBELLE_AIDE = { rsa: 'RSA', prime_activite: "Prime d'activité", aide_logement: 'Aide au logement' };
+
+async function estimerDroits() {
+  const out = document.getElementById('estimOut');
+  if (!out) return;
+  const val = (id) => (document.getElementById(id) || {}).value;
+  const payload = {
+    revenuNetMensuel: Number(val('estRevenu')) || 0,
+    situation: val('estSituation') || 'SEUL',
+    nbEnfants: Number(val('estEnfants')) || 0,
+    loyer: Number(val('estLoyer')) || 0,
+    codeCommune: (val('estCommune') || '').trim(),
+  };
+  out.hidden = false;
+  out.innerHTML = '<p class="loading">Estimation en cours via le moteur public OpenFisca…</p>';
+  try {
+    const res = await fetch('/api/droits-estimation', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.estimations) throw new Error(data.message || 'indisponible');
+    const lignes = Object.entries(data.estimations).map(([k, v]) => {
+      const lib = LIBELLE_AIDE[k] || k;
+      if (v === null) return `<li>${esc(lib)} : <em>non calculable avec ces éléments</em></li>`;
+      return `<li><strong>${esc(lib)}</strong> : ${v > 0 ? '≈ ' + EURO(v) + ' / mois' : 'aucun droit estimé'}</li>`;
+    }).join('');
+    out.innerHTML = `<div class="appro-card"><ul class="estim-list">${lignes}</ul><small>⚠️ ${esc(data.avertissement || '')} Source : ${esc(data.moteur || 'OpenFisca')}.</small></div>`;
+  } catch (err) {
+    out.innerHTML = `<div class="appro-card appro-offline"><p>${esc(String(err && err.message ? err.message : err))}</p><small>Le panorama ci-dessus et le simulateur officiel restent disponibles.</small></div>`;
+  }
 }
 
 // ── Boot ──

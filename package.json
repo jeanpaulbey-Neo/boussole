@@ -6,7 +6,7 @@
   "description": "Boussole — éducation & orientation à l'optimisation financière (France). PWA + proxy Vercel.",
   "scripts": {
     "dev": "node --version >/dev/null && python3 -m http.server 8000",
-    "test": "node test/engine.test.mjs && node test/avis.test.mjs && node test/niches.test.mjs",
+    "test": "node test/engine.test.mjs && node test/avis.test.mjs && node test/niches.test.mjs && node test/droits.test.mjs",
     "icons": "node icons/generate-icons.mjs"
   }
 }

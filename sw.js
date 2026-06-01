@@ -3,7 +3,7 @@
 // repli sur le cache, pour servir la version OTA la plus fraîche tout en restant lisible
 // hors-ligne (cohérent avec data.js qui cache aussi la dernière bonne valeur).
 
-const VERSION = 'boussole-v7';
+const VERSION = 'boussole-v8';
 const SHELL = [
   '/',
   '/index.html',
@@ -17,6 +17,7 @@ const SHELL = [
   '/shared/data/veille-fiscale.json',
   '/shared/data/modules.json',
   '/shared/data/niches-fiscales.json',
+  '/shared/data/droits-sociaux.json',
 ];
 
 self.addEventListener('install', (e) => {

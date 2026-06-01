@@ -302,7 +302,7 @@ function screenChecklist() {
 function rappelsSaisonniers() {
   const m = new Date().getMonth() + 1;
   if (m >= 4 && m <= 6) return 'Campagne de déclaration en cours : vérifie que tu n\'oublies aucun crédit ni réduction.';
-  if (m === 12) return 'Fin d\'année : dernier moment pour verser sur PER/PEE au titre de l'année.';
+  if (m === 12) return 'Fin d\'année : dernier moment pour verser sur PER/PEE au titre de l\'année.';
   return null;
 }
 

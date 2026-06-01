@@ -302,7 +302,7 @@ function screenChecklist() {
 function rappelsSaisonniers() {
   const m = new Date().getMonth() + 1;
   if (m >= 4 && m <= 6) return 'Campagne de déclaration en cours : vérifie que tu n\'oublies aucun crédit ni réduction.';
-  if (m === 12) return 'Fin d\'année : dernier moment pour verser sur PER/PEE au titre de l\'année.';
+  if (m === 12) return 'Fin d\'année : dernier moment pour verser sur PER/PEE au titre de l'année.';
   return null;
 }
 
@@ -382,42 +382,64 @@ function screenAvisValidation() {
   </div>`;
 }
 
-// ── Niches fiscales : panorama + adéquation au profil ────────────────────────
+// ── Niches fiscales : panorama + adéquation au profil ─────────────────────────
+const NICHE_LABEL = {
+  ADAPTEE: { txt: '✅ Adaptée à ton profil', cls: 'niche-ok', ordre: 0 },
+  SOUS_CONDITIONS: { txt: '🟠 Sous conditions', cls: 'niche-cond', ordre: 1 },
+  A_EXPLORER: { txt: '🔎 À explorer', cls: 'niche-expl', ordre: 2 },
+  SANS_OBJET: { txt: '⚪️ Sans objet pour toi', cls: 'niche-na', ordre: 3 },
+};
+const NICHE_TYPE = {
+  CREDIT: 'Crédit d\'impôt', REDUCTION: 'Réduction d\'impôt', DEDUCTION: 'Déduction du revenu',
+  EXONERATION: 'Exonération', AIDE: 'Aide',
+};
+
+function nicheCard({ niche, statut, raison }) {
+  const L = NICHE_LABEL[statut] || NICHE_LABEL.A_EXPLORER;
+  const aLevier = niche.leverId && CATALOGUE.find((l) => l.id === niche.leverId);
+  return `<article class="niche-card ${L.cls}">
+    <div class="niche-head">${tag(niche.coutNet)}<span class="niche-statut">${L.txt}</span>${niche.type ? `<span class="niche-type">${esc(NICHE_TYPE[niche.type] || niche.type)}</span>` : ''}</div>
+    <h3>${esc(niche.titre)}</h3>
+    <p class="niche-principe">${esc(niche.principe)}</p>
+    <p class="niche-raison">${esc(raison)}</p>
+    <ul class="niche-cond">${(niche.conditionsClefs || []).map((c) => `<li>${esc(c)}</li>`).join('')}</ul>
+    ${niche.plafonnement_global ? '<p class="niche-plafond">↳ Entre dans le plafond global des niches (10 000 €/an).</p>' : ''}
+    <div class="niche-actions">
+      ${niche.moduleId ? `<button class="btn-small" data-module="${niche.moduleId}">Apprendre (60 s)</button>` : ''}
+      ${aLevier ? `<button class="btn-small btn-small-ghost" data-lever-detail="${niche.leverId}">Où agir</button>` : ''}
+    </div>
+    <p class="niche-src">${(niche.sources || []).map((s) => `<span class="src">${esc(s)}</span>`).join('')}${niche.article ? `<span class="src src-cgi">${esc(niche.article)}</span>` : ''}</p>
+  </article>`;
+}
+
 function screenNiches() {
   const niches = store.data.niches || [];
   if (!store.profile) return screenOnboarding();
   const res = adequationNiches(store.profile, niches, store.data.fiscalParams);
+  const cats = store.data.nichesCategories || [];
 
-  const ORDRE = { ADAPTEE: 0, SOUS_CONDITIONS: 1, SANS_OBJET: 2 };
-  const LABEL = {
-    ADAPTEE: { txt: '✅ Adaptée à ton profil', cls: 'niche-ok' },
-    SOUS_CONDITIONS: { txt: '🟠 Sous conditions', cls: 'niche-cond' },
-    SANS_OBJET: { txt: '⚪️ Sans objet pour toi', cls: 'niche-na' },
-  };
-  res.sort((a, b) => ORDRE[a.statut] - ORDRE[b.statut]);
+  // Regroupement par catégorie (si dispo), tri interne par pertinence pour le profil.
+  let corps = '';
+  if (cats.length) {
+    const byId = {};
+    res.forEach((r) => { (byId[r.niche.categorie] = byId[r.niche.categorie] || []).push(r); });
+    corps = cats.map((cat) => {
+      const items = (byId[cat.id] || []).sort((a, b) => NICHE_LABEL[a.statut].ordre - NICHE_LABEL[b.statut].ordre);
+      if (!items.length) return '';
+      return `<h3 class="section-h">${esc(cat.titre)}</h3><div class="niche-list">${items.map(nicheCard).join('')}</div>`;
+    }).join('');
+  } else {
+    const sorted = res.slice().sort((a, b) => NICHE_LABEL[a.statut].ordre - NICHE_LABEL[b.statut].ordre);
+    corps = `<div class="niche-list">${sorted.map(nicheCard).join('')}</div>`;
+  }
 
-  const cartes = res.map(({ niche, statut, raison }) => {
-    const L = LABEL[statut];
-    return `<article class="niche-card ${L.cls}">
-      <div class="niche-head">${tag(niche.coutNet)}<span class="niche-statut">${L.txt}</span></div>
-      <h3>${esc(niche.titre)}</h3>
-      <p class="niche-principe">${esc(niche.principe)}</p>
-      <p class="niche-raison">${esc(raison)}</p>
-      <ul class="niche-cond">${niche.conditionsClefs.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>
-      ${niche.plafonnement_global ? '<p class="niche-plafond">↳ Entre dans le plafond global des niches (10 000 €/an).</p>' : ''}
-      <div class="niche-actions">
-        ${niche.moduleId ? `<button class="btn-small" data-module="${niche.moduleId}">Apprendre (60 s)</button>` : ''}
-        ${niche.leverId && CATALOGUE.find((l) => l.id === niche.leverId) ? `<button class="btn-small btn-small-ghost" data-lever-detail="${niche.leverId}">Où agir</button>` : ''}
-      </div>
-      <p class="niche-src">${niche.sources.map((s) => `<span class="src">${esc(s)}</span>`).join('')}</p>
-    </article>`;
-  }).join('');
+  const nbAdaptees = res.filter((r) => r.statut === 'ADAPTEE').length;
 
   return `<div class="screen">${header('Niches fiscales', 'bilan')}
     <div class="scroll">
       ${badge()}
-      <p class="lib-intro">Panorama des principaux dispositifs fiscaux des particuliers, classés selon <strong>ton profil déclaré</strong>. Indicatif et non exhaustif — l'éligibilité exacte se vérifie sur impots.gouv.fr.</p>
-      <div class="niche-list">${cartes}</div>
+      <p class="lib-intro">Panorama des principaux dispositifs accessibles aux particuliers (${res.length}), classés selon <strong>ton profil déclaré</strong>. <strong>${nbAdaptees}</strong> ressortent comme adaptées. Indicatif et non exhaustif — l'éligibilité exacte se vérifie sur impots.gouv.fr.</p>
+      ${corps}
       ${bandeauLegal()}
     </div>
     ${tabbar()}

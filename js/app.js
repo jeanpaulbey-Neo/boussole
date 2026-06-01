@@ -1,7 +1,7 @@
 // Boussole — app PWA d'éducation & d'orientation à l'optimisation financière.
 // SPEC : profilage (§5) → moteur d'orientation (§6) → micro-learning (§7).
 import { loadData } from './data.js';
-import { orienter, estimeTMI, badgeFraicheur, CATALOGUE, adequationNiches, adequationDroits } from './engine.js';
+import { orienter, estimeTMI, badgeFraicheur, CATALOGUE, adequationNiches, adequationDroits, calcIR } from './engine.js';
 import { parseAvisText, profilDepuisAvis } from './avis.js';
 
 const BANDEAU_LEGAL =
@@ -178,6 +178,7 @@ function screenBilan() {
 
   body += `<button class="btn-ghost" data-go="niches">🗂️ Voir toutes les niches fiscales & leur adéquation</button>`;
   body += `<button class="btn-ghost" data-go="droits">🤝 Explorer mes droits sociaux (CAF, aides…)</button>`;
+  body += `<button class="btn-ghost" data-go="chiffrage">💶 Chiffrer mes économies en euros réels</button>`;
 
   return `<div class="screen">${header('Ton bilan d\'orientation')}
     <div class="scroll">
@@ -541,6 +542,81 @@ function screenDroits() {
   </div>`;
 }
 
+// ── Chiffrage personnel en euros réels ────────────────────────────────
+// Quand l'avis est chargé, on dispose du revenu net imposable, des parts et de la TMI
+// EXACTS : on recalcule l'IR par le barème (engine.calcIR) et on simule l'économie d'un
+// versement PER par DIFFÉRENCE de barème (exact, gère le franchissement de tranche),
+// bornée au plafond réel. Aucun montant n'est conseillé : l'utilisateur saisit le sien.
+function screenChiffrage() {
+  if (!store.profile) return screenOnboarding();
+  const p = store.profile;
+  const params = store.data.fiscalParams;
+  const aAvis = p.sourceAvis && typeof p.revenuNetImposableExact === 'number' && typeof p.nombrePartsExact === 'number';
+
+  let synth;
+  if (aAvis) {
+    const ir = calcIR(p.revenuNetImposableExact, p.nombrePartsExact, params);
+    const tmi = estimeTMI(p);
+    synth = `<div class="calc-box">
+      <span class="calc-label">D'après ton avis d'impôt</span>
+      <p>Revenu net imposable : <strong>${EURO(p.revenuNetImposableExact)}</strong> · ${p.nombrePartsExact} part(s) · tranche ${Math.round(tmi * 100)} %</p>
+      <p>Impôt sur le revenu recalculé : <strong>${EURO(ir)}</strong></p>
+      <small>Barème ${esc(params.version)}, quotient familial simplifié. Indicatif (hors crédits/réductions déjà acquis et cas particuliers) — ton avis fait foi.</small>
+    </div>`;
+  } else {
+    synth = `<div class="avis-conf avis-conf-PARTIELLE">Pour un chiffrage en <strong>euros réels</strong> (et non des exemples), <button class="lien-inline" data-go="avis-import">importe ton avis d'impôt</button>. Sans lui, on estime avec ta tranche déclarée (${Math.round(estimeTMI(p) * 100)} %).</div>`;
+  }
+
+  const plafondInfo = (typeof p.plafondPERExact === 'number' && p.plafondPERExact > 0)
+    ? `Ton plafond de déduction disponible : <strong>${EURO(p.plafondPERExact)}</strong> (lu sur ton avis).`
+    : `Ton plafond exact figure sur ton avis (cadre « Plafond épargne retraite »).`;
+
+  return `<div class="screen">${header('Mon chiffrage', 'bilan')}
+    <div class="scroll">
+      ${badge()}
+      ${synth}
+      <h3 class="section-h">Simuler un versement PER</h3>
+      <p class="lib-intro">Combien d'impôt un versement sur un PER te ferait-il économiser cette année ? ${plafondInfo}</p>
+      <div class="champs">
+        <label class="champ-row"><span class="champ-label">Montant que je verserais</span>
+          <span class="champ-input"><input type="number" step="any" inputmode="decimal" id="perMontant" placeholder="ex : 2000"><em>€</em></span></label>
+      </div>
+      <div class="appro-card" id="perOut">Saisis un montant pour voir l'économie d'impôt et ton effort d'épargne réel.</div>
+      <p class="warn">⚠️ L'argent versé sur un PER est bloqué jusqu'à la retraite (sauf cas de déblocage). On ne te conseille aucun montant : à toi de décider ce que tu peux immobiliser.</p>
+      ${bandeauLegal()}
+    </div>
+    ${tabbar()}
+  </div>`;
+}
+
+// Recalcule l'économie d'IR d'un versement PER, en direct (sans re-rendre l'écran).
+function simulerPER() {
+  const inp = document.getElementById('perMontant');
+  const out = document.getElementById('perOut');
+  if (!inp || !out) return;
+  const p = store.profile;
+  const params = store.data.fiscalParams;
+  let versement = Math.max(0, Number(inp.value) || 0);
+  if (!versement) { out.innerHTML = 'Saisis un montant pour voir l\'économie d\'impôt et ton effort d\'épargne réel.'; return; }
+
+  const plafond = (typeof p.plafondPERExact === 'number' && p.plafondPERExact > 0) ? p.plafondPERExact : null;
+  let note = '';
+  if (plafond && versement > plafond) { versement = plafond; note = ` (limité à ton plafond de ${EURO(plafond)})`; }
+
+  let economie;
+  if (p.sourceAvis && typeof p.revenuNetImposableExact === 'number' && typeof p.nombrePartsExact === 'number') {
+    const r = p.revenuNetImposableExact;
+    const parts = p.nombrePartsExact;
+    economie = calcIR(r, parts, params) - calcIR(Math.max(0, r - versement), parts, params);
+  } else {
+    economie = versement * estimeTMI(p); // estimation par la tranche déclarée
+  }
+  economie = Math.max(0, Math.round(economie));
+  const effort = Math.max(0, Math.round(versement - economie));
+  out.innerHTML = `Économie d'impôt estimée : <strong>${EURO(economie)}</strong>${note}.<br>`
+    + `Ton effort d'épargne réel : <strong>${EURO(effort)}</strong> — le reste (${EURO(economie)}) est de l'impôt en moins, mais reste de l'épargne <em>à toi</em>, simplement bloquée.`;
+}
+
 function screenSettings() {
   const fp = store.data.fiscalParams;
   return `<div class="screen">${header('Réglages')}
@@ -571,7 +647,7 @@ function render() {
     'lever-detail': screenLeverDetail, module: screenModule, library: screenLibrary,
     checklist: screenChecklist, paywall: () => screenPaywall(), settings: screenSettings,
     'avis-import': screenAvisImport, 'avis-validation': screenAvisValidation,
-    niches: screenNiches, droits: screenDroits,
+    niches: screenNiches, droits: screenDroits, chiffrage: screenChiffrage,
   };
   app.innerHTML = (screens[store.route] || screenOnboarding)();
 }
@@ -614,6 +690,11 @@ app.addEventListener('click', async (e) => {
   if (a === 'avisAnnuler') { store.avis = null; return go('settings'); }
   if (a === 'avisValider') return validerAvis();
   if (a === 'estimerDroits') return estimerDroits();
+});
+
+// Simulateur PER : recalcul en direct à chaque frappe.
+app.addEventListener('input', (e) => {
+  if (e.target.id === 'perMontant') simulerPER();
 });
 
 // filtre zéro dépense (toggle) + import de fichier avis

@@ -1,6 +1,6 @@
 {
-  "version": "2026.1",
-  "date_maj": "2026-05-30",
+  "version": "2026.2",
+  "date_maj": "2026-06-02",
   "modules": [
     {
       "id": "module_0_boussole",
@@ -68,7 +68,8 @@
       "coutNet": "REORIENTATION",
       "titre": "L'abondement de l'épargne salariale",
       "accroche": "Si ton employeur propose un PEE, il peut ajouter de l'argent quand tu y verses. Un des rares repas gratuits.",
-      "contenu": "Sur un PEE, l'employeur peut abonder (dans une limite légale) ; placer l'intéressement/participation sur le PEE l'exonère d'IR (dans les limites) ; blocage 5 ans (sauf cas de déblocage) ; gain immédiat imbattable.",
+      "contenu": "Sur un PEE, l'abondement de l'employeur et l'intéressement/participation que tu y places sont exonérés d'IR DÈS LE VERSEMENT (dans les limites légales ; prélèvements sociaux dus). Tes versements volontaires, eux, viennent d'argent déjà net (aucune déduction, contrairement au PER). L'argent est bloqué 5 ans (sauf cas de déblocage). Ce que les 5 ans changent : les GAINS du plan (plus-values, dividendes) sortent exonérés d'IR — prélèvements sociaux dus.",
+      "piege": "On croit souvent que « le versement et l'abondement deviennent exonérés d'IR au bout de 5 ans ». En réalité l'abondement et l'intéressement/participation placés sur le plan sont exonérés d'IR DÈS L'ENTRÉE. Les 5 ans conditionnent l'exonération d'IR des GAINS à la sortie (les prélèvements sociaux restent dus).",
       "pourQui": "Tout salarié dont l'entreprise propose PEE/intéressement/participation ; si « je ne sais pas » → demander au service paie (action #1).",
       "calcul": "1 000 € d'intéressement perçu = imposé ; placé avec abondement 50 % → 1 500 € exonérés d'IR (500 € gratuits + impôt évité).",
       "ouAgir": ["Service RH/paie", "Choix au moment du versement (délai court)"],

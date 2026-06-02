@@ -13,16 +13,18 @@
 
 const OPENFISCA = 'https://api.fr.openfisca.org/latest/calculate';
 
-// Mois courant + 11 précédents (12 mois glissants), au format AAAA-MM.
+// Mois courant + (n-1) précédents, au format AAAA-MM.
 // Les 4 premiers servent au trimestre de référence (RSA / prime d'activité) ;
-// les 12 servent à la base ressources annuelle des aides au logement.
-function moisReference(d = new Date()) {
+// 12 servent à la base ressources annuelle des aides au logement ;
+// ~36 servent à la base ressources des prestations familiales (AF modulée, CF, ARS),
+// qui se calcule sur le revenu de l'année N-2 (cf. ARS « rentrée scolaire »).
+function moisReference(d = new Date(), n = 12) {
   const out = [];
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < n; i++) {
     const m = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - i, 1));
     out.push(`${m.getUTCFullYear()}-${String(m.getUTCMonth() + 1).padStart(2, '0')}`);
   }
-  return out; // [courant, M-1, …, M-11]
+  return out; // [courant, M-1, …, M-(n-1)]
 }
 
 function construireSituation(input) {
@@ -37,17 +39,21 @@ function construireSituation(input) {
   // Le revenu du foyer, réparti entre les adultes (la prime d'activité est individualisée).
   // SUBTILITÉ CRITIQUE validée contre OpenFisca : selon la prestation, la base ressources
   // n'utilise PAS la même variable ni la même période :
-  //   • RSA / prime d'activité (ppa)  -> `salaire_net`, sur le TRIMESTRE de référence (4 mois).
+  //   • RSA / prime d'activité (ppa)   -> `salaire_net`, sur le TRIMESTRE de référence (4 mois).
   //   • aides au logement (APL/ALS/ALF) -> `salaire_imposable`, sur 12 mois (base annuelle).
-  // Si on ne renseigne que `salaire_net`, l'APL ne « voit » aucun revenu et se calcule comme
-  // pour un foyer sans ressources (montant aberrant à revenu élevé). On renseigne donc LES DEUX.
+  //   • prestations familiales (AF modulée, CF, ARS) -> base ressources de l'année N-2.
+  // Si on ne renseigne que `salaire_net`, l'APL ne « voit » aucun revenu (montant aberrant à
+  // revenu élevé). De même, si `salaire_imposable` ne couvre que l'année courante, la base
+  // ressources N-2 de l'ARS vaut 0 et l'ARS est accordée à tort à revenu élevé. On renseigne
+  // donc `salaire_imposable` sur ~3 ans (couvre N, N-1, N-2) et `salaire_net` sur le trimestre.
   const nbAdultes = couple ? 2 : 1;
   const parAdulte = Math.round(net / nbAdultes);
   const moisTrimestre = mois.slice(0, 4);
+  const moisImposable = moisReference(new Date(), 36); // ~3 ans : couvre l'année N-2 (ARS / PF)
   const salaireNet = {};
   moisTrimestre.forEach((m) => { salaireNet[m] = parAdulte; });
   const salaireImposable = {};
-  mois.forEach((m) => { salaireImposable[m] = parAdulte; });
+  moisImposable.forEach((m) => { salaireImposable[m] = parAdulte; });
   const revenusAdulte = () => ({
     salaire_net: { ...salaireNet },
     salaire_imposable: { ...salaireImposable },

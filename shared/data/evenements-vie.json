@@ -1,0 +1,190 @@
+{
+  "version": "2026.1",
+  "date_maj": "2026-06-02",
+  "_avertissement": "Parcours PÉDAGOGIQUES d'orientation à l'occasion d'un événement de vie. Boussole n'effectue aucune démarche à ta place, ne conseille aucun produit ni montant, et ne remplace pas les sites officiels. Les délais et règles évoluent — vérifie toujours sur service-public.fr et auprès des organismes (CAF, impôts, France Travail, Assurance retraite…).",
+  "sources": ["service-public.fr", "impots.gouv.fr", "caf.fr", "francetravail.fr", "lassuranceretraite.fr", "ameli.fr"],
+  "evenements": [
+    {
+      "id": "naissance",
+      "titre": "Naissance ou adoption",
+      "emoji": "👶",
+      "accroche": "Un enfant qui arrive change ton quotient familial et ouvre des droits.",
+      "intro": "L'arrivée d'un enfant modifie ton nombre de parts fiscales et déclenche plusieurs prestations. Quelques démarches sont à délai court.",
+      "demarches": [
+        "Déclarer la naissance/l'adoption à ta CAF (ou MSA) — rapidement, pour ouvrir les prestations.",
+        "Rattacher l'enfant à ta complémentaire santé et à la Sécurité sociale.",
+        "Le signaler à ton employeur (congés, mutuelle) et, si besoin, à ta banque/assurances.",
+        "L'année suivante, vérifier le cadre « situation du foyer » de ta déclaration (parts)."
+      ],
+      "impactsFiscaux": [
+        "Demi-part supplémentaire pour les deux premiers enfants à charge, part entière dès le 3e (avantage plafonné).",
+        "Frais de garde d'un enfant de moins de 6 ans hors domicile : crédit d'impôt.",
+        "Emploi d'une garde à domicile : crédit d'impôt emploi à domicile."
+      ],
+      "casesLiees": ["parts_fiscales", "garde_jeunes_enfants", "credit_emploi_domicile"],
+      "droitsLies": ["Prestation d'accueil du jeune enfant (Paje)", "Allocations familiales (dès 2 enfants)", "Complément familial (dès 3 enfants, sous conditions)"],
+      "aVerifier": [
+        "Estime tes droits familiaux dans l'onglet « Droits sociaux ».",
+        "Si tu es locataire, un changement de situation peut faire recalculer ton aide au logement."
+      ]
+    },
+    {
+      "id": "mariage_pacs",
+      "titre": "Mariage ou Pacs",
+      "emoji": "💍",
+      "accroche": "Vous formez un seul foyer fiscal — avec un choix la première année.",
+      "intro": "Le mariage et le Pacs ont les mêmes effets fiscaux : vous devenez un foyer fiscal commun. L'année de l'union, vous pouvez choisir une déclaration commune ou deux déclarations séparées.",
+      "demarches": [
+        "Signaler le changement de situation à l'administration fiscale (impots.gouv.fr, « Gérer mon prélèvement à la source »).",
+        "Mettre à jour ton adresse et ta situation auprès de la CAF, la Sécurité sociale, les mutuelles.",
+        "L'année de l'union : comparer déclaration commune vs séparée (un seul choix, l'année de l'événement)."
+      ],
+      "impactsFiscaux": [
+        "Foyer fiscal commun : addition des revenus et des parts (2 parts pour le couple, avant enfants).",
+        "Le taux de prélèvement à la source peut être individualisé entre les deux membres.",
+        "Selon l'écart de revenus, déclaration commune et séparée ne donnent pas le même impôt l'année de l'union — à comparer."
+      ],
+      "casesLiees": ["parts_fiscales"],
+      "droitsLies": [],
+      "aVerifier": [
+        "Utilise « Mon chiffrage » et le simulateur officiel des impôts pour comparer les deux options l'année de l'union.",
+        "Pense à revoir les clauses bénéficiaires de ton assurance-vie."
+      ]
+    },
+    {
+      "id": "separation",
+      "titre": "Séparation ou divorce",
+      "emoji": "💔",
+      "accroche": "Retour à deux foyers fiscaux distincts, avec de nouveaux droits possibles.",
+      "intro": "Une séparation (divorce, rupture de Pacs) reconstitue deux foyers fiscaux. Le nombre de parts, les prestations et parfois le statut de parent isolé changent.",
+      "demarches": [
+        "Signaler le changement à l'administration fiscale et recalculer ton prélèvement à la source.",
+        "Mettre à jour ta situation auprès de la CAF (résidence des enfants, garde alternée) et des mutuelles.",
+        "Faire le point sur la pension alimentaire (versée ou reçue) et sa déclaration."
+      ],
+      "impactsFiscaux": [
+        "Deux déclarations séparées dès l'année de la séparation ; chacun déclare ses revenus.",
+        "Parent qui élève seul son/ses enfant(s) : demi-part supplémentaire possible (case « parent isolé »).",
+        "Pension alimentaire : déductible pour qui la verse, imposable pour qui la reçoit (selon décision)."
+      ],
+      "casesLiees": ["parts_fiscales", "pension_alimentaire"],
+      "droitsLies": ["Allocation de soutien familial (ASF)", "RSA / prime d'activité (selon nouveaux revenus)", "Aide au logement (recalcul)"],
+      "aVerifier": [
+        "Estime tes nouveaux droits dans l'onglet « Droits sociaux » avec ta situation actuelle.",
+        "Situation patrimoniale complexe (biens communs, immobilier) : un notaire / avocat reste la référence."
+      ]
+    },
+    {
+      "id": "demenagement",
+      "titre": "Déménagement",
+      "emoji": "📦",
+      "accroche": "Une nouvelle adresse, plusieurs droits à recalculer.",
+      "intro": "Changer de logement impacte tes impôts locaux, ton aide au logement et de nombreux contrats. La plupart des démarches se groupent en ligne.",
+      "demarches": [
+        "Mettre à jour ton adresse sur impots.gouv.fr et auprès de la CAF, la Sécu, l'employeur, les assurances.",
+        "Signaler le nouveau loyer à la CAF si tu perçois une aide au logement (recalcul).",
+        "Souscrire/transférer énergie, internet, assurance habitation ; faire suivre ton courrier."
+      ],
+      "impactsFiscaux": [
+        "Taxe d'habitation : supprimée sur la résidence principale, mais due sur une résidence secondaire.",
+        "Si tu deviens propriétaire occupant : taxe foncière à ta charge."
+      ],
+      "casesLiees": [],
+      "droitsLies": ["Aide au logement (APL/ALS, recalcul selon le nouveau loyer et la zone)"],
+      "aVerifier": [
+        "Refais une estimation de l'aide au logement dans « Droits sociaux » avec ton nouveau loyer et ton code postal.",
+        "Le service en ligne « Changement d'adresse » de service-public.fr prévient plusieurs organismes d'un coup."
+      ]
+    },
+    {
+      "id": "perte_emploi",
+      "titre": "Perte d'emploi",
+      "emoji": "📉",
+      "accroche": "Des droits à activer vite, et des aides souvent non réclamées.",
+      "intro": "À la perte d'un emploi, l'inscription rapide et la vérification de tes droits sociaux comptent le plus. Plusieurs aides se cumulent ou prennent le relais.",
+      "demarches": [
+        "S'inscrire à France Travail (ex-Pôle emploi) dès la fin du contrat pour ouvrir l'allocation chômage.",
+        "Vérifier le maintien de ta complémentaire santé (portabilité, sous conditions, après un licenciement).",
+        "Estimer tes droits CAF (RSA, prime d'activité, aide au logement) avec tes nouveaux revenus."
+      ],
+      "impactsFiscaux": [
+        "Les allocations chômage sont imposables et soumises au prélèvement à la source.",
+        "Tu peux faire baisser ton taux de prélèvement à la source si tes revenus chutent (impots.gouv.fr)."
+      ],
+      "casesLiees": [],
+      "droitsLies": ["Allocation d'aide au retour à l'emploi (ARE)", "RSA / prime d'activité", "Allocation de solidarité spécifique (ASS)", "Aide au logement"],
+      "aVerifier": [
+        "Lance une estimation dans « Droits sociaux » : beaucoup de droits ne sont pas réclamés.",
+        "Pense à ajuster ton taux de prélèvement à la source à la baisse."
+      ]
+    },
+    {
+      "id": "retraite",
+      "titre": "Départ à la retraite",
+      "emoji": "🌅",
+      "accroche": "Une demande à anticiper, des règles fiscales qui changent.",
+      "intro": "La retraite ne se déclenche pas automatiquement : il faut la demander à l'avance. Tes revenus et ta fiscalité évoluent, et certains dispositifs d'épargne se débloquent.",
+      "demarches": [
+        "Demander ta retraite plusieurs mois avant la date souhaitée (lassuranceretraite.fr / régimes complémentaires).",
+        "Vérifier ton relevé de carrière et tes points de retraite complémentaire (Agirc-Arrco).",
+        "Faire le point sur ton épargne : un PER peut se débloquer au départ en retraite."
+      ],
+      "impactsFiscaux": [
+        "Les pensions de retraite sont imposables, avec un abattement de 10 % (plafonné).",
+        "Le prélèvement à la source s'applique à tes pensions.",
+        "Sortie d'un PER : la fiscalité dépend du mode de sortie (capital ou rente) — voir service-public.fr."
+      ],
+      "casesLiees": ["per"],
+      "droitsLies": ["Allocation de solidarité aux personnes âgées (Aspa, sous conditions)", "Aide au logement", "APA si perte d'autonomie"],
+      "aVerifier": [
+        "Si tes revenus baissent, vérifie tes droits dans « Droits sociaux » (Aspa, aide au logement).",
+        "Une chute de revenus peut justifier d'ajuster ton prélèvement à la source."
+      ]
+    },
+    {
+      "id": "heritage",
+      "titre": "Héritage ou succession",
+      "emoji": "⚖️",
+      "accroche": "Des délais stricts et un notaire au centre du jeu.",
+      "intro": "Une succession suit des règles précises et des délais courts. Le notaire est l'interlocuteur central ; Boussole se limite à t'orienter et ne simule aucun montant.",
+      "demarches": [
+        "Contacter un notaire pour ouvrir la succession et établir l'actif/le passif.",
+        "Déposer la déclaration de succession dans le délai légal (en principe 6 mois en France métropolitaine).",
+        "Faire le point sur les contrats d'assurance-vie du défunt (hors succession dans bien des cas)."
+      ],
+      "impactsFiscaux": [
+        "Des abattements et des barèmes s'appliquent selon le lien de parenté (voir service-public.fr).",
+        "L'assurance-vie obéit à des règles de transmission spécifiques, distinctes des droits de succession.",
+        "Les biens reçus peuvent générer ensuite des revenus (fonciers, financiers) à déclarer."
+      ],
+      "casesLiees": [],
+      "droitsLies": [],
+      "aVerifier": [
+        "Cas patrimonial par nature complexe : le notaire (et au besoin un conseil) reste la référence.",
+        "Conserve les justificatifs : ils serviront pour le calcul des plus-values en cas de revente."
+      ]
+    },
+    {
+      "id": "premier_emploi",
+      "titre": "Premier emploi",
+      "emoji": "💼",
+      "accroche": "Ta première déclaration et un choix de rattachement.",
+      "intro": "Entrer dans la vie active déclenche ta vie fiscale propre : prélèvement à la source, première déclaration, et parfois le choix de rester rattaché au foyer de tes parents.",
+      "demarches": [
+        "Créer ton espace sur impots.gouv.fr et vérifier ton taux de prélèvement à la source.",
+        "Faire ta première déclaration de revenus l'année suivante (même sans impôt à payer).",
+        "Décider du rattachement au foyer fiscal des parents ou d'une déclaration séparée (selon âge et études)."
+      ],
+      "impactsFiscaux": [
+        "Salaires d'étudiant/apprenti : exonérations possibles dans certaines limites (voir impots.gouv.fr).",
+        "Rester rattaché au foyer des parents ou déclarer seul change l'impôt des deux côtés — à comparer."
+      ],
+      "casesLiees": ["parts_fiscales"],
+      "droitsLies": ["Prime d'activité (selon revenus)", "Aide au logement (si locataire)"],
+      "aVerifier": [
+        "Si tes revenus sont modestes, vérifie la prime d'activité et l'aide au logement dans « Droits sociaux ».",
+        "Compare rattachement vs déclaration séparée avant de trancher."
+      ]
+    }
+  ]
+}

@@ -75,15 +75,26 @@ async function fetchCasesSafe() {
   }
 }
 
+// Parcours événements de vie : optionnel. Retourne { evenements, version }.
+async function fetchEvenementsSafe() {
+  try {
+    const d = await fetchJson('evenements-vie');
+    return { evenements: d.evenements || [], version: d.version || '' };
+  } catch (_) {
+    return { evenements: [], version: '' };
+  }
+}
+
 export async function loadData() {
   try {
-    const [fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc, casesDoc] = await Promise.all([
+    const [fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc, casesDoc, eventsDoc] = await Promise.all([
       fetchJson('fiscal-params'),
       fetchJson('veille-fiscale'),
       fetchJson('modules'),
       fetchNichesSafe(),
       fetchDroitsSafe(),
       fetchCasesSafe(),
+      fetchEvenementsSafe(),
     ]);
     verifierIntegrite(fiscalParams);
     const data = {
@@ -91,16 +102,17 @@ export async function loadData() {
       niches: nichesDoc.niches, nichesCategories: nichesDoc.categories,
       droits: droitsDoc.aides, droitsCategories: droitsDoc.categories, droitsSimulateur: droitsDoc.simulateur,
       casesDeclaration: casesDoc.cases, casesVersion: casesDoc.version,
+      evenements: eventsDoc.evenements, evenementsVersion: eventsDoc.version,
       source: 'reseau',
     };
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc, casesDoc }));
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc, casesDoc, eventsDoc }));
     return data;
   } catch (e) {
     console.warn('[data] fetch réseau échoué, tentative cache local :', e.message);
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
       try {
-        const { fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc, casesDoc } = JSON.parse(cached);
+        const { fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc, casesDoc, eventsDoc } = JSON.parse(cached);
         verifierIntegrite(fiscalParams);
         return {
           fiscalParams, veille, modules: modulesDoc.modules || [],
@@ -108,11 +120,12 @@ export async function loadData() {
           droits: (droitsDoc && droitsDoc.aides) || [], droitsCategories: (droitsDoc && droitsDoc.categories) || [],
           droitsSimulateur: (droitsDoc && droitsDoc.simulateur) || '',
           casesDeclaration: (casesDoc && casesDoc.cases) || {}, casesVersion: (casesDoc && casesDoc.version) || '',
+          evenements: (eventsDoc && eventsDoc.evenements) || [], evenementsVersion: (eventsDoc && eventsDoc.version) || '',
           source: 'cache',
         };
       } catch (_) { /* tombe sur le fallback */ }
     }
     console.warn('[data] aucun cache, utilisation du fallback bundlé');
-    return { fiscalParams: FALLBACK.fiscalParams, veille: FALLBACK.veille, modules: FALLBACK.modules, niches: [], nichesCategories: [], droits: [], droitsCategories: [], droitsSimulateur: '', casesDeclaration: {}, casesVersion: '', source: 'fallback' };
+    return { fiscalParams: FALLBACK.fiscalParams, veille: FALLBACK.veille, modules: FALLBACK.modules, niches: [], nichesCategories: [], droits: [], droitsCategories: [], droitsSimulateur: '', casesDeclaration: {}, casesVersion: '', evenements: [], evenementsVersion: '', source: 'fallback' };
   }
 }

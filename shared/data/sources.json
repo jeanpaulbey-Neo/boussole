@@ -1,0 +1,24 @@
+{
+  "version": "2026.1",
+  "date_maj": "2026-06-02",
+  "_avertissement": "Registre des sources officielles citées dans l'app, avec leur URL canonique. Sert à rendre les références cliquables. On privilégie des URL durables (racines/sections officielles) plutôt que des liens profonds fragiles. Le cron de veille mensuel vérifie que chaque lien répond (anti-lien cassé) ; un humain corrige ici en cas d'échec, puis bump la version.",
+  "sources": [
+    { "id": "service_public", "label": "service-public.fr", "url": "https://www.service-public.fr", "alias": ["service-public.fr", "service public"] },
+    { "id": "impots", "label": "impots.gouv.fr", "url": "https://www.impots.gouv.fr", "alias": ["impots.gouv.fr", "impôts.gouv"] },
+    { "id": "cesu", "label": "Urssaf Cesu", "url": "https://www.cesu.urssaf.fr", "alias": ["cesu", "urssaf cesu"] },
+    { "id": "urssaf", "label": "Urssaf", "url": "https://www.urssaf.fr", "alias": ["urssaf"] },
+    { "id": "bofip", "label": "BOFiP", "url": "https://bofip.impots.gouv.fr", "alias": ["bofip"] },
+    { "id": "legifrance", "label": "Légifrance", "url": "https://www.legifrance.gouv.fr", "alias": ["légifrance", "legifrance"] },
+    { "id": "mesdroitssociaux", "label": "mesdroitssociaux.gouv.fr", "url": "https://www.mesdroitssociaux.gouv.fr", "alias": ["mesdroitssociaux"] },
+    { "id": "caf", "label": "caf.fr", "url": "https://www.caf.fr", "alias": ["caf.fr", "caf "] },
+    { "id": "france_travail", "label": "francetravail.fr", "url": "https://www.francetravail.fr", "alias": ["francetravail", "france travail", "pôle emploi", "pole emploi"] },
+    { "id": "retraite", "label": "lassuranceretraite.fr", "url": "https://www.lassuranceretraite.fr", "alias": ["lassuranceretraite", "assurance retraite", "agirc-arrco"] },
+    { "id": "ameli", "label": "ameli.fr", "url": "https://www.ameli.fr", "alias": ["ameli"] },
+    { "id": "msa", "label": "msa.fr", "url": "https://www.msa.fr", "alias": ["msa"] },
+    { "id": "france_renov", "label": "france-renov.gouv.fr", "url": "https://france-renov.gouv.fr", "alias": ["france-renov", "france rénov"] },
+    { "id": "boss", "label": "BOSS (bulletin officiel Sécurité sociale)", "url": "https://boss.gouv.fr", "alias": ["boss"] },
+    { "id": "anah", "label": "anah.gouv.fr", "url": "https://www.anah.gouv.fr", "alias": ["anah"] },
+    { "id": "cheque_energie", "label": "chequeenergie.gouv.fr", "url": "https://chequeenergie.gouv.fr", "alias": ["chequeenergie", "chèque énergie"] },
+    { "id": "etudiant", "label": "etudiant.gouv.fr", "url": "https://www.etudiant.gouv.fr", "alias": ["etudiant.gouv", "étudiant.gouv"] }
+  ]
+}

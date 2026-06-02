@@ -3,7 +3,7 @@
 // repli sur le cache, pour servir la version OTA la plus fraîche tout en restant lisible
 // hors-ligne (cohérent avec data.js qui cache aussi la dernière bonne valeur).
 
-const VERSION = 'boussole-v19';
+const VERSION = 'boussole-v20';
 const SHELL = [
   '/',
   '/index.html',
@@ -20,6 +20,7 @@ const SHELL = [
   '/shared/data/droits-sociaux.json',
   '/shared/data/cases-declaration.json',
   '/shared/data/evenements-vie.json',
+  '/shared/data/sources.json',
 ];
 
 self.addEventListener('install', (e) => {

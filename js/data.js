@@ -85,9 +85,20 @@ async function fetchEvenementsSafe() {
   }
 }
 
+// Registre des sources officielles (URLs cliquables) : optionnel. Retourne un tableau
+// [{ label, url, alias }]. Sert à rendre les références cliquables côté UI.
+async function fetchSourcesSafe() {
+  try {
+    const d = await fetchJson('sources');
+    return Array.isArray(d.sources) ? d.sources : [];
+  } catch (_) {
+    return [];
+  }
+}
+
 export async function loadData() {
   try {
-    const [fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc, casesDoc, eventsDoc] = await Promise.all([
+    const [fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc, casesDoc, eventsDoc, sourcesIndex] = await Promise.all([
       fetchJson('fiscal-params'),
       fetchJson('veille-fiscale'),
       fetchJson('modules'),
@@ -95,6 +106,7 @@ export async function loadData() {
       fetchDroitsSafe(),
       fetchCasesSafe(),
       fetchEvenementsSafe(),
+      fetchSourcesSafe(),
     ]);
     verifierIntegrite(fiscalParams);
     const data = {
@@ -103,16 +115,17 @@ export async function loadData() {
       droits: droitsDoc.aides, droitsCategories: droitsDoc.categories, droitsSimulateur: droitsDoc.simulateur,
       casesDeclaration: casesDoc.cases, casesVersion: casesDoc.version,
       evenements: eventsDoc.evenements, evenementsVersion: eventsDoc.version,
+      sourcesIndex,
       source: 'reseau',
     };
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc, casesDoc, eventsDoc }));
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc, casesDoc, eventsDoc, sourcesIndex }));
     return data;
   } catch (e) {
     console.warn('[data] fetch réseau échoué, tentative cache local :', e.message);
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
       try {
-        const { fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc, casesDoc, eventsDoc } = JSON.parse(cached);
+        const { fiscalParams, veille, modulesDoc, nichesDoc, droitsDoc, casesDoc, eventsDoc, sourcesIndex } = JSON.parse(cached);
         verifierIntegrite(fiscalParams);
         return {
           fiscalParams, veille, modules: modulesDoc.modules || [],
@@ -121,11 +134,12 @@ export async function loadData() {
           droitsSimulateur: (droitsDoc && droitsDoc.simulateur) || '',
           casesDeclaration: (casesDoc && casesDoc.cases) || {}, casesVersion: (casesDoc && casesDoc.version) || '',
           evenements: (eventsDoc && eventsDoc.evenements) || [], evenementsVersion: (eventsDoc && eventsDoc.version) || '',
+          sourcesIndex: sourcesIndex || [],
           source: 'cache',
         };
       } catch (_) { /* tombe sur le fallback */ }
     }
     console.warn('[data] aucun cache, utilisation du fallback bundlé');
-    return { fiscalParams: FALLBACK.fiscalParams, veille: FALLBACK.veille, modules: FALLBACK.modules, niches: [], nichesCategories: [], droits: [], droitsCategories: [], droitsSimulateur: '', casesDeclaration: {}, casesVersion: '', evenements: [], evenementsVersion: '', source: 'fallback' };
+    return { fiscalParams: FALLBACK.fiscalParams, veille: FALLBACK.veille, modules: FALLBACK.modules, niches: [], nichesCategories: [], droits: [], droitsCategories: [], droitsSimulateur: '', casesDeclaration: {}, casesVersion: '', evenements: [], evenementsVersion: '', sourcesIndex: [], source: 'fallback' };
   }
 }

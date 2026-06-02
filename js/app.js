@@ -83,6 +83,19 @@ function tabbar() {
   return `<nav class="tabbar">${tabs.map(([r, e, l]) => `<button class="tab ${store.route === r ? 'active' : ''}" data-go="${r}">${e}<span>${l}</span></button>`).join('')}</nav>`;
 }
 
+// Rend une référence cliquable si son libellé correspond à une source officielle connue
+// (registre sources.json, mis à jour OTA et surveillé par le cron anti-lien cassé). Sinon,
+// texte simple. Liens https uniquement, ouverts dans un nouvel onglet (rel noopener).
+function srcLink(s) {
+  const idx = (store.data && store.data.sourcesIndex) || [];
+  const low = String(s).toLowerCase();
+  const hit = idx.find((e) => (e.alias || []).some((a) => a && low.includes(String(a).toLowerCase())));
+  if (hit && /^https:\/\//.test(hit.url || '')) {
+    return `<a class="src src-link" href="${esc(hit.url)}" target="_blank" rel="noopener">${esc(s)} ↗</a>`;
+  }
+  return `<span class="src">${esc(s)}</span>`;
+}
+
 // ── Écrans ──
 function screenOnboarding() {
   const refaire = store.profile ? `<button class="btn-ghost" data-go="bilan">Revoir mon bilan</button>` : '';
@@ -215,7 +228,7 @@ function screenLeverDetail() {
       <ol class="ou-agir">${lever.ouAgir.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
       ${blocCases(lever.id)}
       <h3 class="section-h">Sources</h3>
-      <p class="sources">${lever.sources.map((s) => `<span class="src">${esc(s)}</span>`).join('')}</p>
+      <p class="sources">${lever.sources.map(srcLink).join('')}</p>
       <button class="btn-primary" data-module="${lever.moduleId}">Apprendre en 60 s</button>
       ${bandeauLegal()}
     </div>
@@ -238,7 +251,7 @@ function screenModule() {
       <div class="module-section"><span class="ms-label">Pour qui</span><p>${esc(m.pourQui)}</p></div>
       <div class="module-section"><span class="ms-label">Le calcul</span><p>${esc(m.calcul)}</p></div>
       <div class="module-section"><span class="ms-label">Où agir</span><ul>${m.ouAgir.map((s) => `<li>${esc(s)}</li>`).join('')}</ul></div>
-      <p class="sources">${m.sources.map((s) => `<span class="src">${esc(s)}</span>`).join('')}</p>
+      <p class="sources">${m.sources.map(srcLink).join('')}</p>
 
       <div class="quiz" id="quiz" data-answer="${m.quiz.bonneReponse}">
         <h3>Quiz éclair</h3>
@@ -460,7 +473,7 @@ function nicheCard({ niche, statut, raison }) {
       ${aLevier ? `<button class="btn-small btn-small-ghost" data-lever-detail="${niche.leverId}">Où agir</button>` : ''}
     </div>
     ${blocCases(niche.id)}
-    <p class="niche-src">${(niche.sources || []).map((s) => `<span class="src">${esc(s)}</span>`).join('')}${niche.article ? `<span class="src src-cgi">${esc(niche.article)}</span>` : ''}</p>
+    <p class="niche-src">${(niche.sources || []).map(srcLink).join('')}${niche.article ? `<span class="src src-cgi">${esc(niche.article)}</span>` : ''}</p>
   </article>`;
 }
 
@@ -516,7 +529,7 @@ function droitCard({ aide, statut, raison }) {
     <div class="niche-actions">
       ${aide.lien ? `<a class="btn-small btn-small-ghost" href="${esc(aide.lien)}" target="_blank" rel="noopener">En savoir plus ↗</a>` : ''}
     </div>
-    <p class="niche-src">${(aide.sources || []).map((s) => `<span class="src">${esc(s)}</span>`).join('')}</p>
+    <p class="niche-src">${(aide.sources || []).map(srcLink).join('')}</p>
   </article>`;
 }
 

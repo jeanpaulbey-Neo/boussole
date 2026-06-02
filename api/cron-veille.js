@@ -82,6 +82,44 @@ function rappelCases(d = new Date()) {
   ].join('\n');
 }
 
+// Vérification anti-lien cassé : on charge le registre sources.json déployé et on teste
+// que chaque URL officielle répond (GET, redirections suivies). Les liens en échec sont
+// signalés pour correction humaine (éditer sources.json + bump version). L'automatisation
+// DÉTECTE ; l'humain CORRIGE (cf. RUNBOOK).
+async function verifierLiens(base) {
+  let liste = [];
+  try {
+    const r = await fetch(`${base}/shared/data/sources.json`, { headers: { 'user-agent': 'boussole-veille/1.0' } });
+    if (r.ok) { const d = await r.json(); liste = Array.isArray(d.sources) ? d.sources : []; }
+  } catch (_) { /* registre indisponible ce run */ }
+  if (!liste.length) {
+    return '## Liens des sources (anti-lien cassé)\n- _(sources.json introuvable — vérification ignorée ce run.)_';
+  }
+  // User-agent navigateur : beaucoup de sites officiels (Légifrance, ameli, urssaf…)
+  // renvoient 403/503 aux robots tout en étant parfaitement accessibles à un humain.
+  const UA = 'Mozilla/5.0 (compatible; BoussoleVeille/1.0; +https://boussole.app)';
+  const res = await Promise.all(liste.map(async (s) => {
+    try {
+      const rr = await fetch(s.url, { method: 'GET', redirect: 'follow', headers: { 'user-agent': UA, accept: 'text/html,application/xhtml+xml' } });
+      return { label: s.label, url: s.url, status: rr.status };
+    } catch (e) {
+      return { label: s.label, url: s.url, status: 'ERR', err: String(e).slice(0, 80) };
+    }
+  }));
+  // « Cassé » = page introuvable (404/410) : seul cas qui exige de corriger l'URL.
+  // Les 401/403/405/429/5xx sont des blocages anti-robot/WAF (l'URL existe) → « à vérifier »
+  // sans fausse alarme ; une erreur réseau est aussi mise en « à vérifier » (souvent transitoire).
+  const casses = res.filter((x) => x.status === 404 || x.status === 410);
+  const aVerifier = res.filter((x) => x.status === 'ERR' || (typeof x.status === 'number' && x.status >= 400 && x.status !== 404 && x.status !== 410));
+  return [
+    '## Liens des sources (anti-lien cassé)',
+    `- ${res.length} liens testés — ${casses.length} cassé(s) (404/410), ${aVerifier.length} à vérifier (blocage robots/réseau).`,
+    ...casses.map((x) => `- ❌ **CASSÉ** ${x.label} → ${x.url} (HTTP ${x.status}) — corriger \`shared/data/sources.json\` puis bump version.`),
+    ...aVerifier.map((x) => `- ⚠️ ${x.label} → ${x.url} (${x.status}) — bloque les robots ; vérifier à la main au besoin.`),
+    (casses.length === 0 && aVerifier.length === 0) ? '- ✅ Tous les liens répondent normalement.' : '',
+  ].filter(Boolean).join('\n');
+}
+
 async function notifierAdmin(rapport) {
   const hook = process.env.VEILLE_WEBHOOK_URL;
   if (!hook) {
@@ -100,6 +138,10 @@ export default async function handler(req, res) {
   // TODO branchement stockage : comparer snapshots[].hash au snapshot précédent (Vercel KV/Blob)
   //      pour ne déclencher le résumé Claude que sur diff réel. Sans stockage, on résume à chaque run.
   const resume = await resumeViaClaude(snapshots);
+  // Base URL du déploiement (pour relire le registre de sources et tester les liens).
+  const proto = req.headers['x-forwarded-proto'] || 'https';
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+  const liens = host ? await verifierLiens(`${proto}://${host}`) : '## Liens des sources (anti-lien cassé)\n- _(host inconnu — vérification ignorée ce run.)_';
   const date = new Date().toISOString().slice(0, 10);
   const rapport = [
     `# Rapport de veille fiscale — ${date}`,
@@ -113,6 +155,8 @@ export default async function handler(req, res) {
     resume,
     '',
     rappelCases(),
+    '',
+    liens,
     '',
     '## Prochaine action',
     '1. Vérifier chaque valeur signalée sur source de niveau 1–3 (Légifrance / BOFiP / service-public).',

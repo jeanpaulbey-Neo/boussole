@@ -44,6 +44,7 @@ const store = {
   progression: {},
   currentLeverId: null,
   currentModuleId: null,
+  currentEventId: null,
   avis: null,
 };
 
@@ -180,6 +181,7 @@ function screenBilan() {
   body += `<button class="btn-ghost" data-go="niches">🗂️ Voir toutes les niches fiscales & leur adéquation</button>`;
   body += `<button class="btn-ghost" data-go="droits">🤝 Explorer mes droits sociaux (CAF, aides…)</button>`;
   body += `<button class="btn-ghost" data-go="chiffrage">💶 Chiffrer mes économies en euros réels</button>`;
+  body += `<button class="btn-ghost" data-go="evenements">🔀 J'ai un événement de vie (naissance, déménagement…)</button>`;
 
   return `<div class="screen">${header('Ton bilan d\'orientation')}
     <div class="scroll">
@@ -568,6 +570,63 @@ function screenDroits() {
   </div>`;
 }
 
+// ── Parcours « événements de vie » : orientation à l'occasion d'un changement ──
+// Données versionnées evenements-vie.json. 100 % pédagogique : on oriente sur les
+// démarches, les impacts fiscaux et les droits à vérifier — aucun montant conseillé,
+// aucune démarche faite à la place de l'utilisateur. Renvoie vers les outils existants
+// (droits sociaux, « À déclarer ») et vers les sources officielles.
+function screenEvenements() {
+  if (!store.profile) return screenOnboarding();
+  const events = store.data.evenements || [];
+  if (!events.length) {
+    return `<div class="screen">${header('Événements de vie', 'bilan')}
+      <div class="scroll">${badge()}<p class="empty">Les parcours « événement de vie » ne sont pas disponibles hors-ligne pour le moment. Reconnecte-toi pour les charger.</p>${bandeauLegal()}</div>${tabbar()}</div>`;
+  }
+  const cards = events.map((ev) => `<button class="lib-card" data-event="${esc(ev.id)}">
+      <div class="lib-top"><span class="event-emoji">${ev.emoji || '•'}</span></div>
+      <h3>${esc(ev.titre)}</h3>
+      <p>${esc(ev.accroche || '')}</p>
+    </button>`).join('');
+  return `<div class="screen">${header('Événements de vie', 'bilan')}
+    <div class="scroll">
+      ${badge()}
+      <p class="lib-intro">Un changement de situation ? Choisis l'événement : Boussole t'oriente sur les démarches, les impacts fiscaux et les droits à vérifier. On ne fait aucune démarche à ta place et on ne conseille aucun montant.</p>
+      <div class="lib-grid">${cards}</div>
+      ${bandeauLegal()}
+    </div>
+    ${tabbar()}
+  </div>`;
+}
+
+function screenEvenementDetail() {
+  const ev = (store.data.evenements || []).find((x) => x.id === store.currentEventId);
+  if (!ev) return screenEvenements();
+  const liste = (arr, cls) => (arr && arr.length) ? `<ul class="${cls}">${arr.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '';
+  const cases = (ev.casesLiees || []).map((id) => blocCases(id)).join('');
+  const droits = (ev.droitsLies && ev.droitsLies.length)
+    ? `<h3 class="section-h">Droits à vérifier</h3>${liste(ev.droitsLies, 'niche-cond')}<button class="btn-ghost" data-go="droits">🤝 Estimer mes droits sociaux</button>`
+    : '';
+  const aSavoir = (ev.aVerifier && ev.aVerifier.length)
+    ? `<h3 class="section-h">Bon à savoir</h3>${ev.aVerifier.map((x) => `<div class="banniere">💡 ${esc(x)}</div>`).join('')}`
+    : '';
+  return `<div class="screen">${header(ev.titre, 'evenements')}
+    <div class="scroll">
+      <div class="detail-top"><span class="event-emoji">${ev.emoji || ''}</span></div>
+      <h2 class="detail-title">${esc(ev.titre)}</h2>
+      <p class="lib-intro">${esc(ev.intro || '')}</p>
+      <h3 class="section-h">Démarches à prévoir</h3>
+      ${liste(ev.demarches, 'ou-agir')}
+      ${(ev.impactsFiscaux && ev.impactsFiscaux.length) ? `<h3 class="section-h">Ce que ça change côté impôts</h3>${liste(ev.impactsFiscaux, 'niche-cond')}` : ''}
+      ${cases}
+      ${droits}
+      ${aSavoir}
+      <p class="case-verif">Parcours indicatif (v${esc(store.data.evenementsVersion || '')}) — vérifie les délais et conditions sur service-public.fr et auprès des organismes.</p>
+      ${bandeauLegal()}
+    </div>
+    ${tabbar()}
+  </div>`;
+}
+
 // ── Chiffrage personnel en euros réels ───────────────────────
 // Quand l'avis est chargé, on dispose du revenu net imposable, des parts et de la TMI
 // EXACTS : on recalcule l'IR par le barème (engine.calcIR) et on simule l'économie d'un
@@ -693,6 +752,7 @@ function render() {
     checklist: screenChecklist, paywall: () => screenPaywall(), settings: screenSettings,
     'avis-import': screenAvisImport, 'avis-validation': screenAvisValidation,
     niches: screenNiches, droits: screenDroits, chiffrage: screenChiffrage,
+    evenements: screenEvenements, 'evenement-detail': screenEvenementDetail,
   };
   app.innerHTML = (screens[store.route] || screenOnboarding)();
 }
@@ -706,10 +766,12 @@ function finProfilage() {
 }
 
 app.addEventListener('click', async (e) => {
-  const t = e.target.closest('[data-go],[data-action],[data-pick],[data-module],[data-lever],[data-lever-detail],[data-quiz]');
+  const t = e.target.closest('[data-go],[data-action],[data-pick],[data-module],[data-lever],[data-lever-detail],[data-quiz],[data-event]');
   if (!t) return;
 
   if (t.dataset.go) return go(t.dataset.go);
+
+  if (t.dataset.event) return go('evenement-detail', { currentEventId: t.dataset.event });
 
   if (t.dataset.pick !== undefined) {
     const Q = QUESTIONS[store.step];

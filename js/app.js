@@ -26,6 +26,7 @@ const QUESTIONS = [
   { field: 'epargnePrecaution', q: 'Épargne de précaution (~3 mois de dépenses) ?', opts: [['OUI', 'Oui'], ['PARTIEL', 'Partiellement'], ['NON', 'Non']] },
   { field: 'capaciteEpargne', q: "Capacité d'épargne mensuelle ?", opts: [['AUCUNE', 'Aucune'], ['<100', 'Moins de 100 €'], ['100-300', '100 – 300 €'], ['>300', 'Plus de 300 €']] },
   { field: 'logement', q: 'Logement ?', opts: [['LOCATAIRE', 'Locataire'], ['PROPRIO_RP', 'Propriétaire (résidence principale)'], ['PROPRIO_BAILLEUR', 'Propriétaire bailleur']] },
+  { field: 'loyer', q: 'Loyer mensuel (charges comprises) ?', opts: [['0', 'Je ne suis pas locataire'], ['<500', 'Moins de 500 €'], ['500-800', '500 – 800 €'], ['800-1200', '800 – 1 200 €'], ['>1200', 'Plus de 1 200 €']] },
   { field: 'fraisProEleves', q: 'Trajets longs / frais pro élevés ?', opts: [['OUI', 'Oui'], ['NON', 'Non']] },
   { field: 'creditsEnCours', q: 'Crédits en cours ?', opts: [['OUI', 'Oui'], ['NON', 'Non']] },
   { field: 'objectif', q: 'Objectif prioritaire ?', opts: [['SECURISER', 'Sécuriser'], ['PROJET', 'Projet 5–10 ans'], ['RETRAITE', 'Retraite'], ['IMPOTS', "Réduire l'impôt"]] },
@@ -291,11 +292,13 @@ function screenChecklist() {
       ${moisRappels ? `<div class="banniere">⏰ ${esc(moisRappels)}</div>` : ''}
       <h3 class="section-h">À faire pour mon profil</h3>
       <ul class="checklist">${items.map((it, i) => `<li><label><input type="checkbox" data-check="${i}"> <strong>${esc(it.titre)}</strong> — ${esc(it.action)}</label></li>`).join('')}</ul>
-      <h3 class="section-h">Rappels saisonniers</h3>
+      <h3 class="section-h">Échéances de l'année</h3>
       <ul class="rappels">
-        <li>📅 <strong>Avril–juin</strong> : campagne de déclaration → vérifie tes crédits/réductions.</li>
+        <li>📅 <strong>Avril–juin</strong> : campagne de déclaration → vérifie tes crédits/réductions (date limite selon ta zone).</li>
         <li>📅 <strong>31 décembre</strong> : dernier moment pour verser sur PER/PEE au titre de l'année.</li>
       </ul>
+      <button class="btn-ghost" data-action="exportIcs">📅 Ajouter ces échéances à mon agenda (.ics)</button>
+      <p class="case-verif">Le fichier .ics est généré sur ton appareil (aucun envoi). Les dates sont des rappels indicatifs.</p>
       ${bandeauLegal()}
     </div>
     ${tabbar()}
@@ -500,6 +503,9 @@ function blocEstimationDroits() {
   const REV_MID = { '<1500': 1200, '1500-2500': 2000, '2500-4000': 3200, '4000-6000': 5000, '>6000': 7000 };
   const revPre = REV_MID[p.revenuMensuelFoyer] || '';
   const revHint = revPre ? 'estimé depuis ta tranche de profil — ajuste avec ton montant exact' : 'salaires nets, hors prestations';
+  // Loyer pré-rempli depuis la tranche du profil (milieu), modifiable.
+  const LOYER_MID = { '<500': 400, '500-800': 650, '800-1200': 1000, '>1200': 1400 };
+  const loyerPre = LOYER_MID[p.loyer] || '';
   return `<div class="droits-estim">
     <h3 class="section-h">Estimer mes aides (RSA, prime d'activité, logement, prestations familiales…)</h3>
     <div class="avis-conf avis-conf-PARTIELLE">
@@ -515,7 +521,7 @@ function blocEstimationDroits() {
       <label class="champ-row"><span class="champ-label">Enfants à charge</span>
         <span class="champ-input"><input type="number" step="1" min="0" inputmode="numeric" id="estEnfants" value="${nbEnf}"></span></label>
       <label class="champ-row"><span class="champ-label">Loyer mensuel<small class="champ-hint">0 si tu n'es pas locataire</small></span>
-        <span class="champ-input"><input type="number" step="any" inputmode="decimal" id="estLoyer" placeholder="ex : 700"><em>€</em></span></label>
+        <span class="champ-input"><input type="number" step="any" inputmode="decimal" id="estLoyer" value="${loyerPre}" placeholder="ex : 700"><em>€</em></span></label>
       <label class="champ-row"><span class="champ-label">Code postal<small class="champ-hint">facultatif — affine la zone de l'aide au logement</small></span>
         <span class="champ-input"><input type="text" inputmode="numeric" id="estCodePostal" placeholder="ex : 75011" maxlength="5"></span></label>
     </div>
@@ -729,6 +735,7 @@ app.addEventListener('click', async (e) => {
   if (a === 'avisAnnuler') { store.avis = null; return go('settings'); }
   if (a === 'avisValider') return validerAvis();
   if (a === 'estimerDroits') return estimerDroits();
+  if (a === 'exportIcs') return exportIcs();
 });
 
 // Simulateur PER : recalcul en direct à chaque frappe.
@@ -997,6 +1004,42 @@ async function estimerDroits() {
   } catch (err) {
     out.innerHTML = `<div class="appro-card appro-offline"><p>${esc(String(err && err.message ? err.message : err))}</p><small>Le panorama ci-dessus et le simulateur officiel restent disponibles.</small></div>`;
   }
+}
+
+// Export des échéances fiscales au format iCalendar (.ics), généré SUR L'APPAREIL.
+// Évènements « journée entière » avec rappel 7 jours avant. Aucune donnée transmise.
+function icsEsc(s) {
+  return String(s).replace(/[\\;,]/g, (c) => '\\' + c).replace(/\n/g, '\\n');
+}
+function exportIcs() {
+  const an = new Date().getFullYear();
+  const jour = (y, m, d) => `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}`;
+  const events = [
+    { d: [an, 5, 15], titre: 'Boussole : déclarer mes revenus', desc: "Campagne de déclaration en cours — vérifie tes crédits et réductions (emploi à domicile, dons, frais de garde…). Date limite exacte selon ta zone." },
+    { d: [an, 12, 28], titre: 'Boussole : versement PER/PEE avant le 31/12', desc: "Dernier moment pour verser au titre de l'année (déduction d'impôt pour le PER, dans la limite de ton plafond)." },
+  ];
+  const lignes = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Boussole//FR', 'CALSCALE:GREGORIAN'];
+  events.forEach((e, i) => {
+    lignes.push(
+      'BEGIN:VEVENT',
+      `UID:boussole-${an}-${i}@boussole.app`,
+      `DTSTART;VALUE=DATE:${jour(...e.d)}`,
+      `SUMMARY:${icsEsc(e.titre)}`,
+      `DESCRIPTION:${icsEsc(e.desc)}`,
+      'BEGIN:VALARM', 'TRIGGER:-P7D', 'ACTION:DISPLAY', `DESCRIPTION:${icsEsc(e.titre)}`, 'END:VALARM',
+      'END:VEVENT',
+    );
+  });
+  lignes.push('END:VCALENDAR');
+  const blob = new Blob([lignes.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'boussole-echeances.ics';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 // ── Boot ──

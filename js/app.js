@@ -47,6 +47,7 @@ const store = {
   currentEventId: null,
   droitsRetour: 'bilan',
   estimationContexte: null,
+  estimInputs: null,
   avis: null,
 };
 
@@ -582,13 +583,40 @@ function blocEstimationDroits() {
   </div>`;
 }
 
-function screenDroits() {
-  const aides = store.data.droits || [];
-  if (!store.profile) return screenOnboarding();
-  const res = adequationDroits(store.profile, aides);
-  const cats = store.data.droitsCategories || [];
-  const simulateur = store.data.droitsSimulateur || 'https://www.mesdroitssociaux.gouv.fr';
+// Tranche de revenu (clé de REV_ORDRE) depuis un montant mensuel exact.
+function trancheRevenu(m) {
+  const v = Number(m) || 0;
+  if (v < 1500) return '<1500';
+  if (v < 2500) return '1500-2500';
+  if (v < 4000) return '2500-4000';
+  if (v < 6000) return '4000-6000';
+  return '>6000';
+}
 
+// Profil « effectif » pour l'adéquation des aides : le profil déclaré, surchargé par les
+// éléments saisis dans l'estimateur (s'ils existent). C'est ce qui rend le panorama
+// COHÉRENT avec ce que l'utilisateur vient de renseigner juste au-dessus.
+function profilEffectif() {
+  const base = store.profile || {};
+  const e = store.estimInputs;
+  if (!e) return base;
+  return {
+    ...base,
+    revenuMensuelFoyer: trancheRevenu(e.revenuNetMensuel),
+    // « Seul » ne distingue pas célibataire / parent isolé : on conserve le statut isolé du
+    // profil s'il existe (il ouvre l'ASF), sinon célibataire.
+    situationFamiliale: e.situation === 'COUPLE' ? 'COUPLE' : (base.situationFamiliale === 'PARENT_ISOLE' ? 'PARENT_ISOLE' : 'CELIBATAIRE'),
+    nbCharges: Number(e.nbEnfants) || 0,
+    logement: Number(e.loyer) > 0 ? 'LOCATAIRE' : (base.logement || ''),
+  };
+}
+
+// Panorama des aides classées par adéquation, pour un profil donné. Recalculable en place
+// après une estimation (cf. estimerDroits) pour rester cohérent avec les éléments saisis.
+function panoramaDroits(profil) {
+  const aides = store.data.droits || [];
+  const cats = store.data.droitsCategories || [];
+  const res = adequationDroits(profil, aides);
   let corps = '';
   if (cats.length) {
     const byId = {};
@@ -602,17 +630,21 @@ function screenDroits() {
     const sorted = res.slice().sort((a, b) => DROIT_LABEL[a.statut].ordre - DROIT_LABEL[b.statut].ordre);
     corps = `<div class="niche-list">${sorted.map(droitCard).join('')}</div>`;
   }
-
   const nbPrio = res.filter((r) => r.statut === 'PRIORITAIRE').length;
+  const selon = store.estimInputs ? "d'après les éléments saisis" : 'pour ton profil';
+  return `<h3 class="section-h">Panorama des aides (${res.length}) — ${nbPrio} à simuler en priorité ${selon}</h3>${corps}`;
+}
 
+function screenDroits() {
+  if (!store.profile) return screenOnboarding();
+  const simulateur = store.data.droitsSimulateur || 'https://www.mesdroitssociaux.gouv.fr';
   return `<div class="screen">${header('Droits sociaux', store.droitsRetour || 'bilan')}
     <div class="scroll">
       ${badge()}
       <p class="lib-intro">Renseigne tes montants pour estimer tes aides, puis explore le panorama des dispositifs. Pour beaucoup de profils, des droits non réclamés pèsent plus lourd que toute optimisation fiscale.</p>
       ${blocEstimationDroits()}
       <a class="btn-primary" href="${esc(simulateur)}" target="_blank" rel="noopener">🧮 Ouvrir le simulateur officiel ↗</a>
-      <h3 class="section-h">Panorama des aides (${res.length}) — ${nbPrio} à simuler en priorité pour ton profil</h3>
-      ${corps}
+      <div id="droitsPanorama">${panoramaDroits(profilEffectif())}</div>
       ${bandeauLegal()}
     </div>
     ${tabbar()}
@@ -820,7 +852,7 @@ app.addEventListener('click', async (e) => {
   if (!t) return;
 
   // Accès « générique » aux droits (depuis le bilan) : on réinitialise le contexte d'estimation.
-  if (t.dataset.go === 'droits') return go('droits', { droitsRetour: 'bilan', estimationContexte: null });
+  if (t.dataset.go === 'droits') return go('droits', { droitsRetour: 'bilan', estimationContexte: null, estimInputs: null });
   if (t.dataset.go) return go(t.dataset.go);
 
   if (t.dataset.event) return go('evenement-detail', { currentEventId: t.dataset.event });
@@ -849,7 +881,7 @@ app.addEventListener('click', async (e) => {
   if (a === 'avisAnnuler') { store.avis = null; return go('settings'); }
   if (a === 'avisValider') return validerAvis();
   if (a === 'estimerDroits') return estimerDroits();
-  if (a === 'droitsDepuisEvenement') return go('droits', { droitsRetour: 'evenement-detail', estimationContexte: store.currentEventId });
+  if (a === 'droitsDepuisEvenement') return go('droits', { droitsRetour: 'evenement-detail', estimationContexte: store.currentEventId, estimInputs: null });
   if (a === 'exportIcs') return exportIcs();
 });
 
@@ -1101,6 +1133,10 @@ async function estimerDroits() {
     loyer: Number(val('estLoyer')) || 0,
     codePostal: (val('estCodePostal') || '').trim(),
   };
+  // Le panorama d'adéquation reflète désormais les éléments saisis (cohérence avec l'estimation).
+  store.estimInputs = payload;
+  const pano = document.getElementById('droitsPanorama');
+  if (pano) pano.innerHTML = panoramaDroits(profilEffectif());
   out.hidden = false;
   out.innerHTML = '<p class="loading">Estimation en cours via le moteur public OpenFisca…</p>';
   try {

@@ -617,28 +617,20 @@ function profilEffectif() {
   };
 }
 
-// Panorama des aides classées par adéquation, pour un profil donné. Recalculable en place
-// après une estimation (cf. estimerDroits) pour rester cohérent avec les éléments saisis.
+// Panorama des aides regroupées par NIVEAU DE PRIORITÉ (ordre global) : à simuler en
+// priorité → à explorer → peu probable. Recalculable en place après une estimation
+// (cf. estimerDroits) pour rester cohérent avec les éléments saisis.
 function panoramaDroits(profil) {
   const aides = store.data.droits || [];
-  const cats = store.data.droitsCategories || [];
   const res = adequationDroits(profil, aides);
-  let corps = '';
-  if (cats.length) {
-    const byId = {};
-    res.forEach((r) => { (byId[r.aide.categorie] = byId[r.aide.categorie] || []).push(r); });
-    corps = cats.map((cat) => {
-      const items = (byId[cat.id] || []).sort((a, b) => DROIT_LABEL[a.statut].ordre - DROIT_LABEL[b.statut].ordre);
-      if (!items.length) return '';
-      return `<h3 class="section-h">${esc(cat.titre)}</h3><div class="niche-list">${items.map(droitCard).join('')}</div>`;
-    }).join('');
-  } else {
-    const sorted = res.slice().sort((a, b) => DROIT_LABEL[a.statut].ordre - DROIT_LABEL[b.statut].ordre);
-    corps = `<div class="niche-list">${sorted.map(droitCard).join('')}</div>`;
-  }
-  const nbPrio = res.filter((r) => r.statut === 'PRIORITAIRE').length;
+  const ordreStatuts = ['PRIORITAIRE', 'A_EXPLORER', 'PEU_PROBABLE'];
+  const corps = ordreStatuts.map((st) => {
+    const items = res.filter((r) => r.statut === st);
+    if (!items.length) return '';
+    return `<h3 class="section-h">${DROIT_LABEL[st].txt} (${items.length})</h3><div class="niche-list">${items.map(droitCard).join('')}</div>`;
+  }).join('');
   const selon = store.estimInputs ? "d'après les éléments saisis" : 'pour ton profil';
-  return `<h3 class="section-h">Panorama des aides (${res.length}) — ${nbPrio} à simuler en priorité ${selon}</h3>${corps}`;
+  return `<h3 class="section-h">Panorama des aides (${res.length}) — classées par priorité ${selon}</h3>${corps}`;
 }
 
 function screenDroits() {

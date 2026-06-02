@@ -143,9 +143,23 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .quiz-opt.wrong { background: #F8E9DC; border-color: var(--orange); color: var(--orange); }
 .quiz-explain { margin-top: 12px; font-size: 14px; color: var(--ink-soft); background: var(--surface-2); padding: 12px; border-radius: 12px; }
 
-.approfondir-out .appro-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; font-size: 14px; }
+.approfondir-out .appro-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; font-size: 14px; }
 .appro-offline { color: var(--ink-soft); }
 .loading { color: var(--ink-mute); }
+
+/* Rendu Markdown des réponses « Approfondir » */
+.appro-rich { display: flex; flex-direction: column; }
+.appro-rich h4 { font-family: var(--font-display); font-size: 15.5px; color: var(--green-dark); margin: 12px 0 2px; line-height: 1.25; }
+.appro-rich h4:first-child { margin-top: 0; }
+.appro-rich p { font-size: 14px; color: var(--ink-soft); line-height: 1.55; margin: 6px 0; }
+.appro-rich strong { color: var(--ink); font-weight: 700; }
+.appro-rich a { color: var(--green); text-decoration: underline; }
+.appro-rich ul { list-style: none; margin: 6px 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.appro-rich li { position: relative; padding-left: 18px; font-size: 14px; color: var(--ink-soft); line-height: 1.5; }
+.appro-rich li::before { content: '▪'; position: absolute; left: 2px; color: var(--gold); }
+.appro-rich hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+.appro-quote { border-left: 3px solid var(--green-light); background: var(--surface-2); padding: 8px 12px; border-radius: 0 8px 8px 0; font-style: italic; }
+.appro-sources { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 12px; color: var(--ink-mute); }
 
 /* library */
 .lib-intro { font-size: 14px; color: var(--ink-soft); }

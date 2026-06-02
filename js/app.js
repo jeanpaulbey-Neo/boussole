@@ -851,8 +851,48 @@ function approCacheEcrire(k, data) {
   } catch (_) { /* quota plein : on ignore, ce n'est qu'un cache */ }
 }
 
+function inlineMd(t) {
+  let s = esc(t);
+  s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (m, txt, url) => `<a href="${url}" target="_blank" rel="noopener">${txt}</a>`);
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+  return s;
+}
+function renderMarkdown(md) {
+  const lines = String(md || '').split(/\r?\n/);
+  const out = [];
+  let inList = false;
+  const closeList = () => { if (inList) { out.push('</ul>'); inList = false; } };
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) { closeList(); continue; }
+    if (/^#{1,6}\s+/.test(line)) {
+      closeList();
+      out.push(`<h4>${inlineMd(line.replace(/^#{1,6}\s+/, ''))}</h4>`);
+    } else if (/^([-*•‣·]|\d+[.)])\s+/.test(line)) {
+      if (!inList) { out.push('<ul>'); inList = true; }
+      out.push(`<li>${inlineMd(line.replace(/^([-*•‣·]|\d+[.)])\s+/, ''))}</li>`);
+    } else if (/^(-{2,}|—|=+)$/.test(line)) {
+      closeList();
+      out.push('<hr>');
+    } else if (/^[>›»]\s?/.test(line)) {
+      closeList();
+      out.push(`<p class="appro-quote">${inlineMd(line.replace(/^[>›»]\s?/, ''))}</p>`);
+    } else {
+      closeList();
+      out.push(`<p>${inlineMd(line)}</p>`);
+    }
+  }
+  closeList();
+  return out.join('') || `<p>${inlineMd(md)}</p>`;
+}
+
 function renduAppro(out, data, cached) {
-  out.innerHTML = `<div class="appro-card"><p>${esc(data.reponse || '')}</p>${data.sources ? `<small>Sources : ${esc((data.sources || []).join(', '))}${cached ? ' · réponse mémorisée' : ''}</small>` : ''}</div>`;
+  const corps = renderMarkdown(data.reponse || '');
+  const src = data.sources && data.sources.length
+    ? `<p class="appro-sources">Sources : ${esc(data.sources.join(', '))}${cached ? ' · réponse mémorisée' : ''}</p>`
+    : '';
+  out.innerHTML = `<div class="appro-card appro-rich">${corps}${src}</div>`;
 }
 
 async function approfondir(moduleId) {

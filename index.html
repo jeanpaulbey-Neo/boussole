@@ -7,17 +7,115 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Boussole">
-<meta name="description" content="Boussole — éducation & orientation à l'optimisation financière (France). Réduis tes impôts sans dépenser un euro de plus.">
+
+<title>Boussole — réduire ses impôts & connaître ses droits sociaux (France)</title>
+<meta name="description" content="Boussole oriente et éduque sur l'optimisation financière en France : leviers fiscaux chiffrés, niches fiscales classées selon ton profil, estimation des droits sociaux (CAF, RSA, APL via OpenFisca) et cases de déclaration 2042. Gratuit, sans compte, données sur ton appareil.">
+<meta name="keywords" content="optimisation fiscale, réduire ses impôts, niches fiscales, PER, droits sociaux, RSA, APL, CAF, déclaration 2042, OpenFisca, France">
+<meta name="author" content="Boussole">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://cavalier-omega.vercel.app/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Boussole">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Boussole — réduire ses impôts & connaître ses droits sociaux">
+<meta property="og:description" content="Leviers fiscaux chiffrés, niches classées selon ton profil, droits sociaux estimés (OpenFisca) et cases de déclaration. Gratuit, sans compte, 100 % sur ton appareil.">
+<meta property="og:url" content="https://cavalier-omega.vercel.app/">
+<meta property="og:image" content="https://cavalier-omega.vercel.app/icons/icon-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Boussole — réduire ses impôts & connaître ses droits sociaux">
+<meta name="twitter:description" content="Leviers fiscaux chiffrés, niches classées selon ton profil, droits sociaux estimés (OpenFisca). Gratuit, sans compte, 100 % sur ton appareil.">
+<meta name="twitter:image" content="https://cavalier-omega.vercel.app/icons/icon-512.png">
+
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/styles.css">
-<title>Boussole — optimisation financière</title>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Boussole",
+      "url": "https://cavalier-omega.vercel.app/",
+      "description": "Application d'éducation et d'orientation à l'optimisation financière en France : leviers fiscaux chiffrés, niches fiscales classées selon le profil, estimation des droits sociaux (CAF, RSA, APL via OpenFisca) et cases de déclaration 2042.",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web, Android",
+      "inLanguage": "fr-FR",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "featureList": [
+        "Leviers fiscaux chiffrés",
+        "Panorama des niches fiscales selon le profil",
+        "Estimation des droits sociaux via OpenFisca",
+        "Parcours par événements de vie",
+        "Cases de déclaration 2042",
+        "Chiffrage de l'économie d'un versement PER"
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Boussole donne-t-elle des conseils financiers personnalisés ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Non. Boussole éduque et oriente : elle explique les dispositifs et te montre lesquels correspondent à ta situation, sans recommander de produit ni de montant. Pour une décision d'investissement, consulte un conseiller habilité." }
+        },
+        {
+          "@type": "Question",
+          "name": "Mes données sont-elles envoyées sur un serveur ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Non. Tout reste sur ton appareil : aucun compte, aucun suivi. L'estimation des droits sociaux n'appelle le moteur public OpenFisca que si tu le demandes explicitement." }
+        },
+        {
+          "@type": "Question",
+          "name": "Boussole est-elle gratuite ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Oui, Boussole est entièrement gratuite et utilisable hors connexion une fois chargée." }
+        },
+        {
+          "@type": "Question",
+          "name": "Les chiffres fiscaux sont-ils à jour ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Oui : aucun barème n'est codé en dur. Tous les paramètres sont versionnés, datés et sourcés depuis des références officielles, mises à jour régulièrement." }
+        }
+      ]
+    }
+  ]
+}
+</script>
 </head>
 <body>
-<div id="app"><div class="boot">🧭<p>Chargement…</p></div></div>
+<div id="app">
+  <noscript>
+    <article class="seo-fallback">
+      <h1>Boussole — réduire ses impôts et connaître ses droits sociaux</h1>
+      <p>Boussole est une application gratuite d'éducation et d'orientation à l'optimisation
+      financière en France. Elle t'aide à comprendre les dispositifs fiscaux et sociaux qui
+      correspondent à ta situation, sans jamais te conseiller de produit ni de montant.</p>
+      <h2>Ce que tu trouves dans Boussole</h2>
+      <ul>
+        <li><strong>Leviers fiscaux chiffrés</strong> — les principaux moyens de réduire ton imposition, expliqués clairement.</li>
+        <li><strong>Niches fiscales</strong> — un panorama classé selon ton profil, sources officielles à l'appui.</li>
+        <li><strong>Droits sociaux</strong> — estimation CAF, RSA, APL via le moteur public OpenFisca.</li>
+        <li><strong>Événements de vie</strong> — naissance, déménagement, perte d'emploi, retraite et leurs conséquences.</li>
+        <li><strong>Cases de déclaration</strong> — où reporter chaque dispositif sur ta déclaration 2042.</li>
+        <li><strong>Chiffrage réel</strong> — l'économie d'impôt d'un versement PER, à partir de ton avis lu sur l'appareil.</li>
+      </ul>
+      <h2>Ta vie privée d'abord</h2>
+      <p>Aucun compte, aucun envoi de données : tout est calculé sur ton appareil. Le moteur
+      OpenFisca n'est appelé que si tu le demandes explicitement.</p>
+      <p>Cette application nécessite JavaScript. Active-le pour démarrer ton bilan.</p>
+    </article>
+  </noscript>
+  <div class="boot">🧭<p>Chargement…</p></div>
+</div>
 <script type="module" src="/js/app.js"></script>
 </body>
 </html>

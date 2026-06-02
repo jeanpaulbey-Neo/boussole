@@ -1,5 +1,5 @@
 {
-  "version": "2026.2",
+  "version": "2026.3",
   "date_maj": "2026-06-02",
   "_avertissement": "Parcours PÉDAGOGIQUES d'orientation à l'occasion d'un événement de vie. Boussole n'effectue aucune démarche à ta place, ne conseille aucun produit ni montant, et ne remplace pas les sites officiels. Les délais et règles évoluent — vérifie toujours sur service-public.fr et auprès des organismes (CAF, impôts, France Travail, Assurance retraite…).",
   "sources": ["service-public.fr", "impots.gouv.fr", "caf.fr", "francetravail.fr", "lassuranceretraite.fr", "ameli.fr"],
@@ -141,7 +141,8 @@
         "intro": "Depuis « Perte d'emploi » : l'estimation porte sur tes RESSOURCES ACTUELLES — RSA, prime d'activité et aide au logement se calculent sur ce que tu perçois maintenant, pas sur ton ancien salaire.",
         "revenuLabel": "Tes ressources mensuelles actuelles",
         "revenuHint": "allocations chômage (ARE) comprises si tu en perçois ; 0 si tu n'as plus de revenu — n'inclus pas ton ancien salaire",
-        "noPrefill": true
+        "noPrefill": true,
+        "statut": "SANS_EMPLOI"
       }
     },
     {
@@ -171,7 +172,8 @@
         "intro": "Depuis « Départ à la retraite » : estimons l'Aspa et l'aide au logement avec tes revenus de retraité.",
         "revenuLabel": "Tes ressources mensuelles actuelles",
         "revenuHint": "pensions de retraite nettes perçues, hors prestations",
-        "noPrefill": true
+        "noPrefill": true,
+        "statut": "RETRAITE"
       }
     },
     {

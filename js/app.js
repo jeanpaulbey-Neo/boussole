@@ -600,6 +600,11 @@ function profilEffectif() {
   const base = store.profile || {};
   const e = store.estimInputs;
   if (!e) return base;
+  // Statut professionnel déduit du parcours « événement de vie » (ex. perte d'emploi →
+  // SANS_EMPLOI, retraite → RETRAITE), s'il est défini dans evenements-vie.json. Sinon on
+  // conserve le statut déclaré au profil. Cela rend cohérents l'ASS, l'Aspa, l'APA…
+  const ev = store.estimationContexte ? (store.data.evenements || []).find((x) => x.id === store.estimationContexte) : null;
+  const statutCtx = ev && ev.estimation && ev.estimation.statut;
   return {
     ...base,
     revenuMensuelFoyer: trancheRevenu(e.revenuNetMensuel),
@@ -608,6 +613,7 @@ function profilEffectif() {
     situationFamiliale: e.situation === 'COUPLE' ? 'COUPLE' : (base.situationFamiliale === 'PARENT_ISOLE' ? 'PARENT_ISOLE' : 'CELIBATAIRE'),
     nbCharges: Number(e.nbEnfants) || 0,
     logement: Number(e.loyer) > 0 ? 'LOCATAIRE' : (base.logement || ''),
+    statut: statutCtx || base.statut,
   };
 }
 

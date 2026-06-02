@@ -121,18 +121,52 @@ function srcLink(s) {
 // ── Écrans ──
 function screenOnboarding() {
   const refaire = store.profile ? `<button class="btn-ghost" data-go="bilan">Revoir mon bilan</button>` : '';
-  return `<div class="screen onboarding">
-    <div class="hero">
-      <div class="compass">🧭</div>
-      <h1>Boussole</h1>
-      <p class="tagline">Réduis tes impôts <strong>sans dépenser un euro de plus</strong>.</p>
-      <p class="sub">Un bilan d'orientation fiscale &amp; budgétaire en 15 questions. On t'explique ce qui te revient déjà — on ne te vend rien.</p>
+  const feat = (e, t, d) => `<div class="accueil-feat"><span>${e}</span><strong>${t}</strong><p>${d}</p></div>`;
+  return `<div class="screen accueil">
+    <div class="scroll">
+      <header class="accueil-hero">
+        <div class="compass">🧭</div>
+        <h1>Boussole</h1>
+        <p class="tagline">Réduis tes impôts <strong>sans dépenser un euro de plus</strong>.</p>
+        <p class="sub">Un bilan d'orientation fiscale &amp; budgétaire en 15 questions (~3 min). On t'explique ce qui te revient déjà — on ne te vend rien, on ne conseille aucun produit.</p>
+        <div class="accueil-cta">
+          <button class="btn-primary" data-action="start">Commencer mon bilan</button>
+          ${refaire}
+        </div>
+        <p class="accueil-confiance">🔒 100 % sur ton appareil · aucun compte · gratuit</p>
+      </header>
+
+      <section class="accueil-section">
+        <h2 class="accueil-h2">Comment ça marche</h2>
+        <ol class="accueil-steps">
+          <li><span class="accueil-step-num">1</span><div><strong>Ton profil</strong><br><small>15 questions simples : situation, revenus, logement, objectifs.</small></div></li>
+          <li><span class="accueil-step-num">2</span><div><strong>Ton bilan d'orientation</strong><br><small>Les leviers « zéro dépense » d'abord, chiffrés selon ta tranche.</small></div></li>
+          <li><span class="accueil-step-num">3</span><div><strong>Apprendre &amp; agir</strong><br><small>Modules de 60 s, où agir, et tes échéances de l'année.</small></div></li>
+        </ol>
+      </section>
+
+      <section class="accueil-section">
+        <h2 class="accueil-h2">Ce que tu trouves</h2>
+        <div class="accueil-features">
+          ${feat('🎯', 'Leviers chiffrés', 'Ce qui te revient déjà : emploi à domicile, frais réels, dons…')}
+          ${feat('🗂️', 'Niches fiscales', "Panorama classé selon ton profil, sources officielles à l'appui.")}
+          ${feat('🤝', 'Droits sociaux', 'Estimation CAF / RSA / APL via le moteur public OpenFisca.')}
+          ${feat('🔀', 'Événements de vie', "Naissance, déménagement, perte d'emploi, retraite…")}
+          ${feat('📋', 'Cases de déclaration', 'Où reporter chaque dispositif sur ta 2042.')}
+          ${feat('💶', 'Chiffrage réel', "Économie d'un versement PER, à partir de ton avis (lu sur l'appareil).")}
+        </div>
+      </section>
+
+      <section class="accueil-section accueil-privacy">
+        <h2 class="accueil-h2">Ta vie privée d'abord</h2>
+        <p>Ton profil et ta progression restent <strong>sur cet appareil</strong>. Aucun compte, aucune donnée bancaire, aucun tracking. Ton avis d'impôt est lu <strong>localement</strong> (rien n'est envoyé). Seule l'estimation des droits sociaux interroge — <strong>à ta demande</strong> — le moteur public OpenFisca de l'État, sans aucune donnée nominative.</p>
+      </section>
+
+      <div class="accueil-cta accueil-cta-bas">
+        <button class="btn-primary" data-action="start">Commencer mon bilan</button>
+      </div>
+      ${bandeauLegal()}
     </div>
-    <div class="onboarding-actions">
-      <button class="btn-primary" data-action="start">Commencer mon bilan</button>
-      ${refaire}
-    </div>
-    ${bandeauLegal()}
   </div>`;
 }
 

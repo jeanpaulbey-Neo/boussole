@@ -49,6 +49,31 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .sub { color: var(--ink-soft); max-width: 360px; }
 .onboarding-actions { width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 10px; }
 
+/* page d'accueil (web) */
+.accueil-hero { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 8px 4px; }
+.accueil-hero .compass { font-size: 64px; }
+.accueil-hero h1 { font-size: 38px; color: var(--green); letter-spacing: -0.5px; }
+.accueil-hero .tagline { font-size: 19px; }
+.accueil-hero .tagline strong { color: var(--green); }
+.accueil-hero .sub { color: var(--ink-soft); max-width: 460px; }
+.accueil-cta { width: 100%; max-width: 360px; margin: 8px auto 0; display: flex; flex-direction: column; gap: 10px; }
+.accueil-cta-bas { margin-top: 4px; }
+.accueil-confiance { font-size: 12.5px; color: var(--ink-mute); margin-top: 4px; }
+.accueil-section { margin-top: 8px; }
+.accueil-h2 { font-size: 20px; color: var(--green-dark); margin-bottom: 12px; }
+.accueil-steps { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.accueil-steps li { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+.accueil-step-num { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--green); color: #fff; font-weight: 800; font-family: var(--font-display); display: flex; align-items: center; justify-content: center; }
+.accueil-steps small { color: var(--ink-mute); }
+.accueil-features { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.accueil-feat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; box-shadow: var(--shadow-sm); }
+.accueil-feat span { font-size: 24px; }
+.accueil-feat strong { display: block; margin-top: 6px; color: var(--ink); }
+.accueil-feat p { font-size: 13px; color: var(--ink-mute); margin-top: 4px; }
+.accueil-privacy p { font-size: 14px; color: var(--green-dark); background: var(--green-light); border-radius: 12px; padding: 14px; line-height: 1.5; }
+@media (min-width: 640px) { .accueil-features { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 980px) { .accueil-features { grid-template-columns: 1fr 1fr 1fr; } }
+
 /* buttons */
 .btn-primary { background: var(--green); color: #fff; padding: 15px 20px; border-radius: 14px; font-size: 16px; font-weight: 700; box-shadow: var(--shadow-md); width: 100%; }
 .btn-primary:active { background: var(--green-dark); transform: translateY(1px); }

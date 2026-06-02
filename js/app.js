@@ -208,6 +208,7 @@ function screenLeverDetail() {
       ${surv ? `<div class="veille-box">⚠️ <strong>Règle susceptible d'évoluer</strong> (${esc(surv.horizon)}).<br>${esc(surv.nature_risque)}<br><small>Montant à jour pour ${store.data.fiscalParams.annee_declaration}. Statut : ${esc(surv.statut_actuel)}.</small></div>` : ''}
       <h3 class="section-h">Où agir</h3>
       <ol class="ou-agir">${lever.ouAgir.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
+      ${blocCases(lever.id)}
       <h3 class="section-h">Sources</h3>
       <p class="sources">${lever.sources.map((s) => `<span class="src">${esc(s)}</span>`).join('')}</p>
       <button class="btn-primary" data-module="${lever.moduleId}">Apprendre en 60 s</button>
@@ -396,6 +397,24 @@ const NICHE_TYPE = {
   EXONERATION: 'Exonération', AIDE: 'Aide',
 };
 
+// ── Cases de déclaration (« À déclarer ») — données versionnées cases-declaration.json
+// L'id du levier credit_domicile correspond à la niche credit_emploi_domicile.
+const CASE_ALIAS = { credit_domicile: 'credit_emploi_domicile' };
+function blocCases(id) {
+  const map = (store.data && store.data.casesDeclaration) || {};
+  const c = map[id] || map[CASE_ALIAS[id]];
+  if (!c) return '';
+  const form = c.form && c.form !== '—' ? `<span class="case-form">Formulaire ${esc(c.form)}</span>` : '';
+  const lignes = (c.lignes || []).map((l) => `<li><span class="case-num">${esc(l.case)}</span><span>${esc(l.libelle)}</span></li>`).join('');
+  const note = c.note ? `<p class="case-note">${esc(c.note)}</p>` : '';
+  return `<div class="cases-decl">
+    <div class="cases-head">📋 À déclarer ${form}</div>
+    ${lignes ? `<ul class="cases-list">${lignes}</ul>` : ''}
+    ${note}
+    <p class="case-verif">Cases indicatives (campagne ${esc(store.data.casesVersion || '')}) — à vérifier sur ta déclaration en ligne ; beaucoup sont déjà pré-remplies.</p>
+  </div>`;
+}
+
 function nicheCard({ niche, statut, raison }) {
   const L = NICHE_LABEL[statut] || NICHE_LABEL.A_EXPLORER;
   const aLevier = niche.leverId && CATALOGUE.find((l) => l.id === niche.leverId);
@@ -410,6 +429,7 @@ function nicheCard({ niche, statut, raison }) {
       ${niche.moduleId ? `<button class="btn-small" data-module="${niche.moduleId}">Apprendre (60 s)</button>` : ''}
       ${aLevier ? `<button class="btn-small btn-small-ghost" data-lever-detail="${niche.leverId}">Où agir</button>` : ''}
     </div>
+    ${blocCases(niche.id)}
     <p class="niche-src">${(niche.sources || []).map((s) => `<span class="src">${esc(s)}</span>`).join('')}${niche.article ? `<span class="src src-cgi">${esc(niche.article)}</span>` : ''}</p>
   </article>`;
 }
@@ -600,6 +620,7 @@ function screenChiffrage() {
       </div>
       <div class="appro-card" id="perOut">Saisis un montant pour voir l'économie d'impôt et ton effort d'épargne réel.</div>
       <p class="warn">⚠️ L'argent versé sur un PER est bloqué jusqu'à la retraite (sauf cas de déblocage). On ne te conseille aucun montant : à toi de décider ce que tu peux immobiliser.</p>
+      ${blocCases('per')}
       ${bandeauLegal()}
     </div>
     ${tabbar()}

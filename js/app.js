@@ -369,10 +369,32 @@ function champRow(label, key, value, type = 'number', suffix = '', hint = '') {
   </label>`;
 }
 
+// Estimation INDICATIVE du nombre d'enfants/personnes à charge depuis les parts.
+// Ambigu (une demi-part peut être un enfant, un parent isolé ou une invalidité) : sert
+// uniquement de suggestion à confirmer, jamais de valeur imposée.
+function enfantsDepuisParts(parts, sit) {
+  if (typeof parts !== 'number') return null;
+  const base = sit === 'COUPLE' ? 2 : 1;
+  let extra = parts - base;
+  if (sit === 'PARENT_ISOLE') extra -= 0.5;
+  if (extra <= 0) return 0;
+  if (extra <= 1) return Math.round(extra / 0.5); // 0,5 part / enfant pour les 2 premiers
+  return 2 + Math.round(extra - 1); // 1 part / enfant au-delà du 2e
+}
+
 function screenAvisValidation() {
   const a = store.avis || { champs: {}, confiance: 'FAIBLE', avertissements: [] };
   const c = a.champs;
   const confBadge = { BONNE: '🟢 Bonne lecture', PARTIELLE: '🟠 Lecture partielle', FAIBLE: '🔴 Lecture difficile' }[a.confiance] || '';
+  // Personnes à charge : pré-rempli (avis si lu, sinon réponse du profilage), avec une
+  // suggestion déduite des parts. Met à jour nbCharges → adéquation des aides recalculée.
+  const sit = store.profile && store.profile.situationFamiliale;
+  const nbEnfPre = (c.personnesACharge != null) ? c.personnesACharge
+    : (store.profile && typeof store.profile.nbCharges === 'number' ? store.profile.nbCharges : null);
+  const sugg = enfantsDepuisParts(c.nombreParts, sit);
+  const hintEnf = c.nombreParts != null
+    ? `d'après tes ${c.nombreParts} part(s)${sugg != null ? `, ~${sugg} à charge` : ''} — vérifie`
+    : 'enfants/personnes à charge — adapte les aides proposées';
   return `<div class="screen">${header('Vérifie tes chiffres', 'avis-import')}
     <div class="scroll">
       <div class="avis-conf avis-conf-${a.confiance}">${confBadge} — <strong>vérifie et corrige</strong> avant de valider. L'app ne devine jamais à ta place.</div>
@@ -380,6 +402,7 @@ function screenAvisValidation() {
       <div class="champs">
         ${champRow("Revenu net imposable", 'revenuNetImposable', c.revenuNetImposable, 'number', '€', 'ligne « Revenu imposable »')}
         ${champRow("Nombre de parts", 'nombreParts', c.nombreParts, 'number', 'parts', 'en haut de l\'avis')}
+        ${champRow("Enfants / personnes à charge", 'personnesACharge', nbEnfPre, 'number', '', hintEnf)}
         ${champRow("Taux marginal (TMI)", 'tmi', c.tmi, 'pct', '%', 'cadre « Taux marginal d\'imposition »')}
         ${champRow("Plafond épargne retraite (PER)", 'plafondPER', c.plafondPER, 'number', '€', 'cadre « Plafond épargne retraite » → ligne « Plafond pour les cotisations versées »')}
         ${champRow("Impôt net", 'impotNet', c.impotNet, 'number', '€', 'ligne « Impôt net » / « Impôt sur le revenu net »')}

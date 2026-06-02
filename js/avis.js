@@ -40,13 +40,13 @@ function estAnnee(n) {
 // à 9 M€ pour exclure téléphones/identifiants restants.
 const MONTANT_MAX_PLAUSIBLE = 9000000;
 function montantsStricts(text) {
-  const re = /\b\d{1,3}(?:[   ]\d{3})+\b|\b\d{1,3}(?:\.\d{3})+\b|\b\d{4,7}\b/g;
+  const re = /\b\d{1,3}(?:[   ]\d{3})+\b|\b\d{1,3}(?:\.\d{3})+\b|\b\d{4,7}\b/g;
   return [...String(text).matchAll(re)]
     .map((x) => toNumber(x[0]))
     .filter((v) => v != null && v >= 1000 && v <= MONTANT_MAX_PLAUSIBLE && !estAnnee(v));
 }
 
-// ── Extracteurs spécialisés ──────────────────────────────────────────────────
+// ── Extracteurs spécialisés ───────────────────────────────────────
 
 // TMI : on relève TOUS les pourcentages du document et on garde celui qui
 // correspond à une tranche connue du barème (0/11/30/41/45 %). C'est fiable même
@@ -88,6 +88,17 @@ function extraireParts(text) {
   return null;
 }
 
+// Personnes à charge (enfants). Libellé explicite sur l'avis (« Nombre de personnes
+// à charge … 2 »), best-effort. Borné 0–12. À défaut null (l'usager saisira/confirmera).
+function extrairePersonnesACharge(text) {
+  const m = text.match(/(?:nombre\s+de\s+)?personnes?\s+à\s+charge[^\d]{0,30}(\d{1,2})\b/i);
+  if (m) {
+    const n = parseInt(m[1], 10);
+    if (Number.isInteger(n) && n >= 0 && n <= 12) return n;
+  }
+  return null;
+}
+
 // Montant >= 1000 le plus proche après le libellé (format simple : libellé↔valeur proches).
 function extraireGrandNombre(text, labelRegex) {
   const m = text.match(labelRegex);
@@ -114,7 +125,7 @@ function nombreLePlusFrequent(nums) {
 
 // Repli pour l'impôt net : total encadré de soulignements « ___ 13 576 ___ ».
 function impotEntreSoulignements(text) {
-  const nums = [...text.matchAll(/_[\s_]*(\d[\d   .]{2,})\s*_/g)]
+  const nums = [...text.matchAll(/_[\s_]*(\d[\d   .]{2,})\s*_/g)]
     .map((x) => toNumber(x[1]))
     .filter((v) => v != null && v >= 1000 && !estAnnee(v));
   return nums.length ? Math.max(...nums) : null;
@@ -137,6 +148,7 @@ export function parseAvisText(rawText) {
     revenuNetImposable: extraireGrandNombre(text, /revenu\s+(?:net\s+)?imposable/i) || frequent,
     revenuFiscalReference: extraireGrandNombre(text, /revenu\s+fiscal\s+de\s+r[ée]f[ée]rence/i),
     nombreParts: extraireParts(text),
+    personnesACharge: extrairePersonnesACharge(text),
     tmi,
     tauxMoyen: extraireTauxMoyen(text),
     // Plafond PER : lignes multiples (total, non utilisé, calculé…) -> trop ambigu, saisie.
@@ -179,6 +191,9 @@ export function profilDepuisAvis(champs) {
   if (champs.revenuNetImposable != null) patch.revenuNetImposableExact = champs.revenuNetImposable;
   if (champs.nombreParts != null) patch.nombrePartsExact = champs.nombreParts;
   if (champs.plafondPER != null) patch.plafondPERExact = champs.plafondPER;
+  // Personnes à charge validées par l'usager : mettent à jour la composition familiale
+  // (nbCharges) utilisée pour l'adéquation des aides/niches (« adapté » vs « à explorer »).
+  if (champs.personnesACharge != null) patch.nbCharges = Math.max(0, Math.round(champs.personnesACharge));
   // Cohérence avec Q3 : si l'avis montre un impôt nul, l'usager est non imposable.
   if (champs.impotNet != null) patch.estImposable = champs.impotNet > 0 ? 'OUI' : 'NON';
   return patch;

@@ -393,8 +393,7 @@ function screenPaywall(msg) {
         <div class="col"><h3>Gratuit</h3><ul><li>Modules 0–5</li><li>Bilan : top 3 leviers</li><li>Filtre zéro dépense</li></ul></div>
         <div class="col col-prem"><h3>Premium</h3><ul><li>Tous les leviers chiffrés</li><li>Bibliothèque complète</li><li>Simulations ajustables</li><li>Checklist + rappels saisonniers</li><li>Vérif pré-déclaration</li></ul></div>
       </div>
-      <button class="btn-primary" data-action="buy">Activer Premium (démo)</button>
-      <p class="paywall-note">Intégration RevenueCat prévue (abonnement mensuel + annuel, grace period / billing retry). Ici : bascule de démonstration locale.</p>
+      <p class="paywall-note">💳 Les offres Premium (abonnement mensuel / annuel) arrivent bientôt. Le paiement sécurisé sera intégré via Play Billing (Android) et Stripe (web).</p>
       ${bandeauLegal()}
     </div>
   </div>`;
@@ -863,7 +862,7 @@ function screenSettings() {
       <div class="set-group">
         <button class="set-row" data-action="restart">🔄 Refaire mon profil</button>
         <button class="set-row" data-go="avis-import">📄 Importer mon avis d'impôt ${store.profile && store.profile.sourceAvis ? '<span class="set-flag">✓ chiffres exacts actifs</span>' : '<span class="set-flag set-flag-soft">affiner le bilan</span>'}</button>
-        <div class="set-row set-row-toggle"><span>${store.premium ? '⭐ Premium actif' : '🔒 Version gratuite'}</span><button class="btn-small" data-action="togglePrem">${store.premium ? 'Désactiver' : 'Activer (démo)'}</button></div>
+        <div class="set-row set-row-toggle"><span>${store.premium ? '⭐ Premium actif' : '🔒 Version gratuite'}</span>${store.premium ? '' : '<span class="set-flag set-flag-soft">offres à venir</span>'}</div>
       </div>
       <h3 class="section-h">Sources &amp; données fiscales</h3>
       <p class="set-meta">Cadre légal : ${esc(fp.cadre_legal)}<br>Revenus ${fp.annee_revenus} · déclaration ${fp.annee_declaration}<br>Version ${esc(fp.version)} · maj ${esc(fp.date_maj)} · chargé via <em>${esc(store.data.source)}</em></p>
@@ -928,7 +927,6 @@ app.addEventListener('click', async (e) => {
   if (a === 'start') { store.draft = {}; store.step = 0; return go('profiling'); }
   if (a === 'prev') { if (store.step > 0) { store.step--; render(); } return; }
   if (a === 'restart') { store.draft = {}; store.step = 0; store.avis = null; return go('profiling'); }
-  if (a === 'buy' || a === 'togglePrem') { store.premium = a === 'buy' ? true : !store.premium; save(); return go(a === 'buy' ? 'bilan' : 'settings'); }
   if (a === 'approfondir') return approfondir(t.dataset.moduleId);
   if (a === 'avisManuel') { store.avis = { champs: {}, confiance: 'FAIBLE', avertissements: [] }; return go('avis-validation'); }
   if (a === 'avisAnnuler') { store.avis = null; return go('settings'); }

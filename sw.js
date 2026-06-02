@@ -3,7 +3,7 @@
 // repli sur le cache, pour servir la version OTA la plus fraîche tout en restant lisible
 // hors-ligne (cohérent avec data.js qui cache aussi la dernière bonne valeur).
 
-const VERSION = 'boussole-v20';
+const VERSION = 'boussole-v21';
 const SHELL = [
   '/',
   '/index.html',

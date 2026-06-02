@@ -782,7 +782,8 @@ function screenSettings() {
       </div>
       <h3 class="section-h">Sources &amp; données fiscales</h3>
       <p class="set-meta">Cadre légal : ${esc(fp.cadre_legal)}<br>Revenus ${fp.annee_revenus} · déclaration ${fp.annee_declaration}<br>Version ${esc(fp.version)} · maj ${esc(fp.date_maj)} · chargé via <em>${esc(store.data.source)}</em></p>
-      <p class="set-meta">Sources officielles : Légifrance, BOFiP, service-public.fr, impots.gouv.fr, Urssaf, mesdroitssociaux.gouv.fr.</p>
+      <p class="set-meta">Sources officielles :</p>
+      <p class="sources">${['Légifrance', 'BOFiP', 'service-public.fr', 'impots.gouv.fr', 'Urssaf', 'mesdroitssociaux.gouv.fr', 'caf.fr', 'France Travail'].map(srcLink).join('')}</p>
       <h3 class="section-h">Surveillance fiscale</h3>
       <ul class="surv-list">${(store.data.veille.surveillances || []).map((s) => `<li><strong>${esc(s.parametre)}</strong> — ${esc(s.statut_actuel)} <em>(${esc(s.probabilite_evolution)}, ${esc(s.horizon)})</em></li>`).join('')}</ul>
       <h3 class="section-h">Mentions légales</h3>

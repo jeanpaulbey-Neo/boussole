@@ -119,6 +119,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .ou-agir { padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; }
 .sources { display: flex; flex-wrap: wrap; gap: 6px; }
 .src { font-size: 12px; background: var(--surface-2); border: 1px solid var(--border); padding: 4px 10px; border-radius: 16px; color: var(--ink-soft); }
+a.src-link { color: var(--green); border-color: var(--green); cursor: pointer; text-decoration: none; transition: background 0.15s ease, color 0.15s ease; }
+a.src-link:hover, a.src-link:focus-visible { background: var(--green); color: #fff; outline: none; }
 
 /* module */
 .module-top { display: flex; align-items: center; gap: 8px; }

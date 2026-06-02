@@ -271,3 +271,16 @@ a.src-link:hover, a.src-link:focus-visible { background: var(--green); color: #f
 .estim-list li:last-child { border-bottom: none; }
 a.btn-small { display: inline-flex; align-items: center; text-decoration: none; }
 a.btn-primary { display: flex; align-items: center; justify-content: center; text-decoration: none; }
+
+/* ── Grand écran (web / desktop) ── mobile inchangé sous 860px */
+@media (min-width: 860px) {
+  #app { max-width: 900px; box-shadow: var(--shadow-md); }
+  .topbar { border-radius: 0; }
+  /* contenu en colonne lisible, centré dans la largeur élargie */
+  .scroll { max-width: 720px; margin-left: auto; margin-right: auto; width: 100%; }
+  /* listes en 2 colonnes, bibliothèque en 3 */
+  .lever-list, .niche-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+  .lib-grid { grid-template-columns: repeat(3, 1fr); }
+  /* la barre d'onglets reste en bas mais cadrée sur la largeur de l'app */
+  .tabbar { max-width: 900px; }
+}

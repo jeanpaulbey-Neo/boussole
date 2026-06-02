@@ -9,8 +9,14 @@
   "orientation": "portrait",
   "background_color": "#F4F1EA",
   "theme_color": "#0E5C4A",
+  "categories": ["finance", "education", "productivity"],
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Mes droits sociaux", "short_name": "Droits", "description": "Estimer mes aides (CAF, RSA, APL…)", "url": "/?ecran=droits" },
+    { "name": "Mon chiffrage PER", "short_name": "Chiffrage", "description": "Économie d'impôt d'un versement PER", "url": "/?ecran=chiffrage" },
+    { "name": "Événements de vie", "short_name": "Événements", "description": "Naissance, déménagement, perte d'emploi…", "url": "/?ecran=evenements" }
   ]
 }

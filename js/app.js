@@ -65,7 +65,28 @@ const restore = () => {
 
 const app = document.getElementById('app');
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const go = (route, extra = {}) => { Object.assign(store, extra); store.route = route; render(); window.scrollTo(0, 0); };
+// Navigation : on synchronise l'écran courant avec l'History API pour que le bouton
+// « retour » (matériel Android / précédent du navigateur) revienne à l'écran précédent
+// au lieu de quitter l'app. On ne mémorise que l'état de navigation (pas les saisies).
+const NAV_KEYS = ['route', 'currentLeverId', 'currentModuleId', 'currentEventId', 'droitsRetour', 'estimationContexte'];
+function navState() { const s = {}; NAV_KEYS.forEach((k) => { s[k] = store[k]; }); return s; }
+const go = (route, extra = {}) => {
+  Object.assign(store, extra);
+  store.route = route;
+  try { history.pushState(navState(), ''); } catch (_) { /* contexte sans History : on ignore */ }
+  render();
+  window.scrollTo(0, 0);
+};
+window.addEventListener('popstate', (e) => {
+  const s = e.state;
+  if (s && s.route) {
+    NAV_KEYS.forEach((k) => { store[k] = s[k]; });
+  } else {
+    store.route = store.profile ? 'bilan' : 'onboarding';
+  }
+  render();
+  window.scrollTo(0, 0);
+});
 
 // ── Composants réutilisables ──
 function bandeauLegal() {
@@ -1197,7 +1218,12 @@ async function boot() {
   app.innerHTML = '<div class="boot">🧭<p>Chargement…</p></div>';
   store.data = await loadData();
   store.route = store.profile ? 'bilan' : 'onboarding';
+  // Raccourcis du manifeste (Android / écran d'accueil) : /?ecran=droits, chiffrage, etc.
+  const ecran = new URLSearchParams(location.search).get('ecran');
+  const raccourcis = ['droits', 'chiffrage', 'evenements', 'niches', 'library', 'checklist', 'settings'];
+  if (store.profile && ecran && raccourcis.includes(ecran)) store.route = ecran;
   render();
+  try { history.replaceState(navState(), ''); } catch (_) {}
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }

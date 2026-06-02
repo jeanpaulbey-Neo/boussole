@@ -18,6 +18,7 @@ const SOURCES = [
   { id: 'pass', niveau: 3, url: 'https://www.service-public.fr/particuliers/vosdroits/F15386', params: ['epargne_salariale'] },
   { id: 'credit_domicile', niveau: 3, url: 'https://www.service-public.fr/particuliers/vosdroits/F12', params: ['credit_emploi_domicile'] },
   { id: 'dons', niveau: 3, url: 'https://www.service-public.fr/particuliers/vosdroits/F426', params: ['dons'] },
+  { id: 'cases_2042', niveau: 3, url: 'https://www.impots.gouv.fr/particulier/je-declare-mes-revenus', params: ['*cases_declaration*'] },
   { id: 'plf', niveau: 6, url: 'https://www.assemblee-nationale.fr/dyn/budget', params: ['*veille*'] },
 ];
 
@@ -50,7 +51,7 @@ async function resumeViaClaude(snapshots) {
         model: MODEL,
         max_tokens: 700,
         system:
-          "Tu es un assistant de veille fiscale. À partir des extraits de pages officielles fournis, résume UNIQUEMENT ce qui change pour les paramètres suivants : barème IR, PASS, crédit emploi à domicile, dons. Pour chaque changement : valeur avant/après, source, date d'effet. N'invente AUCUN chiffre ; si tu ne trouves pas, dis-le. Ne décide rien : tu signales, l'humain valide.",
+          "Tu es un assistant de veille fiscale. À partir des extraits de pages officielles fournis, résume UNIQUEMENT ce qui change pour les paramètres suivants : barème IR, PASS, crédit emploi à domicile, dons, et tout changement visible des numéros de cases de la déclaration 2042. Pour chaque changement : valeur avant/après, source, date d'effet. N'invente AUCUN chiffre ni numéro de case ; si tu ne trouves pas, dis-le. Ne décide rien : tu signales, l'humain valide.",
         messages: [{ role: 'user', content: 'Extraits:\n' + snapshots.map((s) => `### ${s.id}\n${s.extrait || s.error}`).join('\n\n') }],
       }),
     });
@@ -60,6 +61,25 @@ async function resumeViaClaude(snapshots) {
   } catch (e) {
     return `_(Exception Claude : ${String(e).slice(0, 150)}.)_`;
   }
+}
+
+// Garde-fou « cases de déclaration » : les numéros de cases 2042 (cases-declaration.json)
+// valent pour une campagne donnée et la DGFiP les renumérote parfois. On NE devine jamais
+// un nouveau numéro : on pose un rappel daté pour qu'un humain recontrôle au bon moment.
+// La campagne de déclaration s'ouvre vers avril (revenus de l'année précédente).
+function rappelCases(d = new Date()) {
+  const mois = d.getUTCMonth() + 1;
+  const annee = d.getUTCFullYear();
+  const fenetreVigilance = mois >= 2 && mois <= 6; // févr.→juin : pré-campagne + campagne
+  const prochaineCampagne = mois > 6 ? annee + 1 : annee;
+  return [
+    '## Cases de déclaration (2042) — garde-fou annuel',
+    '- Catalogue : `shared/data/cases-declaration.json` (numéros indicatifs, marqués « à vérifier » dans l\'app).',
+    fenetreVigilance
+      ? `- ⚠️ **Campagne ${annee} ouverte/proche** : RECONTRÔLER chaque numéro de case 2042 sur impots.gouv.fr (brochure 2042 RICI / notice). En cas de changement : éditer cases-declaration.json + bump version + date_maj.`
+      : `- ✅ Hors campagne : prochain contrôle à prévoir vers mars-avril ${prochaineCampagne}.`,
+    '- Rappel : ne jamais inventer un numéro ; à défaut de certitude, laisser le renvoi « formulaire + notice ».',
+  ].join('\n');
 }
 
 async function notifierAdmin(rapport) {
@@ -92,10 +112,13 @@ export default async function handler(req, res) {
     '## Synthèse (à VÉRIFIER sur source officielle avant toute publication)',
     resume,
     '',
+    rappelCases(),
+    '',
     '## Prochaine action',
     '1. Vérifier chaque valeur signalée sur source de niveau 1–3 (Légifrance / BOFiP / service-public).',
     '2. Éditer fiscal-params.json + bump version + date_maj (Procédure A du RUNBOOK).',
-    '3. Commit avec source citée + push.',
+    '3. En période de campagne : recontrôler aussi cases-declaration.json (numéros 2042).',
+    '4. Commit avec source citée + push.',
   ].join('\n');
 
   await notifierAdmin(rapport);

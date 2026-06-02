@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://cavalier-omega.vercel.app/sitemap.xml
+Sitemap: https://boussole-impots.fr/sitemap.xml

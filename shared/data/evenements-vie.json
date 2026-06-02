@@ -1,5 +1,5 @@
 {
-  "version": "2026.1",
+  "version": "2026.2",
   "date_maj": "2026-06-02",
   "_avertissement": "Parcours PÉDAGOGIQUES d'orientation à l'occasion d'un événement de vie. Boussole n'effectue aucune démarche à ta place, ne conseille aucun produit ni montant, et ne remplace pas les sites officiels. Les délais et règles évoluent — vérifie toujours sur service-public.fr et auprès des organismes (CAF, impôts, France Travail, Assurance retraite…).",
   "sources": ["service-public.fr", "impots.gouv.fr", "caf.fr", "francetravail.fr", "lassuranceretraite.fr", "ameli.fr"],
@@ -26,7 +26,13 @@
       "aVerifier": [
         "Estime tes droits familiaux dans l'onglet « Droits sociaux ».",
         "Si tu es locataire, un changement de situation peut faire recalculer ton aide au logement."
-      ]
+      ],
+      "estimation": {
+        "titre": "Estimer mes droits familiaux (Paje, allocations familiales…)",
+        "intro": "Depuis le parcours « Naissance / adoption » : estimons les prestations liées à l'arrivée de l'enfant.",
+        "revenuLabel": "Revenu net mensuel du foyer",
+        "revenuHint": "salaires nets du foyer, hors prestations"
+      }
     },
     {
       "id": "mariage_pacs",
@@ -72,7 +78,14 @@
       "aVerifier": [
         "Estime tes nouveaux droits dans l'onglet « Droits sociaux » avec ta situation actuelle.",
         "Situation patrimoniale complexe (biens communs, immobilier) : un notaire / avocat reste la référence."
-      ]
+      ],
+      "estimation": {
+        "titre": "Estimer mes droits avec ma nouvelle situation",
+        "intro": "Depuis « Séparation / divorce » : renseigne ta NOUVELLE situation (toi seul·e, enfants à charge).",
+        "revenuLabel": "Tes ressources mensuelles actuelles",
+        "revenuHint": "tes seuls revenus désormais (salaire net) ; hors pension reçue et hors prestations",
+        "noPrefill": true
+      }
     },
     {
       "id": "demenagement",
@@ -94,7 +107,13 @@
       "aVerifier": [
         "Refais une estimation de l'aide au logement dans « Droits sociaux » avec ton nouveau loyer et ton code postal.",
         "Le service en ligne « Changement d'adresse » de service-public.fr prévient plusieurs organismes d'un coup."
-      ]
+      ],
+      "estimation": {
+        "titre": "Recalculer mon aide au logement",
+        "intro": "Depuis « Déménagement » : renseigne bien le nouveau loyer et le code postal ci-dessous.",
+        "revenuLabel": "Revenu net mensuel du foyer",
+        "revenuHint": "salaires nets du foyer, hors prestations"
+      }
     },
     {
       "id": "perte_emploi",
@@ -116,7 +135,14 @@
       "aVerifier": [
         "Lance une estimation dans « Droits sociaux » : beaucoup de droits ne sont pas réclamés.",
         "Pense à ajuster ton taux de prélèvement à la source à la baisse."
-      ]
+      ],
+      "estimation": {
+        "titre": "Estimer mes droits après la perte d'emploi",
+        "intro": "Depuis « Perte d'emploi » : l'estimation porte sur tes RESSOURCES ACTUELLES — RSA, prime d'activité et aide au logement se calculent sur ce que tu perçois maintenant, pas sur ton ancien salaire.",
+        "revenuLabel": "Tes ressources mensuelles actuelles",
+        "revenuHint": "allocations chômage (ARE) comprises si tu en perçois ; 0 si tu n'as plus de revenu — n'inclus pas ton ancien salaire",
+        "noPrefill": true
+      }
     },
     {
       "id": "retraite",
@@ -139,7 +165,14 @@
       "aVerifier": [
         "Si tes revenus baissent, vérifie tes droits dans « Droits sociaux » (Aspa, aide au logement).",
         "Une chute de revenus peut justifier d'ajuster ton prélèvement à la source."
-      ]
+      ],
+      "estimation": {
+        "titre": "Estimer mes droits de retraité",
+        "intro": "Depuis « Départ à la retraite » : estimons l'Aspa et l'aide au logement avec tes revenus de retraité.",
+        "revenuLabel": "Tes ressources mensuelles actuelles",
+        "revenuHint": "pensions de retraite nettes perçues, hors prestations",
+        "noPrefill": true
+      }
     },
     {
       "id": "heritage",
@@ -184,7 +217,13 @@
       "aVerifier": [
         "Si tes revenus sont modestes, vérifie la prime d'activité et l'aide au logement dans « Droits sociaux ».",
         "Compare rattachement vs déclaration séparée avant de trancher."
-      ]
+      ],
+      "estimation": {
+        "titre": "Estimer ma prime d'activité et mon aide au logement",
+        "intro": "Depuis « Premier emploi » : estimons tes droits avec ton salaire actuel.",
+        "revenuLabel": "Ton revenu net mensuel",
+        "revenuHint": "ton salaire net ; mets-toi en « Seul » si tu vis seul·e"
+      }
     }
   ]
 }

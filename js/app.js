@@ -45,6 +45,8 @@ const store = {
   currentLeverId: null,
   currentModuleId: null,
   currentEventId: null,
+  droitsRetour: 'bilan',
+  estimationContexte: null,
   avis: null,
 };
 
@@ -500,23 +502,34 @@ function blocEstimationDroits() {
   // Pré-remplissage doux à partir du profil (jamais de valeur exacte devinée).
   const couple = p.situationFamiliale === 'COUPLE' ? 'COUPLE' : 'SEUL';
   const nbEnf = Number(p.nbCharges) || 0;
-  // Pré-remplissage du revenu : on prend le milieu de la tranche déclarée au profil
-  // (le profil ne stocke qu'une fourchette, jamais un montant exact). Modifiable.
+  // Contexte « événement de vie » : si on arrive depuis un parcours, on adapte le titre,
+  // l'intro et le libellé du revenu (cf. estimation dans evenements-vie.json). L'estimation
+  // OpenFisca porte toujours sur les RESSOURCES ACTUELLES — les libellés guident sans tromper.
+  const ev = store.estimationContexte ? (store.data.evenements || []).find((x) => x.id === store.estimationContexte) : null;
+  const ctx = (ev && ev.estimation) || {};
+  // Pré-remplissage du revenu : milieu de la tranche déclarée au profil (jamais un montant
+  // exact). Désactivé (noPrefill) pour les événements où le revenu courant a changé
+  // (perte d'emploi, retraite, séparation) : la tranche du profil n'est plus pertinente.
   const REV_MID = { '<1500': 1200, '1500-2500': 2000, '2500-4000': 3200, '4000-6000': 5000, '>6000': 7000 };
-  const revPre = REV_MID[p.revenuMensuelFoyer] || '';
-  const revHint = revPre ? 'estimé depuis ta tranche de profil — ajuste avec ton montant exact' : 'salaires nets, hors prestations';
+  const revPre = ctx.noPrefill ? '' : (REV_MID[p.revenuMensuelFoyer] || '');
+  const revHintBase = ctx.revenuHint || 'salaires nets, hors prestations';
+  const revHint = revPre ? 'estimé depuis ta tranche de profil — ajuste avec ton montant exact' : revHintBase;
+  const revenuLabel = ctx.revenuLabel || 'Revenu net mensuel du foyer';
+  const titre = ctx.titre || "Estimer mes aides (RSA, prime d'activité, logement, prestations familiales…)";
+  const banniereCtx = ctx.intro ? `<div class="banniere">🔀 ${esc(ctx.intro)}</div>` : '';
   // Loyer pré-rempli depuis la tranche du profil (milieu), modifiable.
   const LOYER_MID = { '<500': 400, '500-800': 650, '800-1200': 1000, '>1200': 1400 };
   const loyerPre = LOYER_MID[p.loyer] || '';
   return `<div class="droits-estim">
-    <h3 class="section-h">Estimer mes aides (RSA, prime d'activité, logement, prestations familiales…)</h3>
+    <h3 class="section-h">${esc(titre)}</h3>
+    ${banniereCtx}
     <div class="avis-conf avis-conf-PARTIELLE">
       ⚠️ <strong>Ce calcul sort de ton appareil.</strong> À ta demande, les éléments saisis ci-dessous
       (sans nom ni identité) sont envoyés au moteur public <strong>OpenFisca</strong> de l'État pour produire
       une estimation indicative. Le reste de Boussole, lui, ne transmet rien. Le simulateur officiel reste la référence.
     </div>
     <div class="champs">
-      <label class="champ-row"><span class="champ-label">Revenu net mensuel du foyer<small class="champ-hint">${revHint}</small></span>
+      <label class="champ-row"><span class="champ-label">${esc(revenuLabel)}<small class="champ-hint">${esc(revHint)}</small></span>
         <span class="champ-input"><input type="number" step="any" inputmode="decimal" id="estRevenu" value="${revPre}" placeholder="ex : 1500"><em>€</em></span></label>
       <label class="champ-row"><span class="champ-label">Situation</span>
         <span class="champ-input"><select id="estSituation"><option value="SEUL"${couple === 'SEUL' ? ' selected' : ''}>Seul(e)</option><option value="COUPLE"${couple === 'COUPLE' ? ' selected' : ''}>En couple</option></select></span></label>
@@ -556,7 +569,7 @@ function screenDroits() {
 
   const nbPrio = res.filter((r) => r.statut === 'PRIORITAIRE').length;
 
-  return `<div class="screen">${header('Droits sociaux', 'bilan')}
+  return `<div class="screen">${header('Droits sociaux', store.droitsRetour || 'bilan')}
     <div class="scroll">
       ${badge()}
       <p class="lib-intro">Renseigne tes montants pour estimer tes aides, puis explore le panorama des dispositifs. Pour beaucoup de profils, des droits non réclamés pèsent plus lourd que toute optimisation fiscale.</p>
@@ -604,7 +617,7 @@ function screenEvenementDetail() {
   const liste = (arr, cls) => (arr && arr.length) ? `<ul class="${cls}">${arr.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '';
   const cases = (ev.casesLiees || []).map((id) => blocCases(id)).join('');
   const droits = (ev.droitsLies && ev.droitsLies.length)
-    ? `<h3 class="section-h">Droits à vérifier</h3>${liste(ev.droitsLies, 'niche-cond')}<button class="btn-ghost" data-go="droits">🤝 Estimer mes droits sociaux</button>`
+    ? `<h3 class="section-h">Droits à vérifier</h3>${liste(ev.droitsLies, 'niche-cond')}<button class="btn-ghost" data-action="droitsDepuisEvenement">🤝 Estimer mes droits sociaux${ev.estimation ? ' (adapté à ta situation)' : ''}</button>`
     : '';
   const aSavoir = (ev.aVerifier && ev.aVerifier.length)
     ? `<h3 class="section-h">Bon à savoir</h3>${ev.aVerifier.map((x) => `<div class="banniere">💡 ${esc(x)}</div>`).join('')}`
@@ -670,8 +683,8 @@ function screenChiffrage() {
   }
 
   const plafondInfo = (typeof p.plafondPERExact === 'number' && p.plafondPERExact > 0)
-    ? `Ton plafond de déduction disponible : <strong>${EURO(p.plafondPERExact)}</strong> (lu sur ton avis).`
-    : `Ton plafond exact figure sur ton avis (cadre « Plafond épargne retraite »).`;
+    ? `Ton plafond de déduction disponible : <strong>${EURO(p.plafondPERExact)}</strong> — lu sur ton avis d'impôt, cadre « Plafond épargne retraite ».`
+    : `<strong>Où trouver ton plafond ?</strong> Sur ton avis d'impôt, dernière page, cadre « Plafond épargne retraite » → ligne « Plafond pour les cotisations versées en ${store.data.fiscalParams.annee_declaration} ». <button class="lien-inline" data-go="avis-import">L'importer depuis mon avis</button>.`;
 
   return `<div class="screen">${header('Mon chiffrage', 'bilan')}
     <div class="scroll">
@@ -680,7 +693,7 @@ function screenChiffrage() {
       <h3 class="section-h">Simuler un versement PER</h3>
       <p class="lib-intro">Combien d'impôt un versement sur un PER te ferait-il économiser cette année ? ${plafondInfo}</p>
       <div class="champs">
-        <label class="champ-row"><span class="champ-label">Montant que je verserais</span>
+        <label class="champ-row"><span class="champ-label">Montant que je verserais<small class="champ-hint">dans la limite de ton plafond (voir ci-dessus)</small></span>
           <span class="champ-input"><input type="number" step="any" inputmode="decimal" id="perMontant" placeholder="ex : 2000"><em>€</em></span></label>
       </div>
       <div class="appro-card" id="perOut">Saisis un montant pour voir l'économie d'impôt et ton effort d'épargne réel.</div>
@@ -769,6 +782,8 @@ app.addEventListener('click', async (e) => {
   const t = e.target.closest('[data-go],[data-action],[data-pick],[data-module],[data-lever],[data-lever-detail],[data-quiz],[data-event]');
   if (!t) return;
 
+  // Accès « générique » aux droits (depuis le bilan) : on réinitialise le contexte d'estimation.
+  if (t.dataset.go === 'droits') return go('droits', { droitsRetour: 'bilan', estimationContexte: null });
   if (t.dataset.go) return go(t.dataset.go);
 
   if (t.dataset.event) return go('evenement-detail', { currentEventId: t.dataset.event });
@@ -797,6 +812,7 @@ app.addEventListener('click', async (e) => {
   if (a === 'avisAnnuler') { store.avis = null; return go('settings'); }
   if (a === 'avisValider') return validerAvis();
   if (a === 'estimerDroits') return estimerDroits();
+  if (a === 'droitsDepuisEvenement') return go('droits', { droitsRetour: 'evenement-detail', estimationContexte: store.currentEventId });
   if (a === 'exportIcs') return exportIcs();
 });
 

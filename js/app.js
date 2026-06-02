@@ -542,27 +542,44 @@ function screenDroits() {
   </div>`;
 }
 
-// ── Chiffrage personnel en euros réels ────────────────────────────────
+// ── Chiffrage personnel en euros réels ───────────────────────
 // Quand l'avis est chargé, on dispose du revenu net imposable, des parts et de la TMI
 // EXACTS : on recalcule l'IR par le barème (engine.calcIR) et on simule l'économie d'un
 // versement PER par DIFFÉRENCE de barème (exact, gère le franchissement de tranche),
 // bornée au plafond réel. Aucun montant n'est conseillé : l'utilisateur saisit le sien.
+
+// Parts de quotient familial estimées depuis le profil, quand l'avis ne les a pas fournies
+// (l'OCR rate souvent cette valeur). Règle standard : 1 (ou 2 en couple) + 0,5/enfant pour
+// les deux premiers, +1 au-delà, +0,5 pour un parent isolé. Indicatif.
+function partsFromProfile(p) {
+  const base = p.situationFamiliale === 'COUPLE' ? 2 : 1;
+  const n = Math.max(0, Number(p.nbCharges) || 0);
+  let parts = base + Math.min(n, 2) * 0.5 + Math.max(0, n - 2) * 1;
+  if (p.situationFamiliale === 'PARENT_ISOLE' && n >= 1) parts += 0.5;
+  return parts;
+}
+
 function screenChiffrage() {
   if (!store.profile) return screenOnboarding();
   const p = store.profile;
   const params = store.data.fiscalParams;
-  const aAvis = p.sourceAvis && typeof p.revenuNetImposableExact === 'number' && typeof p.nombrePartsExact === 'number';
+  const aAvis = p.sourceAvis === true; // l'avis a été importé et gardé en mémoire
+  const aRevenu = typeof p.revenuNetImposableExact === 'number';
+  const partsAvis = typeof p.nombrePartsExact === 'number' ? p.nombrePartsExact : null;
+  const parts = partsAvis != null ? partsAvis : partsFromProfile(p);
 
   let synth;
-  if (aAvis) {
-    const ir = calcIR(p.revenuNetImposableExact, p.nombrePartsExact, params);
+  if (aAvis && aRevenu) {
+    const ir = calcIR(p.revenuNetImposableExact, parts, params);
     const tmi = estimeTMI(p);
     synth = `<div class="calc-box">
       <span class="calc-label">D'après ton avis d'impôt</span>
-      <p>Revenu net imposable : <strong>${EURO(p.revenuNetImposableExact)}</strong> · ${p.nombrePartsExact} part(s) · tranche ${Math.round(tmi * 100)} %</p>
+      <p>Revenu net imposable : <strong>${EURO(p.revenuNetImposableExact)}</strong> · ${parts} part(s)${partsAvis == null ? " <em>(estimées d'après ton profil)</em>" : ''} · tranche ${Math.round(tmi * 100)} %</p>
       <p>Impôt sur le revenu recalculé : <strong>${EURO(ir)}</strong></p>
       <small>Barème ${esc(params.version)}, quotient familial simplifié. Indicatif (hors crédits/réductions déjà acquis et cas particuliers) — ton avis fait foi.</small>
     </div>`;
+  } else if (aAvis && !aRevenu) {
+    synth = `<div class="avis-conf avis-conf-PARTIELLE">Ton avis est bien <strong>importé et gardé en mémoire</strong>, mais le <strong>revenu net imposable</strong> n'a pas été lu. <button class="lien-inline" data-go="avis-import">Compléter mes chiffres</button> pour un chiffrage exact — en attendant, on estime avec ta tranche (${Math.round(estimeTMI(p) * 100)} %).</div>`;
   } else {
     synth = `<div class="avis-conf avis-conf-PARTIELLE">Pour un chiffrage en <strong>euros réels</strong> (et non des exemples), <button class="lien-inline" data-go="avis-import">importe ton avis d'impôt</button>. Sans lui, on estime avec ta tranche déclarée (${Math.round(estimeTMI(p) * 100)} %).</div>`;
   }
@@ -604,12 +621,13 @@ function simulerPER() {
   if (plafond && versement > plafond) { versement = plafond; note = ` (limité à ton plafond de ${EURO(plafond)})`; }
 
   let economie;
-  if (p.sourceAvis && typeof p.revenuNetImposableExact === 'number' && typeof p.nombrePartsExact === 'number') {
+  if (typeof p.revenuNetImposableExact === 'number') {
     const r = p.revenuNetImposableExact;
-    const parts = p.nombrePartsExact;
+    const parts = typeof p.nombrePartsExact === 'number' ? p.nombrePartsExact : partsFromProfile(p);
     economie = calcIR(r, parts, params) - calcIR(Math.max(0, r - versement), parts, params);
   } else {
-    economie = versement * estimeTMI(p); // estimation par la tranche déclarée
+    const tmi = typeof p.tmiExacte === 'number' ? p.tmiExacte : estimeTMI(p);
+    economie = versement * tmi; // estimation par la TMI (avis si dispo, sinon tranche déclarée)
   }
   economie = Math.max(0, Math.round(economie));
   const effort = Math.max(0, Math.round(versement - economie));

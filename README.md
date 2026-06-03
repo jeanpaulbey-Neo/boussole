@@ -1,4 +1,4 @@
-# Boussole — éducation & orientation à l'optimisation financière (France)
+# OptiBoussole — éducation & orientation à l'optimisation financière (France)
 
 App d'apprentissage rapide (« micro-learning ») + **bilan d'orientation fiscale et
 budgétaire**, pour les foyers qui ne peuvent pas se payer un conseiller. L'app **éduque et
@@ -74,7 +74,7 @@ npm i -g vercel
 vercel --prod
 ```
 
-- `/` sert la PWA **Boussole** (la racine du dépôt est la racine du projet Vercel).
+- `/` sert la PWA **OptiBoussole** (la racine du dépôt est la racine du projet Vercel).
 - Le proxy `/api/*` est **optionnel** (voir ci-dessous).
 - Un **cron mensuel** déclenche `/api/cron-veille` (à intensifier manuellement en saison PLF).
 

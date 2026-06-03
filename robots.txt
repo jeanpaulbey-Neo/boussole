@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://boussole-impots.fr/sitemap.xml
+Sitemap: https://optiboussole.fr/sitemap.xml

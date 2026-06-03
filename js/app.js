@@ -1,4 +1,4 @@
-// Boussole — app PWA d'éducation & d'orientation à l'optimisation financière.
+// OptiBoussole — app PWA d'éducation & d'orientation à l'optimisation financière.
 // SPEC : profilage (§5) → moteur d'orientation (§6) → micro-learning (§7).
 import { loadData } from './data.js';
 import { orienter, estimeTMI, badgeFraicheur, CATALOGUE, adequationNiches, adequationDroits, calcIR } from './engine.js';
@@ -126,7 +126,7 @@ function screenOnboarding() {
     <div class="scroll">
       <header class="accueil-hero">
         <div class="compass">🧭</div>
-        <h1>Boussole</h1>
+        <h1>OptiBoussole</h1>
         <p class="tagline">Réduis tes impôts <strong>sans dépenser un euro de plus</strong>.</p>
         <p class="sub">Un bilan d'orientation fiscale &amp; budgétaire en 15 questions (~3 min). On t'explique ce qui te revient déjà — on ne te vend rien, on ne conseille aucun produit.</p>
         <div class="accueil-cta">
@@ -295,7 +295,7 @@ function screenModule() {
   const m = store.data.modules.find((x) => x.id === store.currentModuleId);
   if (!m) return screenBilan();
   // Garde-fou : un module premium non débloqué renvoie au paywall.
-  if (m.premium && !store.premium) return screenPaywall('Ce module avancé fait partie de Boussole Premium.');
+  if (m.premium && !store.premium) return screenPaywall('Ce module avancé fait partie d\'OptiBoussole Premium.');
   const prog = store.progression[m.id] || {};
   return `<div class="screen">${header('Apprendre', store.currentLeverId ? 'lever-detail' : 'library')}
     <div class="scroll module">
@@ -388,7 +388,7 @@ function rappelsSaisonniers() {
 function screenPaywall(msg) {
   return `<div class="screen">${header('Premium', 'bilan')}
     <div class="scroll paywall">
-      <div class="paywall-hero">🔓<h2>Passe à Boussole Premium</h2><p>${esc(msg || 'Moins cher qu\'une heure de conseiller — pour passer de comprendre à agir.')}</p></div>
+      <div class="paywall-hero">🔓<h2>Passe à OptiBoussole Premium</h2><p>${esc(msg || 'Moins cher qu\'une heure de conseiller — pour passer de comprendre à agir.')}</p></div>
       <div class="compare">
         <div class="col"><h3>Gratuit</h3><ul><li>Modules 0–5</li><li>Bilan : top 3 leviers</li><li>Filtre zéro dépense</li></ul></div>
         <div class="col col-prem"><h3>Premium</h3><ul><li>Tous les leviers chiffrés</li><li>Bibliothèque complète</li><li>Simulations ajustables</li><li>Checklist + rappels saisonniers</li><li>Vérif pré-déclaration</li></ul></div>
@@ -617,7 +617,7 @@ function blocEstimationDroits() {
     <div class="avis-conf avis-conf-PARTIELLE">
       ⚠️ <strong>Ce calcul sort de ton appareil.</strong> À ta demande, les éléments saisis ci-dessous
       (sans nom ni identité) sont envoyés au moteur public <strong>OpenFisca</strong> de l'État pour produire
-      une estimation indicative. Le reste de Boussole, lui, ne transmet rien. Le simulateur officiel reste la référence.
+      une estimation indicative. Le reste d'OptiBoussole, lui, ne transmet rien. Le simulateur officiel reste la référence.
     </div>
     <div class="champs">
       <label class="champ-row"><span class="champ-label">${esc(revenuLabel)}<small class="champ-hint">${esc(revHint)}</small></span>
@@ -723,7 +723,7 @@ function screenEvenements() {
   return `<div class="screen">${header('Événements de vie', 'bilan')}
     <div class="scroll">
       ${badge()}
-      <p class="lib-intro">Un changement de situation ? Choisis l'événement : Boussole t'oriente sur les démarches, les impacts fiscaux et les droits à vérifier. On ne fait aucune démarche à ta place et on ne conseille aucun montant.</p>
+      <p class="lib-intro">Un changement de situation ? Choisis l'événement : OptiBoussole t'oriente sur les démarches, les impacts fiscaux et les droits à vérifier. On ne fait aucune démarche à ta place et on ne conseille aucun montant.</p>
       <div class="lib-grid">${cards}</div>
       ${bandeauLegal()}
     </div>
@@ -1217,10 +1217,10 @@ function exportIcs() {
   const an = new Date().getFullYear();
   const jour = (y, m, d) => `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}`;
   const events = [
-    { d: [an, 5, 15], titre: 'Boussole : déclarer mes revenus', desc: "Campagne de déclaration en cours — vérifie tes crédits et réductions (emploi à domicile, dons, frais de garde…). Date limite exacte selon ta zone." },
-    { d: [an, 12, 28], titre: 'Boussole : versement PER/PEE avant le 31/12', desc: "Dernier moment pour verser au titre de l'année (déduction d'impôt pour le PER, dans la limite de ton plafond)." },
+    { d: [an, 5, 15], titre: 'OptiBoussole : déclarer mes revenus', desc: "Campagne de déclaration en cours — vérifie tes crédits et réductions (emploi à domicile, dons, frais de garde…). Date limite exacte selon ta zone." },
+    { d: [an, 12, 28], titre: 'OptiBoussole : versement PER/PEE avant le 31/12', desc: "Dernier moment pour verser au titre de l'année (déduction d'impôt pour le PER, dans la limite de ton plafond)." },
   ];
-  const lignes = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Boussole//FR', 'CALSCALE:GREGORIAN'];
+  const lignes = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//OptiBoussole//FR', 'CALSCALE:GREGORIAN'];
   events.forEach((e, i) => {
     lignes.push(
       'BEGIN:VEVENT',

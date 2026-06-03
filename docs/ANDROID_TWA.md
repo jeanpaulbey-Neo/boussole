@@ -1,6 +1,6 @@
-# Publier Boussole sur le Play Store (TWA)
+# Publier OptiBoussole sur le Play Store (TWA)
 
-Boussole est une PWA. Pour la publier sur le Google Play Store **sans dupliquer le code**, on
+OptiBoussole est une PWA. Pour la publier sur le Google Play Store **sans dupliquer le code**, on
 l'emballe dans une **TWA** (Trusted Web Activity) : une coquille Android qui ouvre l'URL de
 production en plein écran, avec splash screen et barre de statut aux couleurs de l'app.
 
@@ -17,9 +17,9 @@ production en plein écran, avec splash screen et barre de statut aux couleurs d
 1. **Installer Bubblewrap**
    ```bash
    npm i -g @bubblewrap/cli
-   bubblewrap init --manifest https://boussole-impots.fr/manifest.webmanifest
+   bubblewrap init --manifest https://optiboussole.fr/manifest.webmanifest
    ```
-   (renseigner l'`applicationId`, ex. `app.boussole.twa`, et l'URL de prod.)
+   (renseigner l'`applicationId`, ex. `app.optiboussole.twa`, et l'URL de prod.)
 
 2. **Construire l'APK/AAB**
    ```bash
@@ -35,7 +35,7 @@ production en plein écran, avec splash screen et barre de statut aux couleurs d
      (ou, si on utilise « Play App Signing », prendre l'empreinte fournie par la console Play.)
    - Reporter cette empreinte et le `package_name` dans **`/.well-known/assetlinks.json`**
      (remplacer `REMPLACER_PAR_EMPREINTE_SHA256_DE_LA_CLE_DE_SIGNATURE_PLAY`), puis redéployer.
-   - Vérifier : `https://boussole-impots.fr/.well-known/assetlinks.json` répond en 200.
+   - Vérifier : `https://optiboussole.fr/.well-known/assetlinks.json` répond en 200.
 
 4. **Publier** sur la Google Play Console (fiche, captures, politique de confidentialité —
    insister sur le on-device : aucun compte, données locales, seul OpenFisca est appelé sur

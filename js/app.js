@@ -165,6 +165,7 @@ function screenOnboarding() {
       <div class="accueil-cta accueil-cta-bas">
         <button class="btn-primary" data-action="start">Commencer mon bilan</button>
       </div>
+      <p class="accueil-confiance" style="text-align:center"><a class="lien-inline" href="/guides">📚 Lire nos guides — réduire ses impôts, droits sociaux</a></p>
       ${bandeauLegal()}
     </div>
   </div>`;
@@ -863,6 +864,7 @@ function screenSettings() {
         <button class="set-row" data-action="restart">🔄 Refaire mon profil</button>
         <button class="set-row" data-go="avis-import">📄 Importer mon avis d'impôt ${store.profile && store.profile.sourceAvis ? '<span class="set-flag">✓ chiffres exacts actifs</span>' : '<span class="set-flag set-flag-soft">affiner le bilan</span>'}</button>
         <div class="set-row set-row-toggle"><span>${store.premium ? '⭐ Premium actif' : '🔒 Version gratuite'}</span>${store.premium ? '' : '<span class="set-flag set-flag-soft">offres à venir</span>'}</div>
+        <a class="set-row" href="/guides">📚 Nos guides (impôts, droits sociaux)</a>
       </div>
       <h3 class="section-h">Sources &amp; données fiscales</h3>
       <p class="set-meta">Cadre légal : ${esc(fp.cadre_legal)}<br>Revenus ${fp.annee_revenus} · déclaration ${fp.annee_declaration}<br>Version ${esc(fp.version)} · maj ${esc(fp.date_maj)} · chargé via <em>${esc(store.data.source)}</em></p>
@@ -1237,7 +1239,7 @@ function exportIcs() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'boussole-echeances.ics';
+  a.download = 'optiboussole-echeances.ics';
   document.body.appendChild(a);
   a.click();
   a.remove();

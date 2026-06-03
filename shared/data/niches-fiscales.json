@@ -178,14 +178,14 @@
     {
       "id": "pinel",
       "categorie": "LOCATIF",
-      "titre": "Pinel (en extinction)",
+      "titre": "Investissement locatif : ce qui a changé",
       "type": "REDUCTION",
       "coutNet": "DEPENSE",
       "article": "art. 199 novovicies CGI",
-      "principe": "Réduction d'impôt pour l'achat d'un logement neuf loué sous conditions de loyer et de ressources du locataire. Dispositif fermé aux acquisitions depuis fin 2024 (à vérifier).",
-      "conditionsClefs": ["Engagement de location longue durée", "Plafonds de loyer et de ressources", "DISPOSITIF EN EXTINCTION — vérifier l'éligibilité"],
+      "principe": "Le dispositif Pinel est clos : plus aucun nouvel investissement n'est possible depuis fin 2024. Seuls les engagements pris avant cette date continuent d'ouvrir droit à la réduction, à reporter chaque année dans la déclaration. Les dispositifs encore actifs aujourd'hui sont plutôt Loc'Avantages (conventionnement Anah) et Denormandie (ancien à rénover) ; un nouveau cadre pour l'investissement locatif est par ailleurs à l'étude.",
+      "conditionsClefs": ["Pinel : fermé aux nouveaux investissements depuis fin 2024 — il ne reste que le report des engagements déjà pris", "Dispositifs actifs à regarder : Loc'Avantages, Denormandie", "Une réforme de l'investissement locatif est en discussion (à confirmer selon les lois de finances)"],
       "plafonnement_global": true,
-      "sources": ["service-public.fr", "art. 199 novovicies CGI"]
+      "sources": ["service-public.fr", "impots.gouv.fr", "art. 199 novovicies CGI"]
     },
     {
       "id": "loc_avantages",

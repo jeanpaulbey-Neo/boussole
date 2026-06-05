@@ -1,0 +1,2 @@
+# PNG dérivés, régénérables depuis les .svg via render.cjs
+*.png

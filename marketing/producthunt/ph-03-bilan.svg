@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1270" height="760" viewBox="0 0 1270 760">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap');
+      .serif{font-family:'Fraunces',Georgia,serif}
+      .sans{font-family:'Manrope','DejaVu Sans',sans-serif}
+    </style>
+    <filter id="sh" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="24" flood-color="#0A2E25" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="1270" height="760" fill="#F7F3E9"/>
+
+  <!-- brand chip -->
+  <g transform="translate(90,72)">
+    <text x="0" y="32" font-size="36">🧭</text>
+    <text x="48" y="33" class="serif" font-size="30" font-weight="700" fill="#0E5C4A">OptiBoussole</text>
+  </g>
+
+  <!-- left text -->
+  <text x="90" y="258" class="serif" font-size="74" font-weight="700" fill="#14322A">Votre bilan en</text>
+  <text x="90" y="342" class="serif" font-size="74" font-weight="700" fill="#0E5C4A">3 minutes.</text>
+  <text x="92" y="404" class="sans" font-size="28" font-weight="500" fill="#5B7065">15 questions, zéro jargon. On vous montre</text>
+  <text x="92" y="442" class="sans" font-size="28" font-weight="500" fill="#5B7065">les leviers et droits adaptés à VOTRE situation.</text>
+
+  <!-- steps -->
+  <g class="sans">
+    <g transform="translate(92,500)">
+      <circle cx="26" cy="26" r="26" fill="#0E5C4A"/>
+      <text x="26" y="35" text-anchor="middle" font-size="24" font-weight="800" fill="#EAF4EE">1</text>
+      <text x="72" y="34" font-size="26" font-weight="700" fill="#14322A">Vous répondez (anonymement)</text>
+    </g>
+    <g transform="translate(92,566)">
+      <circle cx="26" cy="26" r="26" fill="#0E5C4A"/>
+      <text x="26" y="35" text-anchor="middle" font-size="24" font-weight="800" fill="#EAF4EE">2</text>
+      <text x="72" y="34" font-size="26" font-weight="700" fill="#14322A">On calcule (moteur public OpenFisca)</text>
+    </g>
+    <g transform="translate(92,632)">
+      <circle cx="26" cy="26" r="26" fill="#0E5C4A"/>
+      <text x="26" y="35" text-anchor="middle" font-size="24" font-weight="800" fill="#EAF4EE">3</text>
+      <text x="72" y="34" font-size="26" font-weight="700" fill="#14322A">Vous voyez vos pistes — sans engagement</text>
+    </g>
+  </g>
+
+  <!-- phone mockup -->
+  <g transform="translate(870,140)" filter="url(#sh)">
+    <rect width="320" height="490" rx="44" fill="#FFFFFF"/>
+    <!-- progress -->
+    <rect x="28" y="34" width="264" height="12" rx="6" fill="#E2D9C4"/>
+    <rect x="28" y="34" width="150" height="12" rx="6" fill="#0E5C4A"/>
+    <text x="28" y="84" class="sans" font-size="18" font-weight="700" fill="#9AA89F">QUESTION 7 / 15</text>
+
+    <text x="28" y="138" class="serif" font-size="30" font-weight="700" fill="#14322A">Employez-vous</text>
+    <text x="28" y="176" class="serif" font-size="30" font-weight="700" fill="#14322A">quelqu’un à domicile ?</text>
+
+    <g class="sans" font-size="22" font-weight="700">
+      <rect x="28" y="214" width="264" height="64" rx="18" fill="#0E5C4A"/>
+      <text x="52" y="254" fill="#EAF4EE">Oui, régulièrement</text>
+
+      <rect x="28" y="290" width="264" height="64" rx="18" fill="#FFFFFF" stroke="#D9CEB7" stroke-width="2"/>
+      <text x="52" y="330" fill="#14322A">Ponctuellement</text>
+
+      <rect x="28" y="366" width="264" height="64" rx="18" fill="#FFFFFF" stroke="#D9CEB7" stroke-width="2"/>
+      <text x="52" y="406" fill="#14322A">Non</text>
+    </g>
+  </g>
+</svg>

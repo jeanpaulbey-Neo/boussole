@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1270" height="760" viewBox="0 0 1270 760">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap');
+      .serif{font-family:'Fraunces',Georgia,serif}
+      .sans{font-family:'Manrope','DejaVu Sans',sans-serif}
+    </style>
+    <filter id="sh" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="22" flood-color="#0A2E25" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <rect width="1270" height="760" fill="#F7F3E9"/>
+
+  <g transform="translate(90,72)">
+    <text x="0" y="32" font-size="36">🧭</text>
+    <text x="48" y="33" class="serif" font-size="30" font-weight="700" fill="#0E5C4A">OptiBoussole</text>
+  </g>
+
+  <text x="90" y="216" class="serif" font-size="68" font-weight="700" fill="#14322A">L’argent que vous</text>
+  <text x="90" y="292" class="serif" font-size="68" font-weight="700" fill="#0E5C4A">ne réclamez pas.</text>
+
+  <!-- big stat -->
+  <g transform="translate(90,338)">
+    <rect width="1090" height="120" rx="24" fill="#0E5C4A"/>
+    <text x="44" y="78" class="serif" font-size="58" font-weight="700" fill="#E7B24C">1 foyer sur 3</text>
+    <text x="430" y="58" class="sans" font-size="27" font-weight="600" fill="#EAF4EE">éligible au RSA ne le perçoit pas.</text>
+    <text x="430" y="94" class="sans" font-size="22" font-weight="500" fill="#AFCBBF">Souvent par simple manque d’information. (source DREES)</text>
+  </g>
+
+  <!-- rows -->
+  <g class="sans" filter="url(#sh)">
+    <g transform="translate(90,494)">
+      <rect width="535" height="76" rx="20" fill="#FFFFFF"/>
+      <circle cx="50" cy="38" r="22" fill="#E6F1EC"/><text x="50" y="47" text-anchor="middle" font-size="24">💼</text>
+      <text x="92" y="46" font-size="25" font-weight="700" fill="#14322A">Prime d’activité</text>
+    </g>
+    <g transform="translate(645,494)">
+      <rect width="535" height="76" rx="20" fill="#FFFFFF"/>
+      <circle cx="50" cy="38" r="22" fill="#E6F1EC"/><text x="50" y="47" text-anchor="middle" font-size="24">🤝</text>
+      <text x="92" y="46" font-size="25" font-weight="700" fill="#14322A">RSA</text>
+    </g>
+    <g transform="translate(90,582)">
+      <rect width="535" height="76" rx="20" fill="#FFFFFF"/>
+      <circle cx="50" cy="38" r="22" fill="#E6F1EC"/><text x="50" y="47" text-anchor="middle" font-size="24">🏘️</text>
+      <text x="92" y="46" font-size="25" font-weight="700" fill="#14322A">APL &amp; aides au logement</text>
+    </g>
+    <g transform="translate(645,582)">
+      <rect width="535" height="76" rx="20" fill="#FFFFFF"/>
+      <circle cx="50" cy="38" r="22" fill="#E6F1EC"/><text x="50" y="47" text-anchor="middle" font-size="24">⚡</text>
+      <text x="92" y="46" font-size="25" font-weight="700" fill="#14322A">Chèque énergie</text>
+    </g>
+  </g>
+
+  <text x="90" y="704" class="sans" font-size="24" font-weight="600" fill="#5B7065">Vérifiez vos droits en quelques minutes — anonymement, sans compte.</text>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;family=Manrope:wght@500;700;800&amp;display=swap');
+      .serif{font-family:'Fraunces',Georgia,serif}
+      .sans{font-family:'Manrope','DejaVu Sans',sans-serif}
+    </style>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E5C4A"/>
+      <stop offset="1" stop-color="#0A4334"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" rx="48" fill="url(#g)"/>
+  <text x="120" y="132" font-size="92" text-anchor="middle">🧭</text>
+  <text x="120" y="186" text-anchor="middle" class="serif" font-size="30" font-weight="700" fill="#F7F3E9">OptiBoussole</text>
+</svg>

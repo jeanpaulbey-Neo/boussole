@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OptiBoussole — visuels Product Hunt</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body{font-family:'Manrope',system-ui,sans-serif;margin:0;background:#EFEADD;color:#14322A;padding:40px}
+  h1{font-family:'Fraunces',serif;font-size:34px;margin:0 0 4px}
+  p.sub{color:#5B7065;margin:0 0 28px}
+  .card{background:#fff;border-radius:18px;padding:18px;margin:0 0 26px;box-shadow:0 8px 24px rgba(10,46,37,.10)}
+  .card h2{font-size:18px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center}
+  .dim{color:#9AA89F;font-weight:600;font-size:14px}
+  object,img{width:100%;height:auto;display:block;border-radius:10px;border:1px solid #E2D9C4}
+  .note{background:#fff;border-radius:18px;padding:22px 24px;line-height:1.6}
+  code{background:#F1ECDD;padding:2px 7px;border-radius:6px;font-size:14px}
+  a{color:#0E5C4A}
+</style>
+</head>
+<body>
+  <h1>🧭 OptiBoussole — kit visuel Product Hunt</h1>
+  <p class="sub">Galerie 1270×760 · thumbnail 240×240. Aperçu fidèle (polices Fraunces/Manrope chargées).</p>
+
+  <div class="card"><h2>01 · Thumbnail <span class="dim">240 × 240</span></h2>
+    <object type="image/svg+xml" data="ph-01-thumbnail.svg" style="width:240px"></object></div>
+  <div class="card"><h2>02 · Hero <span class="dim">1270 × 760</span></h2>
+    <object type="image/svg+xml" data="ph-02-hero.svg"></object></div>
+  <div class="card"><h2>03 · Le bilan en 3 min <span class="dim">1270 × 760</span></h2>
+    <object type="image/svg+xml" data="ph-03-bilan.svg"></object></div>
+  <div class="card"><h2>04 · Leviers d’impôt <span class="dim">1270 × 760</span></h2>
+    <object type="image/svg+xml" data="ph-04-impots.svg"></object></div>
+  <div class="card"><h2>05 · Droits sociaux <span class="dim">1270 × 760</span></h2>
+    <object type="image/svg+xml" data="ph-05-droits.svg"></object></div>
+  <div class="card"><h2>06 · Confidentialité <span class="dim">1270 × 760</span></h2>
+    <object type="image/svg+xml" data="ph-06-privacy.svg"></object></div>
+
+  <div class="note">
+    <strong>Convertir en PNG (3 méthodes, de la plus nette à la plus rapide)</strong>
+    <ol>
+      <li><strong>Chrome DevTools (pixel-perfect, polices incluses)</strong> — ouvre le <code>.svg</code> dans Chrome → clic droit → <em>Inspecter</em> → sur la balise <code>&lt;svg&gt;</code> : <em>… → Capture node screenshot</em>. PNG à la dimension exacte.</li>
+      <li><strong>Canva / Figma</strong> — glisse le <code>.svg</code> dans une frame 1270×760 → <em>Export → PNG</em>.</li>
+      <li><strong>Convertisseur en ligne</strong> — un site « SVG to PNG » (régler la largeur à 1270).</li>
+    </ol>
+    Astuce : sers le dossier en local pour un rendu identique → <code>python3 -m http.server 8000</code> puis ouvre <code>http://localhost:8000/marketing/producthunt/</code>.
+  </div>
+</body>
+</html>

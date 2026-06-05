@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1270" height="760" viewBox="0 0 1270 760">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap');
+      .serif{font-family:'Fraunces',Georgia,serif}
+      .sans{font-family:'Manrope','DejaVu Sans',sans-serif}
+    </style>
+    <filter id="sh" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="22" flood-color="#0A2E25" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <rect width="1270" height="760" fill="#F7F3E9"/>
+
+  <g transform="translate(90,72)">
+    <text x="0" y="32" font-size="36">🧭</text>
+    <text x="48" y="33" class="serif" font-size="30" font-weight="700" fill="#0E5C4A">OptiBoussole</text>
+  </g>
+
+  <text x="90" y="216" class="serif" font-size="68" font-weight="700" fill="#14322A">Les leviers d’impôt</text>
+  <text x="90" y="292" class="serif" font-size="68" font-weight="700" fill="#0E5C4A">que vous oubliez.</text>
+  <text x="92" y="346" class="sans" font-size="26" font-weight="500" fill="#5B7065">Des économies « zéro dépense » : on valorise ce que vous faites déjà.</text>
+
+  <!-- cards -->
+  <g class="sans" filter="url(#sh)">
+    <!-- row template -->
+    <g transform="translate(90,390)">
+      <rect width="1090" height="76" rx="20" fill="#FFFFFF"/>
+      <circle cx="50" cy="38" r="22" fill="#E6F1EC"/>
+      <text x="50" y="47" text-anchor="middle" font-size="24">🧾</text>
+      <text x="92" y="47" font-size="26" font-weight="700" fill="#14322A">Frais réels vs abattement de 10 %</text>
+      <g transform="translate(840,18)"><rect width="232" height="40" rx="20" fill="#E6F1EC"/><text x="116" y="27" text-anchor="middle" font-size="19" font-weight="700" fill="#0E5C4A">arbitrage gratuit</text></g>
+    </g>
+    <g transform="translate(90,478)">
+      <rect width="1090" height="76" rx="20" fill="#FFFFFF"/>
+      <circle cx="50" cy="38" r="22" fill="#E6F1EC"/>
+      <text x="50" y="47" text-anchor="middle" font-size="24">🏠</text>
+      <text x="92" y="47" font-size="26" font-weight="700" fill="#14322A">Emploi à domicile</text>
+      <g transform="translate(896,18)"><rect width="176" height="40" rx="20" fill="#FBEFD6"/><text x="88" y="27" text-anchor="middle" font-size="19" font-weight="800" fill="#9A6B12">50 % crédit</text></g>
+    </g>
+    <g transform="translate(90,566)">
+      <rect width="1090" height="76" rx="20" fill="#FFFFFF"/>
+      <circle cx="50" cy="38" r="22" fill="#E6F1EC"/>
+      <text x="50" y="47" text-anchor="middle" font-size="24">❤️</text>
+      <text x="92" y="47" font-size="26" font-weight="700" fill="#14322A">Dons aux associations</text>
+      <g transform="translate(872,18)"><rect width="200" height="40" rx="20" fill="#FBEFD6"/><text x="100" y="27" text-anchor="middle" font-size="19" font-weight="800" fill="#9A6B12">66 % – 75 %</text></g>
+    </g>
+    <g transform="translate(90,654)">
+      <rect width="1090" height="76" rx="20" fill="#FFFFFF"/>
+      <circle cx="50" cy="38" r="22" fill="#E6F1EC"/>
+      <text x="50" y="47" text-anchor="middle" font-size="24">📋</text>
+      <text x="92" y="47" font-size="26" font-weight="700" fill="#14322A">Cases &amp; parts oubliées de la déclaration</text>
+      <g transform="translate(840,18)"><rect width="232" height="40" rx="20" fill="#E6F1EC"/><text x="116" y="27" text-anchor="middle" font-size="19" font-weight="700" fill="#0E5C4A">gain immédiat</text></g>
+    </g>
+  </g>
+</svg>

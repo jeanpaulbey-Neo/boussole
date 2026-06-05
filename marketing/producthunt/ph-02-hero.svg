@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1270" height="760" viewBox="0 0 1270 760">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap');
+      .serif{font-family:'Fraunces',Georgia,serif}
+      .sans{font-family:'Manrope','DejaVu Sans',sans-serif}
+    </style>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E5C4A"/>
+      <stop offset="1" stop-color="#0A3F32"/>
+    </linearGradient>
+    <filter id="sh" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="26" flood-color="#05231B" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="1270" height="760" fill="url(#bg)"/>
+
+  <!-- brand chip -->
+  <g transform="translate(90,72)">
+    <text x="0" y="34" font-size="40">🧭</text>
+    <text x="54" y="36" class="serif" font-size="34" font-weight="700" fill="#F7F3E9">OptiBoussole</text>
+  </g>
+
+  <!-- headline -->
+  <text x="90" y="300" class="serif" font-size="78" font-weight="700" fill="#F7F3E9">Payez moins d’impôts.</text>
+  <text x="90" y="392" class="serif" font-size="78" font-weight="700" fill="#E7B24C">Oubliez moins d’aides.</text>
+
+  <text x="92" y="466" class="sans" font-size="30" font-weight="500" fill="#CFE0D8">Votre bilan impôts &amp; droits sociaux en 3 minutes —</text>
+  <text x="92" y="508" class="sans" font-size="30" font-weight="500" fill="#CFE0D8">gratuit, sans compte, 100 % sur votre appareil.</text>
+
+  <!-- pills -->
+  <g class="sans" font-size="24" font-weight="700">
+    <g transform="translate(92,576)">
+      <rect width="190" height="58" rx="29" fill="#15705A"/>
+      <text x="95" y="38" text-anchor="middle" fill="#EAF4EE">💶 Impôts</text>
+    </g>
+    <g transform="translate(300,576)">
+      <rect width="270" height="58" rx="29" fill="#15705A"/>
+      <text x="135" y="38" text-anchor="middle" fill="#EAF4EE">🤝 Droits sociaux</text>
+    </g>
+    <g transform="translate(588,576)">
+      <rect width="248" height="58" rx="29" fill="#15705A"/>
+      <text x="124" y="38" text-anchor="middle" fill="#EAF4EE">⚙️ OpenFisca</text>
+    </g>
+  </g>
+
+  <!-- phone mockup -->
+  <g transform="translate(905,150)" filter="url(#sh)">
+    <rect width="300" height="470" rx="42" fill="#F7F3E9"/>
+    <rect x="22" y="26" width="256" height="120" rx="22" fill="#0E5C4A"/>
+    <text x="150" y="84" text-anchor="middle" font-size="44">🧭</text>
+    <text x="150" y="122" text-anchor="middle" class="sans" font-size="20" font-weight="700" fill="#EAF4EE">Mon bilan en 3 min</text>
+
+    <g class="sans">
+      <rect x="22" y="166" width="256" height="58" rx="16" fill="#FFFFFF" stroke="#E2D9C4"/>
+      <text x="40" y="201" font-size="20" font-weight="700" fill="#14322A">Frais réels</text>
+      <text x="258" y="201" text-anchor="end" font-size="20" fill="#15916E">✓</text>
+
+      <rect x="22" y="234" width="256" height="58" rx="16" fill="#FFFFFF" stroke="#E2D9C4"/>
+      <text x="40" y="269" font-size="20" font-weight="700" fill="#14322A">Emploi à domicile</text>
+      <text x="258" y="269" text-anchor="end" font-size="20" fill="#15916E">✓</text>
+
+      <rect x="22" y="302" width="256" height="58" rx="16" fill="#FFFFFF" stroke="#E2D9C4"/>
+      <text x="40" y="337" font-size="20" font-weight="700" fill="#14322A">Prime d’activité</text>
+      <text x="258" y="337" text-anchor="end" font-size="20" fill="#15916E">✓</text>
+    </g>
+
+    <rect x="22" y="384" width="256" height="62" rx="18" fill="#E7B24C"/>
+    <text x="150" y="423" text-anchor="middle" class="sans" font-size="22" font-weight="800" fill="#3A2A06">Faire mon bilan</text>
+  </g>
+</svg>

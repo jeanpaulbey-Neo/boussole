@@ -1,2 +1,4 @@
-# PNG dérivés, régénérables depuis les .svg via render.cjs
+# Médias dérivés, régénérables (render.cjs / render-video.cjs)
 *.png
+*.webm
+*.mp4

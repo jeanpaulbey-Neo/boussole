@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:#0A3F32;font-family:'Manrope',Arial,Helvetica,sans-serif}
+  .stage{position:absolute;inset:0;background:radial-gradient(120% 120% at 50% 0%, #0E5C4A 0%, #0A3A2E 100%)}
+  .slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .8s ease}
+  .slide img{max-width:90%;max-height:84%;object-fit:contain;border-radius:18px;
+    box-shadow:0 30px 80px rgba(0,0,0,.45);transform:scale(1.0);transition:transform 4.4s ease-out}
+  .slide.active{opacity:1}
+  .slide.active img{transform:scale(1.045)}
+  .footer{position:absolute;left:0;right:0;bottom:0;height:64px;display:flex;align-items:center;
+    justify-content:center;gap:14px;color:#CFE0D8;font-size:24px;font-weight:600;letter-spacing:.3px;
+    background:rgba(5,35,27,.35)}
+  .footer b{color:#E7B24C}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="slide"><img src="ph-02-hero.png"></div>
+    <div class="slide"><img src="ph-03-bilan.png"></div>
+    <div class="slide"><img src="ph-04-impots.png"></div>
+    <div class="slide"><img src="ph-05-droits.png"></div>
+    <div class="slide"><img src="ph-06-privacy.png"></div>
+  </div>
+  <div class="footer">🧭 optiboussole.fr — <b>gratuit, sans compte, 100&nbsp;% sur votre appareil</b></div>
+  <script>
+    const slides=[...document.querySelectorAll('.slide')];
+    let i=0; slides[0].classList.add('active');
+    const t=setInterval(()=>{
+      if(i>=slides.length-1){clearInterval(t);return;}
+      slides[i].classList.remove('active'); i++; slides[i].classList.add('active');
+    },4200);
+  </script>
+</body>
+</html>

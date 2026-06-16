@@ -55,6 +55,10 @@ node src/train.mjs 500000 80  # plus gros / plus long
 # 3) Valider des nombres précis (réseau vs vérité-terrain)
 node src/predict.mjs 2 7 12 91 97 561 7919 7920 104729
 
+# 3 bis) Pipeline complet : réseau (pré-filtre) PUIS Miller-Rabin (verdict exact),
+#        y compris sur de très grands entiers (BigInt)
+node src/verify.mjs 97 561 1000000007 170141183460469231731687303715884105727
+
 # 4) Bonus : deviner le prochain premier
 node src/next.mjs 100 1000 7919 100000
 
@@ -67,14 +71,16 @@ npm run serve   # sert prime-nn/ ; ouvrir http://localhost:8001/web/
 ```
 prime-nn/
 ├── src/
-│   ├── sieve.mjs      Vérité-terrain : isPrime, crible d'Ératosthène, nextPrime
-│   ├── features.mjs   Encodage entier → vecteur (résidus mod petits premiers, Fourier)
-│   ├── nn.mjs         MLP from scratch : forward, backprop, SGD+momentum, JSON
-│   ├── dataset.mjs    Construction + rééquilibrage + split entraînement/test
-│   ├── metrics.mjs    Exactitude, précision, rappel, F1, matrice de confusion
-│   ├── train.mjs      Entraîne, évalue, choisit le seuil, sauvegarde le modèle
-│   ├── predict.mjs    CLI de validation de primalité
-│   └── next.mjs       CLI « prochain premier » (réutilise le classifieur)
+│   ├── sieve.mjs       Vérité-terrain : isPrime, crible d'Ératosthène, nextPrime
+│   ├── features.mjs    Encodage entier → vecteur (résidus mod petits premiers, Fourier)
+│   ├── nn.mjs          MLP from scratch : forward, backprop, SGD+momentum, JSON
+│   ├── dataset.mjs     Construction + rééquilibrage + split entraînement/test
+│   ├── metrics.mjs     Exactitude, précision, rappel, F1, matrice de confusion
+│   ├── miller-rabin.mjs Test de primalité EXACT sur BigInt (déterministe ≤ 3.3·10²⁴)
+│   ├── train.mjs       Entraîne, évalue, choisit le seuil, sauvegarde le modèle
+│   ├── predict.mjs     CLI de validation de primalité (réseau vs vérité-terrain)
+│   ├── verify.mjs      CLI pipeline : réseau (pré-filtre) + Miller-Rabin (exact, BigInt)
+│   └── next.mjs        CLI « prochain premier » (réutilise le classifieur)
 ├── web/
 │   ├── index.html     Démo interactive (charge model.json)
 │   ├── model.json     Modèle entraîné (poids + seuil)
@@ -82,6 +88,19 @@ prime-nn/
 └── test/
     └── nn.test.mjs    Tests sans dépendance (node test/nn.test.mjs)
 ```
+
+## L'outil « correct » : Miller-Rabin (`src/miller-rabin.mjs`)
+
+Un réseau de taille fixe ne peut **pas** décider la primalité de tous les entiers :
+décider si `n` est premier demande un calcul qui **croît avec `n`**. Miller-Rabin fait
+exactement cela, en `O(log³ n)` :
+
+- **exact (déterministe)** pour tout `n < 3,3·10²⁴` (base de témoins `{2,3,…,37}` prouvée) ;
+- **probabiliste** au-delà (erreur ≤ `4⁻ᵏ`, à sens unique : jamais « composé » à tort) ;
+- fonctionne sur **BigInt** → teste des nombres de centaines de chiffres (ex. `2¹²⁷−1`).
+
+Le bon usage du réseau est donc d'être un **pré-filtre rapide** (rappel ~99 %) devant
+Miller-Rabin qui **tranche** : c'est ce que montre `node src/verify.mjs`.
 
 ## Ce que le projet illustre
 

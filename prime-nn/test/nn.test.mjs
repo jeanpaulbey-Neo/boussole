@@ -8,6 +8,7 @@ import { encode, INPUT_SIZE, MOD_PRIMES } from '../src/features.mjs';
 import { MLP } from '../src/nn.mjs';
 import { buildDataset, trainTestSplit } from '../src/dataset.mjs';
 import { evaluate } from '../src/metrics.mjs';
+import { isPrimeMR, nextPrimeMR, isDeterministic } from '../src/miller-rabin.mjs';
 
 let pass = 0, fail = 0;
 function check(nom, cond, detail = '') {
@@ -72,6 +73,27 @@ const m = evaluate(net, test.X, test.Y, 0.5);
 check('métriques dans [0,1]', m.accuracy >= 0 && m.accuracy <= 1 && m.f1 >= 0 && m.f1 <= 1);
 check('exactitude test > 0.80', m.accuracy > 0.80, `=> ${m.accuracy.toFixed(3)}`);
 check('F1 test > 0.55 (>> hasard)', m.f1 > 0.55, `=> ${m.f1.toFixed(3)}`);
+
+// 7) Miller-Rabin : exact, y compris pièges et très grands nombres
+check('MR : 561 (Carmichael) composé', isPrimeMR(561) === false);
+check('MR : 41041 (Carmichael) composé', isPrimeMR(41041) === false);
+check('MR : 62710561 = 7919² composé', isPrimeMR(62710561n) === false);
+check('MR : 1000000007 premier', isPrimeMR(1000000007n) === true);
+// MR == vérité-terrain sur tout [0, 10000]
+let mrAgree = true;
+for (let n = 0; n <= 10000; n++) {
+  if (isPrimeMR(n) !== isPrime(n)) { mrAgree = false; break; }
+}
+check('MR == division d\'essai sur [0,10000]', mrAgree);
+// Mersenne 2^61 - 1 (premier connu) et 2^61 (composé)
+check('MR : 2^61-1 premier (Mersenne)', isPrimeMR((1n << 61n) - 1n) === true);
+check('MR : 2^61 composé', isPrimeMR(1n << 61n) === false);
+// 2^127 - 1 (premier de Mersenne) — bien au-delà de Number
+check('MR : 2^127-1 premier (Mersenne)', isPrimeMR((1n << 127n) - 1n) === true);
+check('MR : (2^127-1)+2 composé', isPrimeMR((1n << 127n) + 1n) === false);
+check('isDeterministic vrai pour petit n', isDeterministic(12345n));
+check('nextPrimeMR(1000000) == 1000003', nextPrimeMR(1000000n) === 1000003n);
+check('nextPrimeMR(2^61-2) == 2^61-1', nextPrimeMR((1n << 61n) - 2n) === (1n << 61n) - 1n);
 
 console.log(`\n${pass} réussis, ${fail} échoués`);
 process.exit(fail ? 1 : 0);

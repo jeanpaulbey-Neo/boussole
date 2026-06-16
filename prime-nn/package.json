@@ -1,0 +1,14 @@
+{
+  "name": "prime-nn",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Réseau de neurones (écrit à la main, zéro dépendance) pour la primalité : valider qu'un entier est premier, et deviner le prochain premier.",
+  "scripts": {
+    "test": "node test/nn.test.mjs",
+    "train": "node src/train.mjs",
+    "predict": "node src/predict.mjs",
+    "next": "node src/next.mjs",
+    "serve": "python3 -m http.server 8001"
+  }
+}
